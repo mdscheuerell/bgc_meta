@@ -8,98 +8,32 @@
 | Month | month of year |
 | WaterYear | calculated water year |
 | WaterYearMonth | concatenated water year and month |
-
-CSMeanTempC 
-
-Climate Station Mean Monthly Temperature [C] 
-
-CSPrecipitationmm 
-
-Climate Station Sum Monthly Precipitation [mm] 
-
-Runoffmm 
-
-Monthly Sum Runoff [mm] 
-
-StrCamgL 
-
-Stream Solute Monthly Average Concentration Ca [mg/L] 
-
-StrDOCmgL 
-
-Stream Solute Monthly Average Concentration DOC [mg/L] 
-
-StrNH4NmgL 
-
-Stream Solute Monthly Average Concentration NH4N [mg/L] 
-
-StrNO3NmgL 
-
-Stream Solute Monthly Average Concentration NO3N [mg/L] 
-
-StrTDPmgL 
-
-Stream Solute Monthly Average Concentration TDP [mg/L] 
-
-StrSO4SmgL 
-
-Stream Solute Monthly Average Concentration SO4S [mg/L] 
-
-depNH4Nkgha 
-
-Monthly Sum Deposition NH4N [kg/ha] 
-
-depNO3Nkgha 
-
-Monthly Sum Deposition NO3N [kg/ha] 
-
-depTotNkgha 
-
-Monthly Sum Deposition N_atm (sum of NO3N and NH4N) [kg/ha] 
-
-depSO4Skgha 
-
-Monthly Sum Deposition SO4S [kg/ha] 
-
-NAMGridTempC 
-
-Average Monthly Temperature from Canadian Forest Services Historical Climate Grids  
-
-NAMGridPrecipitationmm 
-
-Sum Monthly Precipitation from Canadian Forest Services Historical Climate Grids 
-
-FWACamgL 
-
-Flow Weighted- Average concentration Ca [mg/L] 
-
-FWADOCmgL 
-
-Flow Weighted- Average concentration DOC [mg/L] 
-
-FWANH4NmgL 
-
-Flow Weighted- Average concentration NH4N [mg/L] 
-
-FWANO3NmgL 
-
-Flow Weighted- Average concentration NO3N [mg/L] 
-
-FWATDPmgL 
-
-Flow Weighted- Average concentration TDP [mg/L] 
-
-FWASO4SmgL 
-
-Flow Weighted- Average concentration SO4S [mg/L] 
+| CSMeanTempC | climate station mean monthly temperature (C) 
+| CSPrecipitationmm | climate station sum of monthly precipitation (mm) |
+| Runoffmm | monthly sum of runoff (mm) |
+| StrCamgL | stream solute monthly average concentration Ca (mg/L) |
+| StrDOCmgL | stream solute monthly average concentration DOC (mg/L) |
+| StrNH4NmgL | stream solute monthly average concentration NH4N (mg/L) |
+| StrNO3NmgL | stream solute monthly average concentration NO3N (mg/L) |
+| StrTDPmgL | stream solute monthly average concentration TDP (mg/L) |
+| StrSO4SmgL | stream solute monthly average concentration SO4S (mg/L) |
+| depNH4Nkgha | monthly sum of deposition NH4N (kg/ha) |
+| depNO3Nkgha | monthly sum of deposition NO3N (kg/ha) |
+| depTotNkgha | monthly sum of deposition N_atm (sum of NO3N and NH4N) (kg/ha) |
+| depSO4Skgha | monthly sum of deposition SO4S (kg/ha) |
+| NAMGridTempC | average monthly temperature from Canadian Forest Services Historical Climate Grids |
+| NAMGridPrecipitationmm | sum of monthly Precipitation from Canadian Forest Services Historical Climate Grids |
+| FWACamgL | flow weighted-average concentration Ca (mg/L) |
+| FWADOCmgL | flow weighted-average concentration DOC (mg/L) |
+| FWANH4NmgL | flow weighted-average concentration NH4N (mg/L) |
+| FWANO3NmgL | flow weighted-average concentration NO3N (mg/L) |
+| FWATDPmgL | flow weighted-average concentration TDP (mg/L) |
+| FWASO4SmgL | flow weighted-average concentration SO4S (mg/L) |
 
  
+### Monthly data
 
-CSV Headers Annual 
-
-Header  
-
-Description  
+| Column name | Description |
 
 WaterYear 
 
@@ -107,91 +41,91 @@ Calculated Water Year
 
 CSMeanTempC 
 
-Climate Station Mean Annual Temperature [C] 
+Climate Station Mean Annual temperature (C) 
 
 CSPrecipitationmm 
 
-Climate Station Sum Annual Precipitation [mm] 
+Climate Station sum of Annual Precipitation (mm) 
 
 Runoffmm 
 
-Annual Sum Runoff [mm] 
+Annual sum of Runoff (mm) 
 
 StrCamgL 
 
-Stream Solute Annual Average Concentration Ca [mg/L] 
+stream solute Annual average concentration Ca (mg/L) 
 
 StrDOCmgL 
 
-Stream Solute Annual Average Concentration DOC [mg/L] 
+stream solute Annual average concentration DOC (mg/L) 
 
 StrNH4NmgL 
 
-Stream Solute Annual Average Concentration NH4N [mg/L] 
+stream solute Annual average concentration NH4N (mg/L) 
 
 StrNO3NmgL 
 
-Stream Solute Annual Average Concentration NO3N [mg/L] 
+stream solute Annual average concentration NO3N (mg/L) 
 
 StrTDPmgL 
 
-Stream Solute Annual Average Concentration TDP [mg/L] 
+stream solute Annual average concentration TDP (mg/L) 
 
 StrSO4SmgL 
 
-Stream Solute Annual Average Concentration SO4S [mg/L] 
+stream solute Annual average concentration SO4S (mg/L) 
 
 depNH4Nkgha 
 
-Annual Sum Deposition NH4N [kg/ha] 
+Annual sum of deposition NH4N (kg/ha) 
 
 depNO3Nkgha 
 
-Annual Sum Deposition NO3N [kg/ha] 
+Annual sum of deposition NO3N (kg/ha) 
 
 depTotNkgha 
 
-Annual Sum Deposition N_atm (sum of NO3N and NH4N) [kg/ha] 
+Annual sum of deposition N_atm (sum of NO3N and NH4N) (kg/ha) 
 
 depSO4Skgha 
 
-Annual Sum Deposition SO4S [kg/ha] 
+Annual sum of deposition SO4S (kg/ha) 
 
 NAMGridTempC 
 
-Average Monthly Temperature from Canadian Forest Services Historical Climate Grids  
+average monthly temperature from Canadian Forest Services Historical Climate Grids  
 
 NAMGridPrecipitationmm 
 
-Sum Annual Precipitation from Canadian Forest Services Historical Climate Grids 
+sum of Annual Precipitation from Canadian Forest Services Historical Climate Grids 
 
 FWACamgL 
 
-Flow Weighted- Average concentration Ca [mg/L] 
+flow weighted-average concentration Ca (mg/L) 
 
 FWADOCmgL 
 
-Flow Weighted- Average concentration DOC [mg/L] 
+flow weighted-average concentration DOC (mg/L) 
 
 FWANH4NmgL 
 
-Flow Weighted- Average concentration NH4N [mg/L] 
+flow weighted-average concentration NH4N (mg/L) 
 
 FWANO3NmgL 
 
-Flow Weighted- Average concentration NO3N [mg/L] 
+flow weighted-average concentration NO3N (mg/L) 
 
 FWATDPmgL 
 
-Flow Weighted- Average concentration TDP [mg/L] 
+flow weighted-average concentration TDP (mg/L) 
 
 FWASO4SmgL 
 
-Flow Weighted- Average concentration SO4S [mg/L] 
+flow weighted-average concentration SO4S (mg/L) 
 
 iNDVI 
 
-Integrated Normalized difference vegetation index [-] 
+integrated normalized difference vegetation index (-) 
 
  
 
