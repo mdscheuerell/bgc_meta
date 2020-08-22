@@ -1,13 +1,20 @@
+## This script extracts information from each of the site-specific files
+## located in the /data/managed/ and /data/unmanaged/ directories, and
+## writes all of it to 2 different files based on the temporal resoulation:
+## 1) monthly_data.csv
+## 2) annual_data.csv
+
 ##-------------------
 ## required packages
 ##-------------------
+
 ## library(here)
 ## library(readr)
-
 
 ##-------
 ## setup
 ##-------
+
 ## directories within /data/
 data_dirs <- c("managed", "unmanaged")
 
@@ -29,7 +36,6 @@ colnames_ann <- c("WaterYear", "CSMeanTempC", "CSPrecipitationmm", "Runoffmm",
 ## empty data matrices
 dat_mon <- NULL
 dat_ann <- NULL
-
 
 ##------------
 ## munge data
