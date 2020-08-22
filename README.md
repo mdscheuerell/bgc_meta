@@ -1,2 +1,3 @@
-# bgc_meta
-Meta-analysis of biogeochemistry data from N Am
+# Meta-analysis of stream biogeochemistry data
+
+This repository contains the data and scripts necessary to reproduce the meta-analysis of biogeochemistry data from long-term monitoring programs in North America. 

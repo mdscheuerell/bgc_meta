@@ -6,16 +6,19 @@ There are 2 data files in this directory, each containing site specific time ser
 
 2) `annual_data.csv`
 
-Both of them were created by the script `/analysis/01_data_munging.R`, which takes information from the files located in these sub-directories:
+Both of them were created by the script `/analysis/01_data_munging.R`, which extracts information from the files located in these sub-directories:
 
 * `/managed/`
 
 * `/unmanaged/`
 
+## Descriptions
 
-## Metadata
+Here are the descriptions of the columns within the 2 data files.
 
 ### Monthly data
+
+#### 25 columns
 
 | Column name | Description |
 |:------------|:--------------|
@@ -46,6 +49,8 @@ Both of them were created by the script `/analysis/01_data_munging.R`, which tak
 | FWASO4SmgL | flow weighted-mean concentration of SO4-S (mg/L) |
 
 ### Annual data
+
+#### 23 columns
 
 | Column name | Description |
 |:------------|:--------------|
