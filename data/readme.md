@@ -1,6 +1,21 @@
-# Metadata
+# Data files
 
-## Monthly data
+There are 2 data files in this directory, each containing site specific time series of biogeochemistry data:
+
+1) `monthly_data.csv`
+
+2) `annual_data.csv`
+
+Both of them were created by the script `/analysis/01_data_munging.R`, which takes information from the files located in these sub-directories:
+
+* `/managed/`
+
+* `/unmanaged/`
+
+
+## Metadata
+
+### Monthly data
 
 | Column name | Description |
 |:------------|:--------------|
@@ -30,7 +45,7 @@
 | FWATDPmgL | flow weighted-mean concentration of TDP (mg/L) |
 | FWASO4SmgL | flow weighted-mean concentration of SO4-S (mg/L) |
 
-## Annual data
+### Annual data
 
 | Column name | Description |
 |:------------|:--------------|
@@ -58,7 +73,7 @@
 | FWASO4SmgL | flow weighted-mean concentration of SO4-S (mg/L) |
 | iNDVI | integrated normalized difference vegetation index (unitless) |
 
-### Notes
+#### Notes
 
 HJA: NH4-N is labeled as NH3-N  
 
