@@ -1,8 +1,13 @@
-## load libraries
-library(here)
-library(readr)
+##-------------------
+## required packages
+##-------------------
+## library(here)
+## library(readr)
 
+
+##-------
 ## setup
+##-------
 ## directories within /data/
 data_dirs <- c("managed", "unmanaged")
 
@@ -21,17 +26,20 @@ colnames_ann <- c("WaterYear", "CSMeanTempC", "CSPrecipitationmm", "Runoffmm",
                   "NAMGridTempC", "NAMGridPrecipitationmm", "FWACamgL", "FWADOCmgL", 
                   "FWANH4NmgL", "FWANO3NmgL", "FWATPmgL", "FWASO4SmgL", "iNDVI")
 
-## empty data files
+## empty data matrices
 dat_mon <- NULL
 dat_ann <- NULL
 
 
-## read data
+##------------
+## munge data
+##------------
+
 ## loop over data directories
 for(dd in data_dirs) {
   
-  ## data directory
-  data_dir <- here(paste0("data/",dd))
+  ## path to data directory
+  data_dir <- here::here(paste0("data/",dd))
   
   ## monthly files
   files_mon <- grep("monthly", dir(data_dir), value = TRUE)
@@ -40,8 +48,8 @@ for(dd in data_dirs) {
   for(mm in files_mon) {
     
     ## read file
-    tmp_m <- read_csv(file.path(data_dir, mm),
-                    na = c("", "NA", "N/A"))
+    tmp_m <- readr::read_csv(file.path(data_dir, mm),
+                             na = c("", "NA", "N/A"))
     ## remove spaces from col names
     colnames(tmp_m) <- sub(" ", "", colnames(tmp_m))
     
@@ -56,12 +64,13 @@ for(dd in data_dirs) {
     
     ## add watershed type and site name
     tmp_m <- cbind(type = dd,
-                 site = sub("_monthly.csv", "", mm),
-                 tmp_m[,colnames_mon])
-    ## add to monthly data
+                   site = sub("_monthly.csv", "", mm),
+                   tmp_m[,colnames_mon])
+    
+    ## concatenate with monthly data
     dat_mon <- rbind(dat_mon, tmp_m)
     
-  }
+  } ## end loop over monthly files
   
   ## annual files
   files_ann <- grep("annual", dir(data_dir), value = TRUE)
@@ -70,8 +79,8 @@ for(dd in data_dirs) {
   for(aa in files_ann) {
     
     ## read file
-    tmp_a <- read_csv(file.path(data_dir, aa),
-                    na = c("", "NA", "N/A"))
+    tmp_a <- readr::read_csv(file.path(data_dir, aa),
+                             na = c("", "NA", "N/A"))
     ## remove spaces from col names
     colnames(tmp_a) <- sub(" ", "", colnames(tmp_a))
     
@@ -86,19 +95,22 @@ for(dd in data_dirs) {
     
     ## add watershed type and site name
     tmp_a <- cbind(type = dd,
-                 site = sub("_wateryearannual.csv", "", aa),
-                 tmp_a[,colnames_ann])
-    ## add to annual data
+                   site = sub("_wateryearannual.csv", "", aa),
+                   tmp_a[,colnames_ann])
+    
+    ## concatenate with annual data
     dat_ann <- rbind(dat_ann, tmp_a)
     
-  }
+  } ## end loop over annual files
   
-}
+} ## end loop over directories
 
 ## write monthly data to file
-write_csv(dat_mon, file.path(here("data"), "monthly_data.csv"))
+readr::write_csv(dat_mon,
+                 file.path(here::here("data"), "monthly_data.csv"))
 
 ## write annual data to file
-write_csv(dat_ann, file.path(here("data"), "annual_data.csv"))
+readr::write_csv(dat_ann,
+                 file.path(here::here("data"), "annual_data.csv"))
 
 
