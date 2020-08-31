@@ -16,12 +16,13 @@ Both of them were created by the script `/analysis/01_data_munging.R`, which ext
 
 Here are the descriptions of the columns within the 2 data files.
 
-### Monthly data (27 columns)
+### Monthly data (28 columns)
 
 | Column name | Description |
 |:------------|:--------------|
 | type | type of catchment (managed or unmanaged) |
-| site | location abbreviation (general_watershed) |
+| site | location abbreviation (watershed) |
+| catchment | catchment abbreviation (within a watershed) |
 | Year | calendar year |
 | Month | month of year |
 | WaterYear | calculated water year |
@@ -48,12 +49,13 @@ Here are the descriptions of the columns within the 2 data files.
 | FWATDPmgL | flow weighted-mean concentration of TDP (mg/L) |
 | FWASO4SmgL | flow weighted-mean concentration of SO4-S (mg/L) |
 
-### Annual data (25 columns)
+### Annual data (26 columns)
 
 | Column name | Description |
 |:------------|:--------------|
 | type | type of catchment (managed or unmanaged) |
-| site | location abbreviation (general_watershed) |
+| site | location abbreviation (watershed) |
+| catchment | catchment abbreviation (within a watershed) |
 | WaterYear | calculated water year |
 | CSmeanTempC | climate station mean annual temperature (C) |
 | CSPrecipitationmm | climate station sum of annual Precipitation (mm) |
