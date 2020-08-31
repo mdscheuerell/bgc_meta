@@ -70,7 +70,7 @@ for(dd in data_dirs) {
     
     ## add watershed type and site name
     tmp_m <- cbind(type = dd,
-                   site = sub("([A-Z]{3,4})(_)(.*)", "\\1", mm),
+                   site = sub("([A-Z]{3,4})(_.*)", "\\1", mm),
                    catchment = sub("([A-Z]{3,4}_)(.*)(_monthly.csv)", "\\2", mm),
                    tmp_m[,colnames_mon])
     
@@ -106,7 +106,8 @@ for(dd in data_dirs) {
     
     ## add watershed type and site name
     tmp_a <- cbind(type = dd,
-                   site = sub("_wateryearannual.csv", "", aa),
+                   site = sub("([A-Z]{3,4})(_.*)", "\\1", aa),
+                   catchment = sub("([A-Z]{3,4}_)(.*)(_wateryearannual.csv)", "\\2", aa),
                    tmp_a[,colnames_ann])
     
     ## concatenate with annual data
