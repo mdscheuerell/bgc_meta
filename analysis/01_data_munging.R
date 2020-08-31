@@ -55,7 +55,7 @@ for(dd in data_dirs) {
     
     ## read file
     tmp_m <- readr::read_csv(file.path(data_dir, mm),
-                             na = c("", "NA", "N/A"))
+                             na = c("", "NA", "N/A", "#DIV/0!", "#VALUE!"))
     ## remove spaces from col names
     colnames(tmp_m) <- sub(" ", "", colnames(tmp_m))
     
@@ -70,23 +70,28 @@ for(dd in data_dirs) {
     
     ## add watershed type and site name
     tmp_m <- cbind(type = dd,
-                   site = sub("_monthly.csv", "", mm),
+                   site = sub("([A-Z]{3,4})(_)(.*)", "\\1", mm),
+                   catchment = sub("([A-Z]{3,4}_)(.*)(_monthly.csv)", "\\2", mm),
                    tmp_m[,colnames_mon])
     
     ## concatenate with monthly data
     dat_mon <- rbind(dat_mon, tmp_m)
+    
+    class(dat_mon$CSMeanTempC)
+    
+    mm <- files_mon[5]
     
   } ## end loop over monthly files
   
   ## annual files
   files_ann <- grep("annual", dir(data_dir), value = TRUE)
   
-  ## loop over monthly files
+  ## loop over annual files
   for(aa in files_ann) {
     
     ## read file
     tmp_a <- readr::read_csv(file.path(data_dir, aa),
-                             na = c("", "NA", "N/A"))
+                             na = c("", "NA", "N/A", "#DIV/0!", "#VALUE!"))
     ## remove spaces from col names
     colnames(tmp_a) <- sub(" ", "", colnames(tmp_a))
     
