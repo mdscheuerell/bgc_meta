@@ -19,19 +19,25 @@
 data_dirs <- c("managed", "unmanaged")
 
 ## col names for monthly data
-colnames_mon <- c("Year", "Month", "WaterYear", "WaterYearMonth", "CSMeanTempC", 
-                  "CSPrecipitationmm", "Runoffmm", "StrCamgL", "StrDOCmgL", "StrNH4NmgL", 
-                  "StrNO3NmgL", "StrTDPmgL", "StrSO4SmgL", "depNH4Nkgha", "depNO3Nkgha", 
-                  "depTotNkgha", "depSO4Skgha", "NAMGridTempC", "NAMGridPrecipitationmm", 
-                  "FWACamgL", "FWADOCmgL", "FWANH4NmgL", "FWANO3NmgL", "FWATDPmgL", 
-                  "FWASO4SmgL")
+colnames_mon <- c("Year", "Month", "WaterYear", "WaterYearMonth",
+                  "CSMeanTempC", "CSPrecipitationmm", "Runoffmm",
+                  "StrCamgL", "StrDOCmgL", "StrNH4NmgL", "StrNO3NmgL", 
+                  "StrTDPmgL", "StrPO4PmgL", "StrSO4SmgL",
+                  "depNH4Nkgha", "depNO3Nkgha", "depTotNkgha", "depSO4Skgha",
+                  "NAMGridTempC", "NAMGridPrecipitationmm", 
+                  "FWACamgL", "FWADOCmgL", "FWANH4NmgL",
+                  "FWANO3NmgL", "FWATDPmgL", "FWASO4SmgL")
 
 ## col names for annual data
-colnames_ann <- c("WaterYear", "CSMeanTempC", "CSPrecipitationmm", "Runoffmm", 
-                  "StrCamgL", "StrDOCmgL", "StrNH4NmgL", "StrNO3NmgL", "StrTDPmgL", 
-                  "StrSO4SmgL", "depNH4Nkgha", "depNO3Nkgha", "depTotNkgha", "depSO4Skgha", 
-                  "NAMGridTempC", "NAMGridPrecipitationmm", "FWACamgL", "FWADOCmgL", 
-                  "FWANH4NmgL", "FWANO3NmgL", "FWATPmgL", "FWASO4SmgL", "iNDVI")
+colnames_ann <- c("WaterYear",
+                  "CSMeanTempC", "CSPrecipitationmm", "Runoffmm",
+                  "StrCamgL", "StrDOCmgL", "StrNH4NmgL", "StrNO3NmgL", 
+                  "StrTDPmgL", "StrPO4PmgL", "StrSO4SmgL",
+                  "depNH4Nkgha", "depNO3Nkgha", "depTotNkgha", "depSO4Skgha",
+                  "NAMGridTempC", "NAMGridPrecipitationmm", 
+                  "FWACamgL", "FWADOCmgL", "FWANH4NmgL",
+                  "FWANO3NmgL", "FWATDPmgL", "FWASO4SmgL",
+                  "iNDVI")
 
 ## empty data matrices
 dat_mon <- NULL
