@@ -16,7 +16,7 @@ Both of them were created by the script `/analysis/01_data_munging.R`, which ext
 
 Here are the descriptions of the columns within the 2 data files.
 
-### Monthly data (28 columns)
+### Monthly data (29 columns)
 
 | Column name | Description |
 |:------------|:--------------|
@@ -35,6 +35,7 @@ Here are the descriptions of the columns within the 2 data files.
 | StrNH4NmgL | stream solute monthly mean concentration of NH4-N (mg/L) |
 | StrNO3NmgL | stream solute monthly mean concentration of NO3-N (mg/L) |
 | StrTDPmgL | stream solute monthly mean concentration of TDP (mg/L) |
+| StrPO4PmgL | stream solute monthly mean concentration of PO4-P (mg/L) |
 | StrSO4SmgL | stream solute monthly mean concentration of SO4-S (mg/L) |
 | depNH4Nkgha | monthly sum of deposition of NH4-N (kg/ha) |
 | depNO3Nkgha | monthly sum of deposition of NO3-N (kg/ha) |
@@ -65,6 +66,7 @@ Here are the descriptions of the columns within the 2 data files.
 | StrNH4NmgL | stream solute annual mean concentration of NH4-N (mg/L) |
 | StrNO3NmgL | stream solute annual mean concentration of NO3-N (mg/L) |
 | StrTDPmgL | stream solute annual mean concentration of TDP (mg/L) |
+| StrPO4PmgL | stream solute monthly mean concentration of PO4-P (mg/L) |
 | StrSO4SmgL | stream solute annual mean concentration of SO4-S (mg/L) |
 | depNH4Nkgha | annual sum of deposition of NH4-N (kg/ha) |
 | depNO3Nkgha | annual sum of deposition of NO3-N (kg/ha) |
