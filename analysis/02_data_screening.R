@@ -14,7 +14,7 @@ library(dplyr)
 ##-------
 
 ## path to data directory
-data_dir <- here::here(paste0("data"))
+data_dir <- here::here("data")
 
 ## categories for sites
 site_type <- c("managed", "unmanaged")
