@@ -7,6 +7,7 @@
 ##-------------------
 
 library(dplyr)
+library(tidyr)
 ## library(readr)
 
 ##-------
@@ -42,6 +43,10 @@ tbl_ann_yr_rng <- dat_ann %>%
             na_str_SO4 = sum(is.na(StrSO4SmgL))) %>%
   print(n = Inf)
 
+## write to csv
+readr::write_csv(tbl_ann_yr_rng,
+                 file.path(here::here("analysis"), "tbl_ann_yr_rng.csv"))
+
 ## get first and last year by site
 tbl_mon_yr_rng <- dat_mon %>% 
   group_by(site, catchment) %>%
@@ -56,14 +61,19 @@ tbl_mon_yr_rng <- dat_mon %>%
             na_str_SO4 = sum(is.na(StrSO4SmgL))) %>%
   print(n = Inf)
 
+## write to csv
+readr::write_csv(tbl_mon_yr_rng,
+                 file.path(here::here("analysis"), "tbl_mon_yr_rng.csv"))
+
 
 ## years with NA for all stream solutes
-yrs_all_na <- dat_ann %>% 
+yrs_all_na <- dat_ann %>%
   select(starts_with("Str")) %>%
   is.na() %>%
   apply(1, all)
-  
+
 ## thin data set to exclude years with all NA
 dat_ann_thin <- dat_ann %>%
   filter(!yrs_all_na)
+
 
