@@ -148,3 +148,46 @@ readr::write_csv(dat_ann,
                  file.path(here::here("data"), "annual_data.csv"))
 
 
+##-----------------------------------------------------
+## solute-only data for managed & unmanaged catchments
+##-----------------------------------------------------
+
+## get names of solutes
+solutes <- dat_ann %>%
+  select(starts_with("Str")) %>%
+  colnames()
+
+## empty lists for tmp data
+solutes_unmanaged_ann <- list()
+solutes_managed_ann <- list()
+
+## create solute-specific tables of year-by-site/catchment
+for(i in solutes) {
+  ## unmanaged
+  solutes_unmanaged_ann[[i]] <- dat_ann %>%
+    filter(type == "unmanaged") %>%
+    select(site:WaterYear, all_of(i)) %>%
+    pivot_wider(names_from = c(site, catchment), values_from = i) %>%
+    arrange(WaterYear) %>%
+    mutate(solute = i) %>%
+    select(solute, everything())
+  ## managed
+  solutes_managed_ann[[i]] <- dat_ann %>%
+    filter(type == "managed") %>%
+    select(site:WaterYear, all_of(i)) %>%
+    pivot_wider(names_from = c(site, catchment), values_from = i) %>%
+    arrange(WaterYear) %>%
+    mutate(solute = i) %>%
+    select(solute, everything())
+}
+
+## combine lists into df
+solutes_unmanaged_ann <- do.call(rbind, solutes_unmanaged_ann)
+solutes_managed_ann <- do.call(rbind, solutes_managed_ann)
+
+## write to csv
+readr::write_csv(solutes_unmanaged_ann,
+                 file.path(here::here("data"), "tbl_solutes_unmanaged_ann.csv"))
+readr::write_csv(solutes_managed_ann,
+                 file.path(here::here("data"), "tbl_solutes_managed_ann.csv"))
+
