@@ -8,7 +8,7 @@
 
 library(dplyr)
 library(tidyr)
-## library(readr)
+library(readr)
 
 ##-------
 ## setup
@@ -22,12 +22,11 @@ site_type <- c("managed", "unmanaged")
 
 
 ##-------------
-## screen data
+## annual data
 ##-------------
 
 ## read data files
-dat_ann <- readr::read_csv(file.path(data_dir, "annual_data.csv"))
-dat_mon <- readr::read_csv(file.path(data_dir, "monthly_data.csv"))
+dat_ann <- read_csv(file.path(data_dir, "annual_data.csv"))
 
 ## get first and last year by site
 tbl_ann_yr_rng <- dat_ann %>% 
@@ -44,8 +43,31 @@ tbl_ann_yr_rng <- dat_ann %>%
   print(n = Inf)
 
 ## write to csv
-readr::write_csv(tbl_ann_yr_rng,
-                 file.path(here::here("analysis"), "tbl_ann_yr_rng.csv"))
+write_csv(tbl_ann_yr_rng,
+          file.path(here::here("analysis"), "tbl_ann_yr_rng.csv"))
+
+
+## NA screening across sites
+solutes_unmanaged_ann <- read_csv(file.path(here::here("data"),
+                                            "tbl_solutes_unmanaged_ann.csv"))
+
+## years with NA for all stream solutes
+yrs_all_na <- solutes_unmanaged_ann %>%
+  select(-c(solute, WaterYear)) %>%
+  is.na() %>%
+  apply(1, all)
+
+## thin data set to exclude years with NA at all sites/catchments
+solutes_unmanaged_ann_thin <- solutes_unmanaged_ann %>%
+  filter(!yrs_all_na)
+
+
+##--------------
+## monthly data
+##--------------
+
+## read data files
+dat_mon <- read_csv(file.path(data_dir, "monthly_data.csv"))
 
 ## get first and last year by site
 tbl_mon_yr_rng <- dat_mon %>% 
@@ -62,18 +84,6 @@ tbl_mon_yr_rng <- dat_mon %>%
   print(n = Inf)
 
 ## write to csv
-readr::write_csv(tbl_mon_yr_rng,
-                 file.path(here::here("analysis"), "tbl_mon_yr_rng.csv"))
-
-
-## years with NA for all stream solutes
-yrs_all_na <- dat_ann %>%
-  select(starts_with("Str")) %>%
-  is.na() %>%
-  apply(1, all)
-
-## thin data set to exclude years with all NA
-dat_ann_thin <- dat_ann %>%
-  filter(!yrs_all_na)
-
+write_csv(tbl_mon_yr_rng,
+          file.path(here::here("analysis"), "tbl_mon_yr_rng.csv"))
 
