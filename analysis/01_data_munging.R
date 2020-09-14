@@ -157,6 +157,8 @@ solutes <- dat_ann %>%
   select(starts_with("Str")) %>%
   colnames()
 
+## ANNUAL DATA
+
 ## empty lists for tmp data
 solutes_unmanaged_ann <- list()
 solutes_managed_ann <- list()
@@ -169,7 +171,7 @@ for(i in solutes) {
     select(site:WaterYear, all_of(i)) %>%
     pivot_wider(names_from = c(site, catchment), values_from = i) %>%
     arrange(WaterYear) %>%
-    mutate(solute = i) %>%
+    mutate(solute = sub("(Str)(.*)(mgL)", "\\2", i)) %>%
     select(solute, everything())
   ## managed
   solutes_managed_ann[[i]] <- dat_ann %>%
@@ -177,7 +179,7 @@ for(i in solutes) {
     select(site:WaterYear, all_of(i)) %>%
     pivot_wider(names_from = c(site, catchment), values_from = i) %>%
     arrange(WaterYear) %>%
-    mutate(solute = i) %>%
+    mutate(solute = sub("(Str)(.*)(mgL)", "\\2", i)) %>%
     select(solute, everything())
 }
 
@@ -190,4 +192,8 @@ readr::write_csv(solutes_unmanaged_ann,
                  file.path(here::here("data"), "tbl_solutes_unmanaged_ann.csv"))
 readr::write_csv(solutes_managed_ann,
                  file.path(here::here("data"), "tbl_solutes_managed_ann.csv"))
+
+
+
+
 
