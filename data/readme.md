@@ -20,7 +20,7 @@ Here are the descriptions of the columns within the 2 data files.
 
 | Column name | Description |
 |:------------|:--------------|
-| region | regionale abbreviation (eg, WC = West Coast, GL = Great Lakes) |
+| region | regional abbreviation (eg, WC = West Coast, GL = Great Lakes) |
 | site | location abbreviation (watershed) |
 | catchment | catchment abbreviation (within a watershed) |
 | type | type of catchment (managed or unmanaged) |
@@ -55,7 +55,7 @@ Here are the descriptions of the columns within the 2 data files.
 
 | Column name | Description |
 |:------------|:--------------|
-| region | regionale abbreviation (eg, WC = West Coast, GL = Great Lakes) |
+| region | regional abbreviation (eg, WC = West Coast, GL = Great Lakes) |
 | site | location abbreviation (watershed) |
 | catchment | catchment abbreviation (within a watershed) |
 | type | type of catchment (managed or unmanaged) |
