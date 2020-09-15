@@ -139,6 +139,29 @@ for(dd in data_dirs) {
   
 } ## end loop over directories
 
+## assign regions to sites
+dat_mon <- dat_mon %>%
+  mutate(region = case_when(
+    site == "HJA" ~ "WC",
+    site == "ELA" | site == "MEF" | site == "TLW" | site == "DOR" ~ "GL",
+    site == "HBEF" | site == "BBWM" ~ "NE",
+    site == "CWT" | site == "SEF" ~ "SE",
+    site == "LEF" ~ "PR",
+    site == "SLP" ~ "other"
+  )) %>%
+  select(region, site, catchment, type, everything())
+
+dat_ann <- dat_ann %>%
+  mutate(region = case_when(
+    site == "HJA" ~ "WC",
+    site == "ELA" | site == "MEF" | site == "TLW" | site == "DOR" ~ "GL",
+    site == "HBEF" | site == "BBWM" ~ "NE",
+    site == "CWT" | site == "SEF" ~ "SE",
+    site == "LEF" ~ "PR",
+    site == "SLP" ~ "other"
+  )) %>%
+  select(region, site, catchment, type, everything())
+
 ## write monthly data to file
 readr::write_csv(dat_mon,
                  file.path(here::here("data"), "monthly_data.csv"))
@@ -168,19 +191,19 @@ for(i in solutes) {
   ## unmanaged
   solutes_unmanaged_ann[[i]] <- dat_ann %>%
     filter(type == "unmanaged") %>%
-    select(site:WaterYear, all_of(i)) %>%
-    pivot_wider(names_from = c(site, catchment), values_from = i) %>%
+    select(region:WaterYear, all_of(i)) %>%
+    pivot_wider(names_from = c(region, site, catchment), values_from = i) %>%
     arrange(WaterYear) %>%
     mutate(solute = sub("(Str)(.*)(mgL)", "\\2", i)) %>%
-    select(solute, everything())
+    select(solute, everything(), -type)
   ## managed
   solutes_managed_ann[[i]] <- dat_ann %>%
     filter(type == "managed") %>%
-    select(site:WaterYear, all_of(i)) %>%
-    pivot_wider(names_from = c(site, catchment), values_from = i) %>%
+    select(region:WaterYear, all_of(i)) %>%
+    pivot_wider(names_from = c(region, site, catchment), values_from = i) %>%
     arrange(WaterYear) %>%
     mutate(solute = sub("(Str)(.*)(mgL)", "\\2", i)) %>%
-    select(solute, everything())
+    select(solute, everything(), -type)
 }
 
 ## combine lists into df
