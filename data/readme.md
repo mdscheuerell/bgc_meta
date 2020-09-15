@@ -20,9 +20,10 @@ Here are the descriptions of the columns within the 2 data files.
 
 | Column name | Description |
 |:------------|:--------------|
-| type | type of catchment (managed or unmanaged) |
+| region | regionale abbreviation (eg, WC = West Coast, GL = Great Lakes) |
 | site | location abbreviation (watershed) |
 | catchment | catchment abbreviation (within a watershed) |
+| type | type of catchment (managed or unmanaged) |
 | Year | calendar year |
 | Month | month of year |
 | WaterYear | calculated water year |
@@ -54,9 +55,10 @@ Here are the descriptions of the columns within the 2 data files.
 
 | Column name | Description |
 |:------------|:--------------|
-| type | type of catchment (managed or unmanaged) |
+| region | regionale abbreviation (eg, WC = West Coast, GL = Great Lakes) |
 | site | location abbreviation (watershed) |
 | catchment | catchment abbreviation (within a watershed) |
+| type | type of catchment (managed or unmanaged) |
 | WaterYear | calculated water year |
 | CSmeanTempC | climate station mean annual temperature (C) |
 | CSPrecipitationmm | climate station sum of annual Precipitation (mm) |
