@@ -144,10 +144,9 @@ dat_mon <- dat_mon %>%
   mutate(region = case_when(
     site == "HJA" ~ "WC",
     site == "ELA" | site == "MEF" | site == "TLW" | site == "DOR" ~ "GL",
-    site == "HBEF" | site == "BBWM" ~ "NE",
+    site == "HBEF" | site == "BBWM" | site == "SLP" ~ "NE",
     site == "CWT" | site == "SEF" ~ "SE",
-    site == "LEF" ~ "PR",
-    site == "SLP" ~ "other"
+    site == "LEF" ~ "PR"
   )) %>%
   select(region, site, catchment, type, everything())
 
@@ -155,10 +154,9 @@ dat_ann <- dat_ann %>%
   mutate(region = case_when(
     site == "HJA" ~ "WC",
     site == "ELA" | site == "MEF" | site == "TLW" | site == "DOR" ~ "GL",
-    site == "HBEF" | site == "BBWM" ~ "NE",
+    site == "HBEF" | site == "BBWM" | site == "SLP" ~ "NE",
     site == "CWT" | site == "SEF" ~ "SE",
-    site == "LEF" ~ "PR",
-    site == "SLP" ~ "other"
+    site == "LEF" ~ "PR"
   )) %>%
   select(region, site, catchment, type, everything())
 
