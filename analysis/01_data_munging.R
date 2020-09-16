@@ -93,8 +93,6 @@ for(dd in data_dirs) {
     
     class(dat_mon$CSMeanTempC)
     
-    mm <- files_mon[5]
-    
   } ## end loop over monthly files
   
   ## annual files
@@ -139,6 +137,13 @@ for(dd in data_dirs) {
   
 } ## end loop over directories
 
+## change WaterYearMonth to decimal years
+dat_mon <- dat_mon %>%
+  mutate(WaterYearMonth = case_when(
+  Month >= 10 ~ (Year + 1) + (Month - 10) / 12,
+  Month < 10 ~ Year + (Month + 2) / 12
+))
+
 ## assign regions to sites
 dat_mon <- dat_mon %>%
   mutate(region = case_when(
@@ -175,7 +180,7 @@ readr::write_csv(dat_ann,
 
 ## get names of solutes
 solutes <- dat_ann %>%
-  select(starts_with("Str")) %>%
+  select(starts_with("FWA")) %>%
   colnames()
 
 ## ANNUAL DATA
@@ -192,7 +197,7 @@ for(i in solutes) {
     select(region:WaterYear, all_of(i)) %>%
     pivot_wider(names_from = c(region, site, catchment), values_from = i) %>%
     arrange(WaterYear) %>%
-    mutate(solute = sub("(Str)(.*)(mgL)", "\\2", i)) %>%
+    mutate(solute = sub("(FWA)(.*)(mgL)", "\\2", i)) %>%
     select(solute, everything(), -type)
   ## managed
   solutes_managed_ann[[i]] <- dat_ann %>%
@@ -200,7 +205,7 @@ for(i in solutes) {
     select(region:WaterYear, all_of(i)) %>%
     pivot_wider(names_from = c(region, site, catchment), values_from = i) %>%
     arrange(WaterYear) %>%
-    mutate(solute = sub("(Str)(.*)(mgL)", "\\2", i)) %>%
+    mutate(solute = sub("(FWA)(.*)(mgL)", "\\2", i)) %>%
     select(solute, everything(), -type)
 }
 
@@ -213,6 +218,51 @@ readr::write_csv(solutes_unmanaged_ann,
                  file.path(here::here("data"), "tbl_solutes_unmanaged_ann.csv"))
 readr::write_csv(solutes_managed_ann,
                  file.path(here::here("data"), "tbl_solutes_managed_ann.csv"))
+
+
+## MONTHLY DATA
+
+## empty lists for tmp data
+solutes_unmanaged_mon <- list()
+solutes_managed_mon <- list()
+
+## create solute-specific tables of year-by-site/catchment
+for(i in solutes) {
+  ## unmanaged
+  solutes_unmanaged_mon[[i]] <- dat_mon %>%
+    filter(type == "unmanaged") %>%
+    select(region:WaterYearMonth, all_of(i)) %>%
+    group_by(region, site, catchment) %>%
+    mutate(row = row_number()) %>%
+    pivot_wider(names_from = c(region, site, catchment),
+                values_from = i) %>%
+    select(-row) %>%
+    arrange(WaterYear) %>%
+    mutate(solute = sub("(FWA)(.*)(mgL)", "\\2", i)) %>%
+    select(solute, everything(), -type)
+  ## managed
+  solutes_managed_mon[[i]] <- dat_mon %>%
+    filter(type == "managed") %>%
+    select(region:WaterYearMonth, all_of(i)) %>%
+    group_by(region, site, catchment) %>%
+    mutate(row = row_number()) %>%
+    pivot_wider(names_from = c(region, site, catchment),
+                values_from = i) %>%
+    select(-row) %>%
+    arrange(WaterYear) %>%
+    mutate(solute = sub("(FWA)(.*)(mgL)", "\\2", i)) %>%
+    select(solute, everything(), -type)
+}
+
+## combine lists into df
+solutes_unmanaged_mon <- do.call(rbind, solutes_unmanaged_mon)
+solutes_managed_mon <- do.call(rbind, solutes_managed_mon)
+
+## write to csv
+readr::write_csv(solutes_unmanaged_mon,
+                 file.path(here::here("data"), "tbl_solutes_unmanaged_mon.csv"))
+readr::write_csv(solutes_managed_mon,
+                 file.path(here::here("data"), "tbl_solutes_managed_mon.csv"))
 
 
 
