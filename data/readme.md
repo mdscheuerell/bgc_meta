@@ -20,14 +20,14 @@ Here are the descriptions of the columns within the 2 data files.
 
 | Column name | Description |
 |:------------|:--------------|
-| region | regional abbreviation (eg, WC = West Coast, GL = Great Lakes) |
+| region | regional abbreviation (see notes below) |
 | site | location abbreviation (watershed) |
 | catchment | catchment abbreviation (within a watershed) |
 | type | type of catchment (managed or unmanaged) |
 | Year | calendar year |
 | Month | month of year |
 | WaterYear | calculated water year |
-| WaterYearMonth | concatenated water year and month |
+| WaterYearMonth | decimal water year-month (= year + [month - 1]/12) |
 | CSmeanTempC | climate station mean monthly temperature (C) 
 | CSPrecipitationmm | climate station sum of monthly precipitation (mm) |
 | Runoffmm | monthly sum of runoff (mm) |
@@ -55,7 +55,7 @@ Here are the descriptions of the columns within the 2 data files.
 
 | Column name | Description |
 |:------------|:--------------|
-| region | regional abbreviation (eg, WC = West Coast, GL = Great Lakes) |
+| region | regional abbreviation (see notes below) |
 | site | location abbreviation (watershed) |
 | catchment | catchment abbreviation (within a watershed) |
 | type | type of catchment (managed or unmanaged) |
@@ -85,6 +85,8 @@ Here are the descriptions of the columns within the 2 data files.
 | iNDVI | integrated normalized difference vegetation index (unitless) |
 
 #### Notes
+
+`region`: WC = West Coast, GL = Great Lakes, NE = northeast, SE = southeast, PR = Puerto Rico
 
 HJA: NH4-N is labeled as NH3-N  
 
