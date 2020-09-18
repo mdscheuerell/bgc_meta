@@ -133,13 +133,17 @@ solutes <- dat_mon %>%
 ## converting g to mg
 solutes <- solutes %>%
   mutate(StrDOCmgL = case_when(
-    site == "BBWM" | site == "LEF" ~ StrDOCmgL * 1000)) %>%
+    site == "BBWM" | site == "LEF" ~ StrDOCmgL * 1000,
+    site != "BBWM" | site != "LEF" ~ StrDOCmgL)) %>%
   mutate(StrSO4SmgL = case_when(
-    site == "DOR" ~ StrSO4SmgL * 1000)) %>%
+    site == "DOR" ~ StrSO4SmgL * 1000,
+    site != "DOR" ~ StrSO4SmgL)) %>%
   mutate(StrNH4NmgL = case_when(
-    site == "LEF" ~ StrNH4NmgL * 1000)) %>%
+    site == "LEF" ~ StrNH4NmgL * 1000,
+    site != "LEF" ~ StrNH4NmgL)) %>%
   mutate(StrNO3NmgL = case_when(
-    site == "LEF" ~ StrNO3NmgL * 1000))
+    site == "LEF" ~ StrNO3NmgL * 1000,
+    site != "LEF" ~ StrNO3NmgL))
 
 ## correct units based on TKH's analysis (/data/unit_corrections.csv)
 ## converting g to mg
