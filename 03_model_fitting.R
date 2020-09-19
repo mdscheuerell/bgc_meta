@@ -39,6 +39,10 @@ mod_set_RW <- vector("list", length(solutes))
 mod_set_RW_b <- vector("list", length(solutes))
 mod_set_one_RW <- vector("list", length(solutes))
 mod_set_one_RW_b <- vector("list", length(solutes))
+mod_set_region_RW <- vector("list", length(solutes))
+mod_set_region_RW_b <- vector("list", length(solutes))
+mod_set_site_RW <- vector("list", length(solutes))
+mod_set_site_RW_b <- vector("list", length(solutes))
 
 ## loop over solutes
 for(i in 1:length(solutes)) {
@@ -53,8 +57,9 @@ for(i in 1:length(solutes)) {
     scale(scale = FALSE) %>%
     t()
   
-  ## SET 1: all catchments are unique processes
-  ## (a) RW without bias
+  # ## SET 1: all catchments are unique processes
+  # ## (a) RW without bias
+  # ## model setup
   # mod_list <- list(
   #   B = "identity",
   #   U = "zero",
@@ -72,41 +77,150 @@ for(i in 1:length(solutes)) {
   # ## fit model
   # mod_set_RW_b[[i]] <- MARSS(dat_sol, model = mod_list,
   #                             control = list(maxit = 5000), method = "BFGS")
+  # 
+  # ## SET 2: all catchments are shared processes within N Am
+  # ## (a) RW without bias
+  # ## model setup
+  # mod_list <- list(
+  #   B = "identity",
+  #   U = "zero",
+  #   Q = "diagonal and unequal",
+  #   Z = matrix(1, nrow = nrow(dat_sol), ncol = 1),
+  #   A = "zero",
+  #   R = "diagonal and equal"
+  # )
+  # ## fit model
+  # mod_set_one_RW[[i]] <- MARSS(dat_sol, model = mod_list,
+  #                              control = list(maxit = 5000), method = "BFGS")
+  # 
+  # ## (b) RW with bias
+  # mod_list$U = "unconstrained"
+  # ## fit model
+  # mod_set_one_RW_b[[i]] <- MARSS(dat_sol, model = mod_list,
+  #                                control = list(maxit = 5000), method = "BFGS")
   
-  ## SET 2: all catchments are shared processes within N Am
+  ## SET 3: all catchments share a process within a region
   ## (a) RW without bias
+  ## regions for all catchments
+  names_regions <- dat_sol %>%
+    rownames %>%
+    gsub(pattern = "(.{2})(_.*)", replacement = "\\1")
+  ##  unique regions 
+  regions <- unique(names_regions)
+  ## number of regions
+  n_regions <- length(regions)
+  ## empty Z matrix
+  ZZ <- matrix(0, nrow = nrow(dat_sol), ncol = n_regions)
+  colnames(ZZ) <- regions
+  ## fill in Z with correct regions
+  for(j in 1:n_regions) {
+    ZZ[names_regions == regions[j], j] <- 1
+  }
+  ## model setup
   mod_list <- list(
     B = "identity",
     U = "zero",
     Q = "diagonal and unequal",
-    Z = matrix(1, nrow = nrow(dat_sol), ncol = 1),
+    Z = ZZ,
     A = "zero",
     R = "diagonal and equal"
   )
   ## fit model
-  mod_set_one_RW[[i]] <- MARSS(dat_sol, model = mod_list,
+  mod_set_region_RW[[i]] <- MARSS(dat_sol, model = mod_list,
                                control = list(maxit = 5000), method = "BFGS")
   
   ## (b) RW with bias
-  mod_list$U = "unconstrained"
+  ## U for biased RW's
+  mod_list$U <- matrix(regions, ncol = 1)
   ## fit model
-  mod_set_one_RW_b[[i]] <- MARSS(dat_sol, model = mod_list,
+  mod_set_region_RW_b[[i]] <- MARSS(dat_sol, model = mod_list,
                                  control = list(maxit = 5000), method = "BFGS")
+  
+  ## SET 4: all catchments share a process within a site
+  ## (a) RW without bias
+  ## sites for all catchments
+  names_sites <- dat_sol %>%
+    rownames %>%
+    gsub(pattern = "(.{2}_)(.{3,4})(_.*)", replacement = "\\2")
+  ##  unique regions 
+  sites <- unique(names_sites)
+  ## number of regions
+  n_sites <- length(sites)
+  ## empty Z matrix
+  ZZ <- matrix(0, nrow = nrow(dat_sol), ncol = n_sites)
+  colnames(ZZ) <- sites
+  ## fill in Z with correct regions
+  for(j in 1:n_sites) {
+    ZZ[names_sites == sites[j], j] <- 1
+  }
+  ## model setup
+  mod_list <- list(
+    B = "identity",
+    U = "zero",
+    Q = "diagonal and unequal",
+    Z = ZZ,
+    A = "zero",
+    R = "diagonal and equal"
+  )
+  ## fit model
+  mod_set_site_RW[[i]] <- MARSS(dat_sol, model = mod_list,
+                                  control = list(maxit = 5000), method = "BFGS")
+  
+  # ## (b) RW with bias
+  ## U for biased RW's
+  mod_list$U <- matrix(sites, ncol = 1)
+  ## fit model
+  mod_set_site_RW_b[[i]] <- MARSS(dat_sol, model = mod_list,
+                                    control = list(maxit = 5000), method = "BFGS")
   
 }
 
-
-# saveRDS(mod_set_RW,
-#         file = file.path(here::here("analysis"), "fitted_unique_states_RW.rds"))
-# 
-# saveRDS(mod_set_RW_b,
-#         file = file.path(here::here("analysis"), "fitted_unique_states_RW_b.rds"))
-
+## save results
+## unique states
+saveRDS(mod_set_RW,
+        file = file.path(here::here("analysis"), "fitted_unique_states_RW.rds"))
+saveRDS(mod_set_RW_b,
+        file = file.path(here::here("analysis"), "fitted_unique_states_RW_b.rds"))
+## site states
+saveRDS(mod_set_site_RW,
+        file = file.path(here::here("analysis"), "fitted_site_state_RW.rds"))
+saveRDS(mod_set_site_RW_b,
+        file = file.path(here::here("analysis"), "fitted_site_state_RW_b.rds"))
+## regional states
+saveRDS(mod_set_region_RW,
+        file = file.path(here::here("analysis"), "fitted_region_state_RW.rds"))
+saveRDS(mod_set_region_RW_b,
+        file = file.path(here::here("analysis"), "fitted_region_state_RW_b.rds"))
+## global N Am state
 saveRDS(mod_set_one_RW,
         file = file.path(here::here("analysis"), "fitted_one_state_RW.rds"))
-
 saveRDS(mod_set_one_RW_b,
         file = file.path(here::here("analysis"), "fitted_one_state_RW_b.rds"))
 
+## model selection table
+tbl_mod_aic <- data.frame(model = c("unique states", "unique states + bias",
+                                    "site states", "site states + bias",
+                                    "regional states", "regional states + bias",
+                                    "one N Am state", "one N Am state + bias"),
+                          Ca = rep(NA, 8),
+                          DOC = rep(NA, 8),
+                          NH4 = rep(NA, 8),
+                          NO3 = rep(NA, 8),
+                          TDP = rep(NA, 8),
+                          SO4 = rep(NA, 8))
 
+tbl_mod_aic[1,-1] <- sapply(mod_set_RW, AIC)
+tbl_mod_aic[2,-1] <- sapply(mod_set_RW_b, AIC)
+tbl_mod_aic[3,-1] <- sapply(mod_set_site_RW, AIC)
+tbl_mod_aic[4,-1] <- sapply(mod_set_site_RW_b, AIC)
+tbl_mod_aic[5,-1] <- sapply(mod_set_region_RW, AIC)
+tbl_mod_aic[6,-1] <- sapply(mod_set_region_RW_b, AIC)
+tbl_mod_aic[7,-1] <- sapply(mod_set_one_RW, AIC)
+tbl_mod_aic[8,-1] <- sapply(mod_set_one_RW_b, AIC)
+
+for(i in 1:length(solutes)) {
+  tbl_mod_aic[,i+1] <- round(tbl_mod_aic[,i+1] - min(tbl_mod_aic[,i+1]), 1)
+}
+
+tbl_mod_aic
 
