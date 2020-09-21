@@ -10,6 +10,7 @@
 
 ## library(here)
 ## library(readr)
+library(dplyr)
 
 ##-------
 ## setup
@@ -90,8 +91,6 @@ for(dd in data_dirs) {
     
     ## concatenate with monthly data
     dat_mon <- rbind(dat_mon, tmp_m)
-    
-    class(dat_mon$CSMeanTempC)
     
   } ## end loop over monthly files
   
