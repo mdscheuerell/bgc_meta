@@ -22,8 +22,7 @@ df <- df %>%
 
 ## names of solutes
 solutes <- df %>%
-  # select(starts_with("FWA")) %>%
-  select(starts_with("Str")) %>%
+  select(starts_with("FWA")) %>%
   colnames
 
 ## first and last water years
@@ -57,47 +56,47 @@ for(i in 1:length(solutes)) {
     scale(scale = FALSE) %>%
     t()
   
-  # ## SET 1: all catchments are unique processes
-  # ## (a) RW without bias
-  # ## model setup
-  # mod_list <- list(
-  #   B = "identity",
-  #   U = "zero",
-  #   Q = "diagonal and unequal",
-  #   Z = "identity",
-  #   A = "zero",
-  #   R = "diagonal and equal"
-  # )
-  # ## fit model
-  # mod_set_RW[[i]] <- MARSS(dat_sol, model = mod_list,
-  #                           control = list(maxit = 5000), method = "BFGS")
-  # 
-  # ## (b) RW with bias
-  # mod_list$U = "unconstrained"
-  # ## fit model
-  # mod_set_RW_b[[i]] <- MARSS(dat_sol, model = mod_list,
-  #                             control = list(maxit = 5000), method = "BFGS")
-  # 
-  # ## SET 2: all catchments are shared processes within N Am
-  # ## (a) RW without bias
-  # ## model setup
-  # mod_list <- list(
-  #   B = "identity",
-  #   U = "zero",
-  #   Q = "diagonal and unequal",
-  #   Z = matrix(1, nrow = nrow(dat_sol), ncol = 1),
-  #   A = "zero",
-  #   R = "diagonal and equal"
-  # )
-  # ## fit model
-  # mod_set_one_RW[[i]] <- MARSS(dat_sol, model = mod_list,
-  #                              control = list(maxit = 5000), method = "BFGS")
-  # 
-  # ## (b) RW with bias
-  # mod_list$U = "unconstrained"
-  # ## fit model
-  # mod_set_one_RW_b[[i]] <- MARSS(dat_sol, model = mod_list,
-  #                                control = list(maxit = 5000), method = "BFGS")
+  ## SET 1: all catchments are unique processes
+  ## (a) RW without bias
+  ## model setup
+  mod_list <- list(
+    B = "identity",
+    U = "zero",
+    Q = "diagonal and unequal",
+    Z = "identity",
+    A = "zero",
+    R = "diagonal and equal"
+  )
+  ## fit model
+  mod_set_RW[[i]] <- MARSS(dat_sol, model = mod_list,
+                            control = list(maxit = 5000), method = "BFGS")
+
+  ## (b) RW with bias
+  mod_list$U = "unconstrained"
+  ## fit model
+  mod_set_RW_b[[i]] <- MARSS(dat_sol, model = mod_list,
+                              control = list(maxit = 5000), method = "BFGS")
+
+  ## SET 2: all catchments are shared processes within N Am
+  ## (a) RW without bias
+  ## model setup
+  mod_list <- list(
+    B = "identity",
+    U = "zero",
+    Q = "diagonal and unequal",
+    Z = matrix(1, nrow = nrow(dat_sol), ncol = 1),
+    A = "zero",
+    R = "diagonal and equal"
+  )
+  ## fit model
+  mod_set_one_RW[[i]] <- MARSS(dat_sol, model = mod_list,
+                               control = list(maxit = 5000), method = "BFGS")
+
+  ## (b) RW with bias
+  mod_list$U = "unconstrained"
+  ## fit model
+  mod_set_one_RW_b[[i]] <- MARSS(dat_sol, model = mod_list,
+                                 control = list(maxit = 5000), method = "BFGS")
   
   ## SET 3: all catchments share a process within a region
   ## (a) RW without bias

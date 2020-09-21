@@ -5,7 +5,7 @@
 ## necessary user inputs
 ##-----------------------
 
-yr_first <- 1989
+yr_first <- 1981
 yr_last <- 2005
 
 ##-------------------
@@ -127,36 +127,31 @@ solutes <- dat_mon %>%
   ## pull out years of interest (last year + 1 to get full water year)
   filter(dec_water_yr >= yr_first & dec_water_yr < (yr_last + 1)) %>%
   ## only keep solutes for now
-  select(region:catchment, dec_water_yr, starts_with("Str")) 
+  select(region:catchment, dec_water_yr, starts_with("FWA")) 
   
-## correct units based on TKH's analysis (/data/unit_corrections.csv)
-## converting g to mg
-solutes <- solutes %>%
-  mutate(StrDOCmgL = case_when(
-    site == "BBWM" | site == "LEF" ~ StrDOCmgL * 1000,
-    site != "BBWM" | site != "LEF" ~ StrDOCmgL)) %>%
-  mutate(StrSO4SmgL = case_when(
-    site == "DOR" ~ StrSO4SmgL * 1000,
-    site != "DOR" ~ StrSO4SmgL)) %>%
-  mutate(StrNH4NmgL = case_when(
-    site == "LEF" ~ StrNH4NmgL * 1000,
-    site != "LEF" ~ StrNH4NmgL)) %>%
-  mutate(StrNO3NmgL = case_when(
-    site == "LEF" ~ StrNO3NmgL * 1000,
-    site != "LEF" ~ StrNO3NmgL))
+
+solutes %>%
+  group_by(catchment) %>%
+  summarise_at(-c(1:3), list(min = min, max = max), na.rm = TRUE) %>%
+  print(n = Inf)
+
 
 ## correct units based on TKH's analysis (/data/unit_corrections.csv)
 ## converting g to mg
-# solutes <- solutes %>%
-#   mutate(FWADOCmgL = case_when(
-#     site == "BBWM" | site == "LEF" ~ FWADOCmgL * 1000)) %>%
-#   mutate(FWASO4SmgL = case_when(
-#     site == "DOR" ~ FWASO4SmgL * 1000)) %>%
-#   mutate(FWANH4NmgL = case_when(
-#     site == "LEF" ~ FWANH4NmgL * 1000)) %>%
-#   mutate(FWANO3NmgL = case_when(
-#     site == "LEF" ~ FWANO3NmgL * 1000))
-  
+solutes <- solutes %>%
+  mutate(FWADOCmgL = case_when(
+    site == "BBWM" | site == "LEF" ~ FWADOCmgL * 1000,
+    site != "BBWM" | site != "LEF" ~ FWADOCmgL)) %>%
+  mutate(FWASO4SmgL = case_when(
+    site == "DOR" ~ FWASO4SmgL * 1000,
+    site != "DOR" ~ FWASO4SmgL)) %>%
+  mutate(FWANH4NmgL = case_when(
+    site == "LEF" ~ FWANH4NmgL * 1000,
+    site != "LEF" ~ FWANH4NmgL)) %>%
+  mutate(FWANO3NmgL = case_when(
+    site == "LEF" ~ FWANO3NmgL * 1000,
+    site != "LEF" ~ FWANO3NmgL))
+
 ## write solutes to file
 readr::write_csv(solutes,
                  file.path(here::here("data"), "tbl_solutes_unmanaged_mon.csv"))
