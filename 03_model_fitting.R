@@ -233,5 +233,25 @@ for(i in 1:length(solutes)) {
 tbl_mod_aic
 
 ## bootstrap biased RW models by site
-lapply(mod_set_site_RW_b, MARSSparamCIs, nboot = 1000)
+bias_bootstrap <- lapply(mod_set_site_RW_b, MARSSparamCIs, nboot = 1000)
+
+## create table of bias estimates (+/- CI) 
+tmp <- list()
+for(i in 1:length(solutes)) {
+  bias_ID <- grep("U.*", names(bias_bootstrap[[i]]$parMean))
+  tmp$solute <- rep(sub("(FWA)(.*)(mgL)", "\\2", solutes[i]), length(bias_ID))
+  tmp$site <- sub("(U\\.)(.*)", "\\2", names(bias_bootstrap[[i]]$parMean[bias_ID]))
+  tmp$bias <- bias_bootstrap[[i]]$parMean[bias_ID]
+  tmp$loCI <- bias_bootstrap[[i]]$par.lowCI$U
+  tmp$upCI <- bias_bootstrap[[i]]$par.upCI$U
+  if(i == 1) {
+    tbl_bias_bootstrap <- data.frame(tmp)
+  } else {
+    tbl_bias_bootstrap <- rbind(tbl_bias_bootstrap, data.frame(tmp))
+  }
+}
+tbl_bias_bootstrap[, -c(1:2)] <- signif(tbl_bias_bootstrap[, -c(1:2)], 3)
+rownames(tbl_bias_bootstrap) <- NULL
+tbl_bias_bootstrap
+
 
