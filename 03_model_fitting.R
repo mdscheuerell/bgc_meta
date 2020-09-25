@@ -12,8 +12,8 @@ df <- readr::read_csv(file.path(here::here("data"), "tbl_solutes_unmanaged_mon.c
 ## CAVEATS
 
 ## 1) remove SLP
-df <- df %>%
-  filter(site != "SLP")
+# df <- df %>%
+#   filter(site != "SLP")
 
 ## 2) convert 0 to NA following mtg and emails (ie, "no sample")
 df <- df %>%
@@ -46,8 +46,17 @@ mod_set_site_RW_b <- vector("list", length(solutes))
 ## loop over solutes
 for(i in 1:length(solutes)) {
   
+  ## assign df to temp file
+  df_tmp <- df
+  
+  ## screen for lack of TDP data
+  if(solutes[i] == "FWATDPmgL") {
+    df_tmp <- df_tmp %>%
+      filter(site != "BBWM" & site != "SLP")
+  }
+  
   ## select solute and pivot wider
-  dat_sol <- df %>%
+  dat_sol <- df_tmp %>%
     select(region:dec_water_yr, all_of(solutes[i])) %>%
     tidyr::pivot_wider(names_from = c(region, site, catchment),
                        values_from = solutes[i]) %>%
@@ -222,4 +231,7 @@ for(i in 1:length(solutes)) {
 }
 
 tbl_mod_aic
+
+## bootstrap biased RW models by site
+lapply(mod_set_site_RW_b, MARSSparamCIs, nboot = 1000)
 
