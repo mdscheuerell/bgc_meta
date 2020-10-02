@@ -19,6 +19,13 @@ df <- readr::read_csv(file.path(here::here("data"), "tbl_solutes_unmanaged_mon.c
 df <- df %>%
    purrr::modify_at(-c(1:4), ~na_if(., 0))
   
+## dummy covariates for season
+n_months <- df$dec_water_yr %>%
+  unique() %>%
+  length()
+seas_1 <- sin(2 * pi * seq(n_months) /12)
+seas_2 <- cos(2 * pi * seq(n_months) /12)
+
 
 ## names of solutes
 solutes <- df %>%
@@ -28,10 +35,6 @@ solutes <- df %>%
 ## first and last water years
 yr_first <- min(df$dec_water_yr)
 yr_last <- floor(max(df$dec_water_yr))
-
-# ## sequence of decimal water years
-# tvec <- seq(min(df$dec_water_yr), max(df$dec_water_yr),
-#             length.out = 12 * (yr_last - yr_first + 1))
 
 ## empty lists for model fits
 mod_set_RW <- vector("list", length(solutes))
@@ -71,6 +74,8 @@ for(i in 1:length(solutes)) {
   mod_list <- list(
     B = "identity",
     U = "zero",
+    C = "unconstrained",
+    c = rbind(seas_1, seas_2),
     Q = "diagonal and unequal",
     Z = "identity",
     A = "zero",
@@ -92,6 +97,8 @@ for(i in 1:length(solutes)) {
   mod_list <- list(
     B = "identity",
     U = "zero",
+    C = "unconstrained",
+    c = rbind(seas_1, seas_2),
     Q = "diagonal and unequal",
     Z = matrix(1, nrow = nrow(dat_sol), ncol = 1),
     A = "zero",
@@ -128,6 +135,8 @@ for(i in 1:length(solutes)) {
   mod_list <- list(
     B = "identity",
     U = "zero",
+    C = "unconstrained",
+    c = rbind(seas_1, seas_2),
     Q = "diagonal and unequal",
     Z = ZZ,
     A = "zero",
@@ -165,6 +174,8 @@ for(i in 1:length(solutes)) {
   mod_list <- list(
     B = "identity",
     U = "zero",
+    C = "unconstrained",
+    c = rbind(seas_1, seas_2),
     Q = "diagonal and unequal",
     Z = ZZ,
     A = "zero",
