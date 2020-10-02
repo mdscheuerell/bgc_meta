@@ -163,6 +163,9 @@ TLW_C34$catch_area_km2 <- 0.6859
 TLW_C35$catch_area_km2 <- 0.0402
 TLW_C38$catch_area_km2 <- 0.0646
 
+# Reformat LEF_MPR date
+LEF_MPR$DATE <- as.Date(LEF_MPR$DATE, format = "%m/%d/%Y")
+
 Q_mm <- list(LEF_MPR = LEF_MPR,
              SLP_WS9 = SLP_WS9, 
              TLW_C31 = TLW_C31, 
@@ -229,8 +232,8 @@ Qall <- lapply(Qall, function(x) {
 
 Qall <- lapply(Qall, separate, site, c("studyarea", "watershed"))
 
-#Per Irena, drop LEF_MPR (also problems formatting date for this site)
-Qall <- within(Qall, rm(LEF_MPR)) 
+# Per Irena, drop LEF_MPR (also problems formatting date for this site)
+#Qall <- within(Qall, rm(LEF_MPR)) 
 
 ## Collapse to a single dataframe for plotting
 Qall.df <- bind_rows(Qall, .id = "SiteID")
@@ -243,7 +246,9 @@ Qall.df$Date <- coalesce(Qall.df$Date, Qall.df$DATE)
 Qall.pl <- Qall.df %>% ggplot(aes(x = Date, y = discharge_Ls, color = watershed)) +
   geom_point() +
   geom_line() +
-  facet_wrap(~studyarea, scales = "free_y")
+  facet_wrap(~SiteID, scales = "free_y")
+
+# Data gaps: SEF 1980s, HJA_WS7 10/1/1987-9/30/1994
 
 ggsave(path = "plots", filename = "discharge.pdf", width = 10, height = 10, units = "in")
 
