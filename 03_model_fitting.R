@@ -6,7 +6,8 @@ library(dplyr)
 library(MARSS)
 
 ## load solutes data
-df <- readr::read_csv(file.path(here::here("data"), "tbl_solutes_unmanaged_mon.csv"))
+# df <- readr::read_csv(file.path(here::here("data"), "tbl_solutes_unmanaged_mon.csv"))
+df <- readr::read_csv(file.path(here::here("data"), "tbl_solutes_mon.csv"))
 
 
 ## CAVEATS
@@ -197,24 +198,24 @@ for(i in 1:length(solutes)) {
 ## save results
 ## unique states
 saveRDS(mod_set_RW,
-        file = file.path(here::here("analysis"), "fitted_unique_states_RW.rds"))
+        file = file.path(here::here("analysis"), "fitted_all_unique_states_RW.rds"))
 saveRDS(mod_set_RW_b,
-        file = file.path(here::here("analysis"), "fitted_unique_states_RW_b.rds"))
+        file = file.path(here::here("analysis"), "fitted_all_unique_states_RW_b.rds"))
 ## site states
 saveRDS(mod_set_site_RW,
-        file = file.path(here::here("analysis"), "fitted_site_state_RW.rds"))
+        file = file.path(here::here("analysis"), "fitted_all_site_state_RW.rds"))
 saveRDS(mod_set_site_RW_b,
-        file = file.path(here::here("analysis"), "fitted_site_state_RW_b.rds"))
+        file = file.path(here::here("analysis"), "fitted_all_site_state_RW_b.rds"))
 ## regional states
 saveRDS(mod_set_region_RW,
-        file = file.path(here::here("analysis"), "fitted_region_state_RW.rds"))
+        file = file.path(here::here("analysis"), "fitted_all_region_state_RW.rds"))
 saveRDS(mod_set_region_RW_b,
-        file = file.path(here::here("analysis"), "fitted_region_state_RW_b.rds"))
+        file = file.path(here::here("analysis"), "fitted_all_region_state_RW_b.rds"))
 ## global N Am state
 saveRDS(mod_set_one_RW,
-        file = file.path(here::here("analysis"), "fitted_one_state_RW.rds"))
+        file = file.path(here::here("analysis"), "fitted_all_one_state_RW.rds"))
 saveRDS(mod_set_one_RW_b,
-        file = file.path(here::here("analysis"), "fitted_one_state_RW_b.rds"))
+        file = file.path(here::here("analysis"), "fitted_all_one_state_RW_b.rds"))
 
 ## model selection table
 tbl_mod_aic <- data.frame(model = c("unique states", "unique states + bias",
