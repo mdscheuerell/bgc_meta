@@ -119,7 +119,7 @@ write_csv(tbl_mon_yr_rng,
 ## get FWA solutes for unmanaged catchments
 solutes <- dat_mon %>%
   ## pull out unmanaged catchments
-  filter(type == "unmanaged") %>%
+  # filter(type == "unmanaged") %>%
   ## create decimal water year
   mutate(dec_water_yr = case_when(
        Month >= 10 ~ (Year + 1) + (Month - 10) / 12,
@@ -131,7 +131,7 @@ solutes <- dat_mon %>%
   
 
 solutes %>%
-  group_by(catchment) %>%
+  group_by(site, catchment) %>%
   summarise_at(-c(1:3), list(min = min, max = max), na.rm = TRUE) %>%
   print(n = Inf)
 
@@ -153,9 +153,12 @@ solutes <- solutes %>%
     site != "LEF" ~ FWANO3NmgL))
 
 ## write solutes to file
-readr::write_csv(solutes,
-                 file.path(here::here("data"), "tbl_solutes_unmanaged_mon.csv"))
+# readr::write_csv(solutes,
+#                  file.path(here::here("data"), "tbl_solutes_unmanaged_mon.csv"))
 
+## write solutes to file
+readr::write_csv(solutes,
+                 file.path(here::here("data"), "tbl_solutes_mon.csv"))
 
 
 
