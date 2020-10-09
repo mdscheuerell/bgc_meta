@@ -146,23 +146,25 @@ for(dd in data_dirs) {
 ## assign regions to sites
 dat_mon <- dat_mon %>%
   mutate(region = case_when(
-    site == "HJA" ~ "WC",
-    site == "ELA" | site == "MEF" | site == "TLW" | site == "DOR" ~ "GL",
-    site == "HBEF" | site == "BBWM" | site == "SLP" ~ "NE",
-    site == "CWT" | site == "SEF" ~ "SE",
+    site == "HJA" ~ "NW",
+    site == "ELA" | site == "MEF" | site == "TLW" | site == "DOR" ~ "NF",
+    site == "HBEF" | site == "SLP" ~ "NF",
+    site == "BBWM" | site == "CWT" | site == "SEF" ~ "EF",
     site == "LEF" ~ "PR"
   )) %>%
-  select(region, site, catchment, type, everything())
+  select(region, site, catchment, type, everything()) %>%
+  arrange(region, site, type, catchment)
 
 dat_ann <- dat_ann %>%
   mutate(region = case_when(
-    site == "HJA" ~ "WC",
-    site == "ELA" | site == "MEF" | site == "TLW" | site == "DOR" ~ "GL",
-    site == "HBEF" | site == "BBWM" | site == "SLP" ~ "NE",
-    site == "CWT" | site == "SEF" ~ "SE",
+    site == "HJA" ~ "NW",
+    site == "ELA" | site == "MEF" | site == "TLW" | site == "DOR" ~ "NF",
+    site == "HBEF" | site == "SLP" ~ "NF",
+    site == "BBWM" | site == "CWT" | site == "SEF" ~ "EF",
     site == "LEF" ~ "PR"
   )) %>%
-  select(region, site, catchment, type, everything())
+  select(region, site, catchment, type, everything()) %>%
+  arrange(region, site, type, catchment)
 
 ## write monthly data to file
 readr::write_csv(dat_mon,
