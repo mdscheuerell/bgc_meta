@@ -61,14 +61,19 @@ boots <- MARSS::MARSSparamCIs(fit_brw, nboot = 1000)
 ## 95% CI
 c(boots$par.lowCI$U, boots$par.upCI$U)
 
-## Is there a trend via Mann-Kendall
+## Is there a trend via Mann-Kendall? Yes
 trend::mk.test(yb)
+## estimate trend via Sen's method
+sen_fit <- trend::sens.slope(yb)
+sen_int <- median(yb - sen_fit$estimates * seq(nn))
+y_hat <- sen_fit$estimates * seq(nn) + sen_int
+sen_resid <- yb - y_hat
 
 ## estimate trend via lm()
-fit_lm <- lm(yb ~ seq(nn))
-summary(fit_lm)
-y_hat <- fitted(fit_lm)
-confint(fit_lm)
+# fit_lm <- lm(yb ~ seq(nn))
+# summary(fit_lm)
+# y_hat <- fitted(fit_lm)
+# confint(fit_lm)
 
 
 ## plots of fits, residuals, and ACF
@@ -79,32 +84,47 @@ par(mfrow = c(2,3), mai = c(0.7, 0.7, 0.1, 0.1), omi = c(0, 0, 0.2, 0))
 ## BRW fit
 plot.ts(yb, pch = 16, type = "o", cex = 1.2, las = 1,
         ylim = range(cbind(y_hat, yb)), ylab = expression(italic(y)))
-text(x = 0, y = 12, expression(paste(hat(b), " = 0.36 (0.10, 0.62)")), pos = 4, cex = 0.8)
+text(x = 0, y = 12.5, expression(paste(hat(b), " = 0.36 (0.10, 0.62)")), pos = 4, cex = 0.8)
 lines(t(fit_brw$states), col = "dodgerblue", lwd = 2)
-mtext("A", 3, line = 0.5, adj = 1, cex = 0.8)
+mtext("A", 3, line = 0.5, adj = 0, cex = 0.8)
 ## BRW residuals
 plot.ts(t(residuals(fit_brw)$model), lwd = 2, las = 1, col = "dodgerblue",
-        ylim = range(residuals(fit_lm)), ylab = "Residuals")
-mtext("B", 3, line = 0.5, adj = 1, cex = 0.8)
+        ylim = range(sen_resid), ylab = "Residuals")
+mtext("B", 3, line = 0.5, adj = 0, cex = 0.8)
 ## BRW ACF
 acf(t(residuals(fit_brw)$model), las = 1, lag.max = 10,
     xlim = c(1,10), ylim = c(-0.6, 0.6))
-mtext("C", 3, line = 0.5, adj = 1, cex = 0.8)
+mtext("C", 3, line = 0.5, adj = 0, cex = 0.8)
 
-## lm fit
+## Sen's slope
 plot.ts(yb, pch = 16, type = "o", cex = 1.2, las = 1,
         ylim = range(cbind(y_hat, yb)), ylab = expression(italic(y)))
-text(x = 0, y = 12, expression(paste(hat(b), " = 0.43 (0.38, 0.48)")), pos = 4, cex = 0.8)
+text(x = 0, y = 12.5, expression(paste(hat(b), " = 0.44 (0.39, 0.50)")), pos = 4, cex = 0.8)
 lines(y_hat, col = "indianred", lwd = 2)
-mtext("D", 3, line = 0.5, adj = 1, cex = 0.8)
-## lm residuals
-plot.ts(residuals(fit_lm), lwd = 2, las = 1, col = "indianred",
-        ylim = range(residuals(fit_lm)), ylab = "Residuals")
-mtext("E", 3, line = 0.5, adj = 1, cex = 0.8)
-## lm ACF
-acf(residuals(fit_lm), las = 1, lag.max = 10,
+mtext("D", 3, line = 0.5, adj = 0, cex = 0.8)
+## Sen's residuals
+plot.ts(sen_resid, lwd = 2, las = 1, col = "indianred",
+        ylim = range(sen_resid), ylab = "Residuals")
+mtext("E", 3, line = 0.5, adj = 0, cex = 0.8)
+## Sen's ACF
+acf(sen_resid, las = 1, lag.max = 10,
     xlim = c(1,10), ylim = c(-0.6, 0.6))
-mtext("F", 3, line = 0.5, adj = 1, cex = 0.8)
+mtext("F", 3, line = 0.5, adj = 0, cex = 0.8)
+
+# ## lm fit
+# plot.ts(yb, pch = 16, type = "o", cex = 1.2, las = 1,
+#         ylim = range(cbind(y_hat, yb)), ylab = expression(italic(y)))
+# text(x = 0, y = 12, expression(paste(hat(b), " = 0.43 (0.38, 0.48)")), pos = 4, cex = 0.8)
+# lines(y_hat, col = "indianred", lwd = 2)
+# mtext("D", 3, line = 0.5, adj = 0, cex = 0.8)
+# ## lm residuals
+# plot.ts(residuals(fit_lm), lwd = 2, las = 1, col = "indianred",
+#         ylim = range(residuals(fit_lm)), ylab = "Residuals")
+# mtext("E", 3, line = 0.5, adj = 0, cex = 0.8)
+# ## lm ACF
+# acf(residuals(fit_lm), las = 1, lag.max = 10,
+#     xlim = c(1,10), ylim = c(-0.6, 0.6))
+# mtext("F", 3, line = 0.5, adj = 0, cex = 0.8)
 
 dev.off()
 
