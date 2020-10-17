@@ -5,8 +5,8 @@
 ## necessary user inputs
 ##-----------------------
 
-yr_first <- 1981
-yr_last <- 2005
+yr_first <- 1964
+yr_last <- 2018
 
 ##-------------------
 ## required packages
