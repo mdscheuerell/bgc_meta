@@ -1,5 +1,13 @@
 ## This script loads the munged `solutes` data frame and fits MARSS models
 
+##-----------------------
+## necessary user inputs
+##-----------------------
+
+yr_first <- 1984
+yr_last <- 2010
+
+
 ## load libraries
 library(dplyr)
 ## library(tidyr)
@@ -13,29 +21,29 @@ df <- readr::read_csv(file.path(here::here("data"), "tbl_solutes_unmanaged_mon.c
 ## CAVEATS
 
 ## 1) remove SLP
-# df <- df %>%
-#   filter(site != "SLP")
+df <- df %>%
+  filter(site != "SLP" & site != "SEF")
 
-## 2) convert 0 to NA following mtg and emails (ie, "no sample")
+## 2) trim data set to common time frame
+df <- df %>%
+  filter(dec_water_yr >= yr_first & dec_water_yr <= yr_last)
+
+## 3) convert 0 to NA following mtg and emails (ie, "no sample")
 df <- df %>%
    purrr::modify_at(-c(1:4), ~na_if(., 0))
-  
+
 ## dummy covariates for season
 n_months <- df$dec_water_yr %>%
   unique() %>%
   length()
-seas_1 <- sin(2 * pi * seq(n_months) /12)
-seas_2 <- cos(2 * pi * seq(n_months) /12)
+seas_1 <- sin(2 * pi * seq(n_months) / 12)
+seas_2 <- cos(2 * pi * seq(n_months) / 12)
 
 
 ## names of solutes
 solutes <- df %>%
   select(starts_with("FWA")) %>%
   colnames
-
-## first and last water years
-yr_first <- min(df$dec_water_yr)
-yr_last <- floor(max(df$dec_water_yr))
 
 ## empty lists for model fits
 mod_set_RW <- vector("list", length(solutes))
