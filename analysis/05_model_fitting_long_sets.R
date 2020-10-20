@@ -14,7 +14,7 @@ sites_yrs <- data.frame(site = c("DOR", "ELA", "HJA", "HBEF", "MEF", "TLW"),
                         year_last = c(2014, 2013, 2018, 2018, 2016, 2010))
 
 ## names of solutes to analyze
-solutes <- c("FWACamgL", "FWATDPmgL")
+solutes <- c("FWACamgL", "FWATDPmgL", "FWANO3NmgL")
 
 ## models to fit
 models <- c("catch", "catch + bias", "site", "site + bias")
@@ -22,7 +22,7 @@ models <- c("catch", "catch + bias", "site", "site + bias")
 n_mods <- length(solutes) * length(sites_yrs$site) * length(models)
   
 ## df for results
-tbl_mod_sel <- data.frame(solute = rep(c("Ca", "TDP"), ea = length(sites_yrs$site) * length(models)),
+tbl_mod_sel <- data.frame(solute = rep(c("Ca", "TDP", "NO3N"), ea = length(sites_yrs$site) * length(models)),
                           site = rep(rep(sites_yrs$site, ea = length(models)), length(solutes)),
                           model = rep(models, length(solutes) * length(sites_yrs$site)),
                           AIC = rep(NA, n_mods))
@@ -61,6 +61,11 @@ for(i in 1:length(sites_yrs$site)) {
   ## loop over solutes
   for(j in solutes) {
     
+    ## skip sites without NO3N data
+    if(j == "FWANO3NmgL" & (sites_yrs$site[i] == "ELA" | sites_yrs$site[i] == "HJA")) {
+      break
+    }
+    
     ## select solute and pivot wider
     dat_to_fit <- dat_sol %>%
       select(site:dec_water_yr, all_of(j)) %>%
@@ -90,7 +95,7 @@ for(i in 1:length(sites_yrs$site)) {
     
     ## assign AIC to results table
     tbl_mod_sel <- tbl_mod_sel %>%
-      mutate(AIC = replace(AIC, which(solute == sub("(FWA)(.{2,3})(mgL)", "\\2", j)
+      mutate(AIC = replace(AIC, which(solute == sub("(FWA)(.{2,4})(mgL)", "\\2", j)
                                       & site == sites_yrs$site[i]
                                       & model == "catch"),
                            tmp$AIC))
@@ -103,7 +108,7 @@ for(i in 1:length(sites_yrs$site)) {
     
     ## assign AIC to results table
     tbl_mod_sel <- tbl_mod_sel %>%
-      mutate(AIC = replace(AIC, which(solute == sub("(FWA)(.{2,3})(mgL)", "\\2", j)
+      mutate(AIC = replace(AIC, which(solute == sub("(FWA)(.{2,4})(mgL)", "\\2", j)
                                       & site == sites_yrs$site[i]
                                       & model == "catch + bias"),
                            tmp$AIC))
@@ -127,7 +132,7 @@ for(i in 1:length(sites_yrs$site)) {
     
     ## assign AIC to results table
     tbl_mod_sel <- tbl_mod_sel %>%
-      mutate(AIC = replace(AIC, which(solute == sub("(FWA)(.{2,3})(mgL)", "\\2", j)
+      mutate(AIC = replace(AIC, which(solute == sub("(FWA)(.{2,4})(mgL)", "\\2", j)
                                       & site == sites_yrs$site[i]
                                       & model == "site"),
                            tmp$AIC))
@@ -141,7 +146,7 @@ for(i in 1:length(sites_yrs$site)) {
     
     ## assign AIC to results table
     tbl_mod_sel <- tbl_mod_sel %>%
-      mutate(AIC = replace(AIC, which(solute == sub("(FWA)(.{2,3})(mgL)", "\\2", j)
+      mutate(AIC = replace(AIC, which(solute == sub("(FWA)(.{2,4})(mgL)", "\\2", j)
                                       & site == sites_yrs$site[i]
                                       & model == "site + bias"),
                            tmp$AIC))
