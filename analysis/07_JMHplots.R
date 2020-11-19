@@ -295,6 +295,7 @@ Seas.TDP.df <- seasPlotFun.Site(12, Seas.TDP, "TDP")
     
   # Compare site & catchment fits
   # checked BBWM has one catchment  - EB
+
   pdf(file = file.path(here::here("plots"), "07p_SeasCompOfSiteCatch_so4.pdf"), height = 10, width = 5)
     ggplot() +
       geom_line(data = Seas.So4.Both.df, 
