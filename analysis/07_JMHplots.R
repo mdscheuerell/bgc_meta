@@ -8,6 +8,9 @@ library(ggpubr)
 # Timeseries plots - using short timeseries
 ###########################
 
+BlankTS <- seq.Date(from = as.Date("1984/10/01"), to = as.Date("2010/10/01"), "months")
+  
+
 # GET BEST MODELS
 # THE ORDER OF THE MODELS IS: Ca, DOC, NH4, NO3N, TDP, SO4
 # this is the "best" model for DOC, NH4, NO3, TDP
@@ -20,8 +23,8 @@ SeasUniqState <- readRDS(file = file.path(here::here("analysis"), "fitted_seas_u
 
 Ca <- as.data.frame(t(MarsSeasSiteStateB[[1]]$states)) %>% 
     mutate(solute = "Ca") %>% 
-    mutate(TimeNum = seq(1,313, by = 1)) # this is the # of rows in all of these files CAREFUL to change if needed
-
+    mutate(TimeNum = seq(1,313, by = 1)) %>%  # this is the # of rows in all of these files CAREFUL to change if needed
+    mutate(DateTime = BlankTS)
 Ca.se <- as.data.frame(t(MarsSeasSiteStateB[[1]]$states.se)) %>% 
     mutate(solute = "Ca") %>% 
     rename_with(~paste0(.,"__se"), BBWM:HJA) %>% 
@@ -29,7 +32,8 @@ Ca.se <- as.data.frame(t(MarsSeasSiteStateB[[1]]$states.se)) %>%
 
 DOC <- as.data.frame(t(MarsSeasSiteState[[2]]$states)) %>% 
   mutate(solute = "DOC") %>% 
-  mutate(TimeNum = seq(1,313, by = 1))
+  mutate(TimeNum = seq(1,313, by = 1)) %>% 
+  mutate(DateTime = BlankTS)
 
 DOC.se <- as.data.frame(t(MarsSeasSiteState[[2]]$states.se))%>% 
   mutate(solute = "DOC") %>% 
@@ -38,7 +42,8 @@ DOC.se <- as.data.frame(t(MarsSeasSiteState[[2]]$states.se))%>%
 
 NH4N <- as.data.frame(t(MarsSeasSiteState[[3]]$states)) %>% 
   mutate(solute = "NH4N") %>% 
-  mutate(TimeNum = seq(1,313, by = 1))
+  mutate(TimeNum = seq(1,313, by = 1)) %>% 
+  mutate(DateTime = BlankTS)
 
 NH4N.se <- as.data.frame(t(MarsSeasSiteState[[3]]$states.se))%>% 
   mutate(solute = "NH4N") %>% 
@@ -47,7 +52,8 @@ NH4N.se <- as.data.frame(t(MarsSeasSiteState[[3]]$states.se))%>%
 
 NO3N <- as.data.frame(t(MarsSeasSiteState[[4]]$states)) %>% 
   mutate(solute = "NO3N") %>% 
-  mutate(TimeNum = seq(1,313, by = 1))
+  mutate(TimeNum = seq(1,313, by = 1)) %>% 
+  mutate(DateTime = BlankTS)
 
 NO3N.se <- as.data.frame(t(MarsSeasSiteState[[4]]$states.se))%>% 
   mutate(solute = "NO3N") %>% 
@@ -59,7 +65,8 @@ TDP <- as.data.frame(t(MarsSeasSiteState[[5]]$states)) %>%
   mutate(solute = "TDP",
          BBWM = as.numeric("NA")) %>% 
   select(BBWM, HBEF, MEF, TLW, DOR, ELA, HJA, solute) %>% 
-  mutate(TimeNum = seq(1,313, by = 1))
+  mutate(TimeNum = seq(1,313, by = 1)) %>% 
+  mutate(DateTime = BlankTS)
 
 TDP.se <- as.data.frame(t(MarsSeasSiteState[[5]]$states.se))%>% 
   mutate(solute = "TDP",
@@ -71,7 +78,8 @@ TDP.se <- as.data.frame(t(MarsSeasSiteState[[5]]$states.se))%>%
 # THIS IS NOT THE BEST MODEL FOR SO4 B/C IT WOULDN'T FIT IN DF
 SO4S <- as.data.frame(t(MarsSeasSiteState[[6]]$states)) %>% 
   mutate(solute = "SO4S") %>% 
-  mutate(TimeNum = seq(1,313, by = 1))
+  mutate(TimeNum = seq(1,313, by = 1)) %>% 
+  mutate(DateTime = BlankTS)
 
 SO4S.se <- as.data.frame(t(MarsSeasSiteState[[6]]$states.se))%>% 
   mutate(solute = "SO4S") %>% 
@@ -82,6 +90,8 @@ states0 <- rbind(Ca, DOC, NH4N, NO3N, TDP, SO4S) %>%
   pivot_longer(cols = BBWM:HJA, names_to = "site", values_to = "state")%>% 
   mutate(SiteSolNum = paste0(site,"__",solute, "__",TimeNum))
 
+#Check
+# plot(states0$DateTime ~ states0$TimeNum)
 
 states.se <- rbind(Ca.se, DOC.se, NH4N.se, NO3N.se, TDP.se, SO4S.se) %>% 
   pivot_longer(cols = BBWM__se:HJA__se, names_to = "site", values_to = "state.se") %>% 
@@ -91,20 +101,23 @@ states.se <- rbind(Ca.se, DOC.se, NH4N.se, NO3N.se, TDP.se, SO4S.se) %>%
 states <- states0 %>% 
   full_join(states.se %>% 
               select(state.se, SiteSolNum), by = "SiteSolNum") %>% 
-  mutate(site = fct_relevel(site, c("HJA", "ELA", "MEF", "TLW", "DOR", "HBEF", "BBWM")))
+  mutate(site = fct_relevel(site, c("HJA", "ELA", "MEF", "TLW", "DOR", "HBEF", "BBWM")),
+         DateTime = as.POSIXct(DateTime, format = "%Y-%m-%d"))
+
 
 
 # Make plot
 pdf(file = file.path(here::here("plots"), "07p_NO3timeseriesPlot.pdf"), height = 6, width = 10)
 ggplot(states %>% 
-         filter(solute == "NO3N"), aes(y = state, x = TimeNum)) +
+         filter(solute == "NO3N"), aes(y = state, x = DateTime)) +
   geom_line() +
   geom_ribbon(data = states%>% 
-                filter(solute == "NO3N"), aes(ymin = state - state.se, ymax = state + state.se, x = TimeNum), alpha = 0.25, color = "transparent", fill = "grey20") +
+                filter(solute == "NO3N"), aes(ymin = state - state.se, ymax = state + state.se, x = DateTime), alpha = 0.25, color = "transparent", fill = "grey20") +
   facet_grid(site ~.) +
   theme_bw() +
-  ylab(expression(paste(NO[3],"-N state (± 1 SE)"))) +
+  ylab(expression(paste(NO[3]^{"-"},"-N state (± 1 SE)"))) +
   xlab("Time") +
+  scale_x_datetime(date_labels = "%b-%y", date_breaks = "5 years") +
   scale_y_continuous(breaks = c(-7.5, 0, 7.5), limits = c(-7.5,7.5)) +
   theme(axis.title = element_text(size = 20),
         axis.text = element_text(size = 14),
@@ -330,7 +343,10 @@ SeasDat <- rbind(Seas.Ca.df, Seas.Doc.df, Seas.NH4.df, Seas.NO3.df, Seas.TDP.df,
                    # ugh don't know a better way to do this
                    DateIsh = as.POSIXct(paste0("01-",month3,"-2020"), format = "%d-%m-%Y"),
                    doy = as.POSIXct(paste0("01-",month3,"-2020"), format = "%j"),
-                   monthName = strftime(paste0("01-",month3,"-2020"), format = "%b")) 
+                   monthName = strftime(paste0("01-",month3,"-2020"), format = "%b"),
+                   solute2 = fct_recode(solute, "Calcium" = "Ca", "Dissolved organic C" = "DOC",
+                                       "Ammonium" = "NH4", "Nitrate" = "NO3", "Total dissolved P" = "TDP",
+                                       "Sulfate" = "SO4")) 
     
   
   
@@ -338,12 +354,18 @@ pdf(file = file.path(here::here("plots"), "07p_SeasBySolute.pdf"), height = 8, w
   ggplot(SeasDat, 
          aes(y = seas, x = DateIsh, color = sites, linetype = Sig2)) +
     geom_line(size = 1.25) +
-    scale_color_brewer(palette = "Set2")+
-    scale_linetype_manual(values = c("dotted" ,"dashed", "solid")) +
+    scale_color_brewer(palette = "Set2", name = "Sites")+
+    scale_linetype_manual(values = c("dotted" ,"dashed", "solid"), name = "Significant coef") +
     scale_x_datetime(date_labels = "%b") +
-    facet_wrap(vars(solute), nrow = 3, ncol = 3) +
+    facet_wrap(vars(solute2), nrow = 3, ncol = 3) +
     xlab(NULL) +
-    theme_bw()
+    ylab("Seasonality") +
+    theme_bw() +
+    theme(
+      axis.text = element_text(size = 12),
+      axis.title.y = element_text(size = 18),
+      panel.grid.minor = element_blank()
+    )
 dev.off()
 
 
@@ -360,6 +382,7 @@ pdf(file = file.path(here::here("plots"), "07p_SeasBySite.pdf"), height = 8, wid
 dev.off()
 
 
+# RAW TIMESERIES DATA
 # Let's check one or two of these
 library(lubridate)
 df <- readr::read_csv(file.path(here::here("data"), "tbl_solutes_unmanaged_mon.csv")) %>% 
@@ -381,7 +404,7 @@ ggplot(df, aes(y = log(FWATDPmgL), x = doy, color = Yf)) +
   # facet_grid(site ~ catchment)
 dev.off()
 
-# save.image("07_JMHplots_Rdat")
+save.image("07_JMHplots_Rdat")
 # load("07_JMHplots_Rdat")
 
 
