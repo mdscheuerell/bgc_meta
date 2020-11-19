@@ -141,7 +141,7 @@ CaCoef2 <- CaCoef %>%
 # Seasonality Plots
 ###########################
 
-# FUCTION TO BUILD SEASONAL DATASET
+# FUCTIONS TO BUILD SEASONAL DATASET
 # https://stackoverflow.com/questions/24384179/how-to-determine-whether-two-variables-have-the-same-sign-in-r/24384436
 SigFun <- function(a,b) {ifelse(a == 0 | b == 0,"FALSE",!xor(sign(a)+1,sign(b)+1))}
 
@@ -196,7 +196,8 @@ SeasDatFun.Unique <- function(MarsMod, SitesList){
 }
 
 
-# FUNCTION TO GENERATE TIME SERIES FOR PLOTING
+# FUNCTIONS TO GENERATE TIME SERIES FOR PLOTING
+# for sites
 seasPlotFun.Site <- function(periodS, MarsDF, solute){
   # set up sin and cos matrix
   # periodS <- 12# TEST
@@ -227,6 +228,7 @@ seasPlotFun.Site <- function(periodS, MarsDF, solute){
   seas.F.df2
 }
 
+# For catchments
 seasPlotFun.Unique <- function(periodS, MarsDF, solute){
   # set up sin and cos matrix
   periodS <- 12# TEST
@@ -277,7 +279,7 @@ Seas.NO3.df <- seasPlotFun.Site(12, Seas.NO3, "NO3")
 Seas.TDP <- SeasDatFun.Site(MarsSeasSiteState[[5]], SitesList_4Tdp)
 Seas.TDP.df <- seasPlotFun.Site(12, Seas.TDP, "TDP") 
 
-# BEST MODEL UNIQUE SITES BEST HERE SO DOING IT BOTH WAYS
+# SO4: BEST MODEL UNIQUE SITES BEST HERE SO DOING IT BOTH WAYS
   # Sites
     Seas.SO4.Site <- SeasDatFun.Site(MarsSeasSiteState[[6]], SitesList_Not4Tdp)
     Seas.SO4.Site.df <- seasPlotFun.Site(12, Seas.SO4.Site, "SO4")
@@ -293,12 +295,13 @@ Seas.TDP.df <- seasPlotFun.Site(12, Seas.TDP, "TDP")
     
   # Compare site & catchment fits
   # checked BBWM has one catchment  - EB
-  pdf(file = file.path(here::here("plots"), "07p_SeasCompOfSiteCatch.pdf"), height = 10, width = 5)
+  pdf(file = file.path(here::here("plots"), "07p_SeasCompOfSiteCatch_so4.pdf"), height = 10, width = 5)
     ggplot() +
       geom_line(data = Seas.So4.Both.df, 
                  aes(y = seas_catch, x = month, color = catchment))+
       geom_line(data = Seas.So4.Both.df, 
                 aes(y = seas_sites, x = month)) +
+      # scale_color_brewer(palette = "Set2")+
       facet_grid(sites ~.)
   dev.off()
       
@@ -308,31 +311,77 @@ Seas.TDP.df <- seasPlotFun.Site(12, Seas.TDP, "TDP")
 SeasDat <- rbind(Seas.Ca.df, Seas.Doc.df, Seas.NH4.df, Seas.NO3.df, Seas.TDP.df, Seas.SO4.Site.df) %>% 
             mutate(sites = fct_relevel(sites, c("HJA", "ELA", "MEF", "TLW", "DOR", "HBEF", "BBWM")),
                    Sig2 = fct_relevel(Sig2, c("no", "one", "both")),
-                   solute = fct_relevel(solute, c("Ca", "DOC", "NH4", "NO3", "TDP", "SO4"))) 
+                   solute = fct_relevel(solute, c("Ca", "DOC", "NH4", "NO3", "TDP", "SO4")), 
+                   #corrected for water year
+                   month2 = ifelse(month == "1", "10",
+                              ifelse(month == "2", "11",
+                                ifelse(month == "3", "12",
+                                  ifelse(month == "4", "1",
+                                    ifelse(month == "5", "2",
+                                      ifelse(month == "6", "3",
+                                        ifelse(month == "7", "4",
+                                          ifelse(month == "8", "5",
+                                            ifelse(month == "9", "6", 
+                                              ifelse(month == "10", "7",
+                                                ifelse(month == "11", "8",
+                                                  ifelse(month == "12", "9", "blah")))))))))))),
+                   month3 = as.numeric(month2),
+                   # ugh don't know a better way to do this
+                   DateIsh = as.POSIXct(paste0("01-",month3,"-2020"), format = "%d-%m-%Y"),
+                   doy = as.POSIXct(paste0("01-",month3,"-2020"), format = "%j"),
+                   monthName = strftime(paste0("01-",month3,"-2020"), format = "%b")) 
     
   
   
-pdf(file = file.path(here::here("plots"), "07p_SeasBySolute.pdf"), height = 10, width = 10)
+pdf(file = file.path(here::here("plots"), "07p_SeasBySolute.pdf"), height = 8, width = 10)
   ggplot(SeasDat, 
-         aes(y = seas, x = month, color = sites, linetype = Sig2)) +
-    geom_line() +
+         aes(y = seas, x = DateIsh, color = sites, linetype = Sig2)) +
+    geom_line(size = 1.25) +
+    scale_color_brewer(palette = "Set2")+
     scale_linetype_manual(values = c("dotted" ,"dashed", "solid")) +
+    scale_x_datetime(date_labels = "%b") +
     facet_wrap(vars(solute), nrow = 3, ncol = 3) +
+    xlab(NULL) +
     theme_bw()
 dev.off()
 
 
-pdf(file = file.path(here::here("plots"), "07p_SeasBySite.pdf"), height = 10, width = 10)
+pdf(file = file.path(here::here("plots"), "07p_SeasBySite.pdf"), height = 8, width = 10)
   ggplot(SeasDat, 
-         aes(y = seas, x = month, color = solute, linetype = Sig2)) +
-    geom_line() +
+         aes(y = seas, x = DateIsh, color = solute, linetype = Sig2)) +
+    geom_line(size = 1.25) +
+    scale_x_datetime(date_labels = "%b") +
+    xlab(NULL) +
     scale_linetype_manual(values = c("dotted" ,"dashed", "solid")) +
+    scale_color_brewer(palette = "Set2")+
     facet_wrap(vars(sites), nrow = 3, ncol = 3) +
     theme_bw()
 dev.off()
 
 
-save.image("07_JMHplots_Rdat")
+# Let's check one or two of these
+library(lubridate)
+df <- readr::read_csv(file.path(here::here("data"), "tbl_solutes_unmanaged_mon.csv")) %>% 
+  # this is not correct because date is water not calender year, but probably within a couple months
+  mutate(dec_water_yr2 = format(date_decimal(dec_water_yr), "%d-%m-%Y"),
+         # Water year starts on 1 Oct.
+         dec_water_yr3 = as.POSIXct(dec_water_yr2, format = "%d-%m-%Y") - (92*24*60*60),
+         Y = as.numeric(strftime(dec_water_yr3, format = "%Y")),
+         Yf = as.factor(as.character(Y)),
+         M = strftime(dec_water_yr3, format = "%m"),
+         doy = as.numeric(strftime(dec_water_yr3, format = "%j"))) 
+
+# This looks roughly similar but note that the months are different between this ans seasonality
+pdf(file = file.path(here::here("plots"), "07p_RawSeasonalityPlots_TDP.pdf"), height = 10, width = 10)
+ggplot(df, aes(y = log(FWATDPmgL), x = doy, color = Yf)) +
+  geom_point(size = 0.5, alpha = 0.5) +
+  facet_wrap(vars(site,catchment)) +
+  stat_smooth(se = FALSE, size = 0.5)
+  # facet_grid(site ~ catchment)
+dev.off()
+
+# save.image("07_JMHplots_Rdat")
+# load("07_JMHplots_Rdat")
 
 
 
