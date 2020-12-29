@@ -109,7 +109,8 @@ SO4.fwa <- dat_ann %>% ggplot(aes(x = WaterYear, y = FWASO4SmgL, color = catchme
 
 ## Monthly mean concentration ##
 # Calcium
-Ca.fwm <- dat_mon %>% ggplot(aes(x = WaterYear, y = FWACamgL, color = catchment, shape = type)) +
+Ca.fwm <- dat_mon %>% filter(type == "unmanaged") %>%
+  ggplot(aes(x = WaterYear, y = FWACamgL, color = catchment, shape = type)) +
   geom_point() +
   geom_line() +
   facet_wrap(~site, ncol = 3, scales = "free_y")
@@ -120,7 +121,8 @@ Ca.fwm <- dat_mon %>% ggplot(aes(x = WaterYear, y = FWACamgL, color = catchment,
 # Units for LEF Ca are incorrect
 
 # DOC
-DOC.fwm <- dat_mon %>% ggplot(aes(x = WaterYear, y = FWADOCmgL, color = catchment, shape = type)) +
+DOC.fwm <- dat_mon %>% filter(type == "unmanaged") %>% 
+  ggplot(aes(x = WaterYear, y = FWADOCmgL, color = catchment, shape = type)) +
   geom_point() +
   geom_line() +
   facet_wrap(~site, ncol = 3, scales = "free_y")
@@ -130,7 +132,8 @@ DOC.fwm <- dat_mon %>% ggplot(aes(x = WaterYear, y = FWADOCmgL, color = catchmen
 # Check DOC outliers for HBEF
 
 #NH4
-NH4.fwm <- dat_mon %>% ggplot(aes(x = WaterYear, y = FWANH4NmgL, color = catchment, shape = type)) +
+NH4.fwm <- dat_mon %>% filter(type == "unmanaged") %>%
+  ggplot(aes(x = WaterYear, y = FWANH4NmgL, color = catchment, shape = type)) +
   geom_point() +
   geom_line() +
   facet_wrap(~site, ncol = 3, scales = "free_y")
@@ -138,7 +141,8 @@ NH4.fwm <- dat_mon %>% ggplot(aes(x = WaterYear, y = FWANH4NmgL, color = catchme
 # Check NH4 units for LEF
 
 #NO3
-NO3.fwm <- dat_mon %>% ggplot(aes(x = WaterYear, y = FWANO3NmgL, color = catchment, shape = type)) +
+NO3.fwm <- dat_mon %>% filter(type == "unmanaged") %>%
+  ggplot(aes(x = WaterYear, y = FWANO3NmgL, color = catchment)) +
   geom_point() +
   geom_line() +
   facet_wrap(~site, ncol = 3, scales = "free_y")
@@ -146,7 +150,8 @@ NO3.fwm <- dat_mon %>% ggplot(aes(x = WaterYear, y = FWANO3NmgL, color = catchme
 # Units incorrect for LEF
 
 #TDP
-TDP.fwm <- dat_mon %>% ggplot(aes(x = WaterYear, y = FWATDPmgL, color = catchment, shape = type)) +
+TDP.fwm <- dat_mon %>% filter(type == "unmanaged") %>% 
+  ggplot(aes(x = WaterYear, y = FWATDPmgL, color = catchment)) +
   geom_point() +
   geom_line() +
   facet_wrap(~site, ncol = 3, scales = "free_y")
@@ -154,7 +159,8 @@ TDP.fwm <- dat_mon %>% ggplot(aes(x = WaterYear, y = FWATDPmgL, color = catchmen
 # Erroneous values at beginning of CWT record
 
 # SO4
-SO4.fwm <- dat_mon %>% ggplot(aes(x = WaterYear, y = FWASO4SmgL, color = catchment, shape = type)) +
+SO4.fwm <- dat_mon %>% filter(type == "unmanaged") %>%
+  ggplot(aes(x = WaterYear, y = FWASO4SmgL, color = catchment)) +
   geom_point() +
   geom_line() +
   facet_wrap(~site, ncol = 3, scales = "free_y")
