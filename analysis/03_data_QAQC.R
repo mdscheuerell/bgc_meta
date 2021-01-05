@@ -168,3 +168,15 @@ SO4.fwm <- dat_mon %>% filter(type == "unmanaged") %>%
 ggsave(path = "plots", filename = "SO4.fwm.pdf", width = 11, height = 8)
 
 # Are the outlier values at SLP (~3 points) & TLW (~6 points) real?
+
+########
+# scatterplot matrix (JMH)
+####
+library(GGally)
+
+df <- readr::read_csv(file.path(here::here("data"), "monthly_data.csv")) %>% 
+  select(catchment, Year, Month, StrCamgL:StrSO4SmgL, FWACamgL:FWASO4SmgL) %>% 
+  mutate(date = as.POSIXct(paste0(Year, "-", Month, "-01"), format ="%Y-%m-%d"))
+
+ggpairs(df %>% 
+          select(StrCamgL:FWASO4SmgL))
