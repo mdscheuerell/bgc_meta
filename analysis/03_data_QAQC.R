@@ -170,13 +170,154 @@ ggsave(path = "plots", filename = "SO4.fwm.pdf", width = 11, height = 8)
 # Are the outlier values at SLP (~3 points) & TLW (~6 points) real?
 
 ########
-# scatterplot matrix (JMH)
+# Are FWA and concentrations identical (JMH)
 ####
-library(GGally)
+
+
+# FYI – Here’s how this traces to the data used in the MARSS analyses: 
+# It looks like Mark’s MARSS script uses “tbl_solutes_unmanaged_mon.csv” which only has FWMCs. 
+# That can be traced back to “tbl_solutes_unmanaged_mon.csv” which was created in “02_data_screening”,
+# which can be traced back to “monthly_data.csv” which was created in “01_data_munging”.
+# “monthly_data.csv” has both concentrations and FWMCs. 
 
 df <- readr::read_csv(file.path(here::here("data"), "monthly_data.csv")) %>% 
-  select(catchment, Year, Month, StrCamgL:StrSO4SmgL, FWACamgL:FWASO4SmgL) %>% 
-  mutate(date = as.POSIXct(paste0(Year, "-", Month, "-01"), format ="%Y-%m-%d"))
+  filter(type == "unmanaged") %>% 
+  filter(site %in% c("HJA", "ELA", "MEF", "TLW", "DOR", "HBEF", "BBWM")) %>% 
+  # don't know why there are NA's in Year/Month
+  filter(!is.na(Year)) %>% 
+  mutate(date = as.POSIXct(paste0(Year, "-", Month, "-01"), format ="%Y-%m-%d")) %>% 
+  select(site, catchment, date, StrCamgL:StrSO4SmgL, FWACamgL:FWASO4SmgL) 
+  
+# rearranging data
+df.conc <- df %>% 
+  select(site:StrSO4SmgL) %>% 
+  pivot_longer(col = StrCamgL:StrSO4SmgL, values_to = "values", names_to = "vars") %>% 
+  mutate(solute = str_remove(vars, "Str"),
+         var = "Conc") %>% 
+  select(-vars)
 
-ggpairs(df %>% 
-          select(StrCamgL:FWASO4SmgL))
+df.fwa <- df %>% 
+  select(site:date, FWACamgL:FWASO4SmgL) %>% 
+  pivot_longer(col = FWACamgL:FWASO4SmgL, values_to = "values", names_to = "vars") %>% 
+  mutate(solute = str_remove(vars, "FWA"),
+         var = "FWA") %>% 
+  select(-vars)
+
+# data in long form 
+df2 <- rbind(df.conc, df.fwa) %>% 
+  mutate(across(c("site", "catchment", "solute", "var"), factor))
+
+# data in wide form with conc and fwa in columns
+df2w <- df2 %>% 
+  pivot_wider(names_from = var, values_from = values)
+  # pivot_wider(id_cols = c(catchment, Year, Month, solute), names_from = "var", values_from = "values")
+
+# scatterplots of FWA v. Conc
+ConFWA.Ca <- ggplot(df2w %>% 
+         filter(solute == "CamgL"), aes(y = FWA, x = Conc)) +
+  geom_point() +
+  facet_wrap(vars(site, catchment), scales = "free") +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  ggtitle("CamgL")
+
+ConFWA.DOC <- ggplot(df2w %>% 
+         filter(solute == "DOCmgL"), aes(y = FWA, x = Conc)) +
+  geom_point() +
+  facet_wrap(vars(site, catchment), scales = "free") +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  ggtitle("DOCmgL")
+
+ConFWA.NH4 <- ggplot(df2w %>% 
+         filter(solute == "NH4NmgL"), aes(y = FWA, x = Conc)) +
+  geom_point() +
+  facet_wrap(vars(site, catchment), scales = "free") +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  ggtitle("NH4NmgL")
+
+ConFWA.NO3 <- ggplot(df2w %>% 
+         filter(solute == "NO3NmgL"), aes(y = FWA, x = Conc)) +
+  geom_point() +
+  facet_wrap(vars(site, catchment), scales = "free") +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  ggtitle("NO3NmgL")
+
+ConFWA.SO4 <- ggplot(df2w %>% 
+         filter(solute == "SO4SmgL"), aes(y = FWA, x = Conc)) +
+  geom_point() +
+  facet_wrap(vars(site, catchment), scales = "free") +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  ggtitle("SO4SmgL")
+
+ConFWA.TDP <- ggplot(df2w %>% 
+         filter(solute == "TDPmgL"), aes(y = FWA, x = Conc)) +
+  geom_point() +
+  facet_wrap(vars(site, catchment), scales = "free") +
+  geom_abline(intercept = 0, slope = 1, color = "red") +
+  ggtitle("TDPmgL")
+
+pdf(file.path(here::here("plots"), "ConcVfwaPlots.pdf"), height = 8, width = 12)
+ConFWA.Ca
+ConFWA.DOC
+ConFWA.NH4
+ConFWA.NO3
+ConFWA.SO4
+ConFWA.TDP
+dev.off()
+
+# timeseries of FWA and conc
+ConWTA.ts.Ca <- ggplot(df2 %>% 
+         filter(solute == "CamgL"), aes(y = log(values), x = date, color = var)) +
+  geom_line(alpha = 0.25) +
+  facet_wrap(vars(site, catchment), scales = "free_y") +
+  ggtitle("CamgL")
+
+ConWTA.ts.Ca.C34 <- ggplot(df2 %>% 
+                         filter(solute == "CamgL") %>% 
+                        filter(catchment == "C34"), aes(y = log(values), x = date, color = var)) +
+  geom_line(alpha = 0.25) +
+  ggtitle("CamgL Catchment C34")
+
+ConWTA.ts.DOC <- ggplot(df2 %>% 
+         filter(solute == "DOCmgL"), aes(y = log(values), x = date, color = var)) +
+  geom_line(alpha = 0.25) +
+  facet_wrap(vars(site, catchment), scales = "free_y") +
+  ggtitle("DOCmgL")
+
+
+ConWTA.ts.NH4 <- ggplot(df2 %>% 
+         filter(solute == "NH4NmgL"), aes(y = values, x = date, color = var)) +
+  geom_line(alpha = 0.25) +
+  facet_wrap(vars(site, catchment), scales = "free_y")+
+  ggtitle("NH4NmgL")
+
+# are the missing NH4 values real NA's: Yes 864 NAs of 936
+EB.NH4 <- df2 %>% 
+  filter(solute == "NH4NmgL") %>% 
+  filter(catchment == "EB")
+
+ConWTA.ts.NO3 <- ggplot(df2 %>% 
+         filter(solute == "NO3NmgL"), aes(y = log(values), x = date, color = var)) +
+  geom_line(alpha = 0.25) +
+  facet_wrap(vars(site, catchment), scales = "free_y")+
+  ggtitle("NO3NmgL")
+
+ConWTA.ts.SO4 <- ggplot(df2 %>% 
+                          filter(solute == "SO4SmgL"), aes(y = log(values), x = date, color = var)) +
+  geom_line(alpha = 0.25) +
+  facet_wrap(vars(site, catchment), scales = "free_y")+
+  ggtitle("SO4SmgL")
+
+ConWTA.ts.TDP <- ggplot(df2 %>% 
+         filter(solute == "TDPmgL"), aes(y = log(values), x = date, color = var)) +
+  geom_line(alpha = 0.25) +
+  facet_wrap(vars(site, catchment), scales = "free_y")+
+  ggtitle("TDPmgL")
+
+pdf(file.path(here::here("plots"), "ConWTATimeSeries.pdf"), height = 8, width = 12)
+ConWTA.ts.Ca
+ConWTA.ts.DOC
+ConWTA.ts.NH4
+ConWTA.ts.NO3
+ConWTA.ts.SO4
+ConWTA.ts.TDP
+dev.off()
