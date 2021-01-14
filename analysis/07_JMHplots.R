@@ -405,8 +405,12 @@ ggplot(df, aes(y = log(FWATDPmgL), x = doy, color = Yf)) +
 dev.off()
 
 save.image("07_JMHplots_Rdat")
-# load("07_JMHplots_Rdat")
+load("07_JMHplots_Rdat")
 
+
+df %>% 
+  group_by(site) %>% 
+  summarize_at(vars(FWACamgL:FWASO4SmgL), list(mean = mean), na.rm = TRUE)
 
 
 

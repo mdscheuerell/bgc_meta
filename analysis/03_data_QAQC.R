@@ -188,6 +188,10 @@ df <- readr::read_csv(file.path(here::here("data"), "monthly_data.csv")) %>%
   mutate(date = as.POSIXct(paste0(Year, "-", Month, "-01"), format ="%Y-%m-%d")) %>% 
   select(site, catchment, date, StrCamgL:StrSO4SmgL, FWACamgL:FWASO4SmgL) 
   
+df %>% 
+  split(.$catchment) %>% 
+  map(summary)
+
 # rearranging data
 df.conc <- df %>% 
   select(site:StrSO4SmgL) %>% 
