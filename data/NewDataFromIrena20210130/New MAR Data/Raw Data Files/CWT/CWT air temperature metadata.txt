@@ -1,0 +1,8 @@
+Climate Stations 	WS 	Time Series WY	Source
+cs17			CWT17 	1986 to 2019 	Basin Map from Coweeta Hydrologic Laboratory 
+			CWT18 			https://www.srs.fs.usda.gov/coweeta/tools-and-data/CoweetaBasinMap.pdf
+cs21			CWT02	1991 to 2019 	
+			CWT07		
+
+Units
+Degrees Celsius

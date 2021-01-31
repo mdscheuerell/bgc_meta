@@ -1,0 +1,2980 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml packageId="knb-lter-hbr.208.3"
+  system="https://pasta.edirepository.org"
+  xmlns:eml="https://eml.ecoinformatics.org/eml-2.2.0"
+  xmlns:stmml="http://www.xml-cml.org/schema/stmml-1.2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="eml://ecoinformatics.org/eml-2.2.0  https://nis.lternet.edu/schemas/EML/eml-2.2.0/xsd/eml.xsd">
+  <access
+    authSystem="https://pasta.edirepository.org/authentication"
+    order="allowFirst" scope="document"
+      system="https://pasta.edirepository.org">
+    <allow>
+      <principal>uid=HBR,o=LTER,dc=ecoinformatics,dc=org</principal>
+      <permission>all</permission>
+    </allow>
+    <allow>
+      <principal>public</principal>
+      <permission>read</permission>
+    </allow>
+  </access>
+  <dataset>
+    <alternateIdentifier
+        system="https://doi.org">doi:10.6073/pasta/8fbffd791b09ddb746066ce5899fb477</alternateIdentifier><title>Continuous precipitation and stream chemistry data, Hubbard Brook Ecosystem Study, 1963 – present.</title>
+    <creator>
+      <individualName>
+        <givenName>Emily</givenName>
+        <surName>Bernhardt</surName>
+      </individualName>
+      <organizationName>Duke University</organizationName>
+      <electronicMailAddress>emily.bernhardt@duke.edu</electronicMailAddress>
+      <userId
+        directory="https://orcid.org">https://orcid.org/0000-0003-3031-621X</userId>
+    </creator>
+    <creator>
+      <individualName>
+        <givenName>Gene</givenName>
+        <surName>Likens</surName>
+      </individualName>
+      <organizationName>Cary Institute of Ecosystem Studies</organizationName>
+      <electronicMailAddress>likensg@caryinstitute.org</electronicMailAddress>
+      <userId
+        directory="https://orcid.org">https://orcid.org/0000-0002-0884-2726</userId>
+    </creator>
+    <creator>
+      <individualName>
+        <givenName>Emma</givenName>
+        <surName>Rosi</surName>
+      </individualName>
+      <organizationName>Cary Institute of Ecosystem Studies</organizationName>
+      <electronicMailAddress>rosie@caryinstitute.org</electronicMailAddress>
+      <userId
+          directory="https://orcid.org">https://orcid.org/0000-0002-3476-6368</userId>
+    </creator>
+    <pubDate>2020-10-30</pubDate>
+    <abstract>
+      <para>
+  The Hubbard Brook Ecosystem Study officially began on 1 June 1963. 
+  This archive contains HBWatER, the results of &gt;50 years of
+  collection and analysis of weekly stream water and precipitation
+  samples obtained from 1 June 1963 to the most recently approved water
+  year. Stream chemistry is reported for nine gauged watersheds and the
+  mainstem of Hubbard Brook. Precipitation chemistry is reported for
+  rain collectors on both the north facing and south facing slopes of
+  the Hubbard Brook valley. All solute data are reported as
+  concentrations in (mg/l). HBWatER originated with the idea of applying
+  the small watershed approach to study element flux and cycling through
+  intact ecosystems. These chemical data have been used in conjunction
+  with continuous streamflow and precipitation records to estimate
+  watershed biogeochemical inputs and outputs. Such records have been
+  instrumental in: identifying the existence and the impact of acid rain
+  and then documenting its decline and legacy impacts on forested
+  watersheds; documenting the effects of deforestation and natural
+  forest disturbance on ecosystem nutrient exports; and in constructing
+  element budgets for ecosystems over succession. Hundreds of published
+  papers have taken advantage of HBWatER to understand how elements
+  cycle through ecosystems.
+</para>
+      <para>
+  These data were gathered as part of the Hubbard Brook Ecosystem Study
+  (HBES). The HBES is a collaborative effort at the Hubbard Brook
+  Experimental Forest, which is operated and maintained by the USDA
+  Forest Service, Northern Research Station.
+</para>
+    </abstract>
+    <keywordSet>
+      <keyword>ecosystems</keyword>
+      <keyword>forests</keyword>
+      <keyword>watersheds</keyword>
+      <keyword>streams</keyword>
+      <keyword>water chemistry</keyword>
+      <keyword>precipitation</keyword>
+      <keyword>acid neutralizing capacity</keyword>
+      <keyword>ammonium</keyword>
+      <keyword>calcium</keyword>
+      <keyword>chloride</keyword>
+      <keyword>magnesium</keyword>
+      <keyword>nitrate</keyword>
+      <keyword>pH</keyword>
+      <keyword>phosphate</keyword>
+      <keyword>potassium</keyword>
+      <keyword>sodium</keyword>
+      <keyword>sulfate</keyword>
+      <keywordThesaurus>LTER Controlled Vocabulary</keywordThesaurus>
+    </keywordSet>
+    <keywordSet>
+      <keyword>disturbance</keyword>
+      <keywordThesaurus>LTER Core Research Area</keywordThesaurus>
+    </keywordSet>
+    <keywordSet>
+      <keyword>HBR</keyword>
+      <keyword>Hubbard Brook LTER</keyword>
+      <keyword>Hubbard Brook Experimental Forest</keyword>
+      <keyword>Hubbard Brook Ecosystem Study</keyword>
+      <keyword>HBES</keyword>
+      <keyword>HBEF</keyword>
+      <keyword>New Hampshire</keyword>
+      <keyword>NH</keyword>
+      <keyword>White Mountain National Forest</keyword>
+      <keywordThesaurus>HBES Vocabulary</keywordThesaurus>
+    </keywordSet>
+    <keywordSet>
+      <keyword>LTREB</keyword>
+    </keywordSet>
+    <keywordSet>
+      <keyword>Ecology, Ecosystems, &amp; Environment</keyword>
+      <keywordThesaurus>National Research &amp; Development Taxonomy</keywordThesaurus>
+    </keywordSet>
+    <intellectualRights>
+      <para>This information is released under the Creative Commons license - Attribution - CC BY (https://creativecommons.org/licenses/by/4.0/). The consumer of these data (\"Data User\" herein) is required to cite it appropriately in any publication that results from its use. The Data User should realize that these data may be actively used by others for ongoing research and that coordination may be necessary to prevent duplicate publication. The Data User is urged to contact the authors of these data if any questions about methodology or results occur. Where appropriate, the Data User is encouraged to consider collaboration or co-authorship with the authors. The Data User should realize that misinterpretation of data may occur if used out of context of the original study. While substantial efforts are made to ensure the accuracy of data and associated documentation, complete accuracy of data sets cannot be guaranteed. All data are made available \"as is.\" The Data User should be aware, however, that data are updated periodically and it is the responsibility of the Data User to check for new versions of the data. The data authors and the repository where these data were obtained shall not be liable for damages resulting from any use or misinterpretation of the data. Thank you.
+</para>
+    </intellectualRights>
+    <coverage>
+      <geographicCoverage>
+        <geographicDescription>Hubbard Brook Experimental Forest</geographicDescription>
+        <boundingCoordinates>
+          <westBoundingCoordinate>-71.8062</westBoundingCoordinate>
+          <eastBoundingCoordinate>-71.7022</eastBoundingCoordinate>
+          <northBoundingCoordinate>43.959</northBoundingCoordinate>
+          <southBoundingCoordinate>43.914</southBoundingCoordinate>
+        </boundingCoordinates>
+      </geographicCoverage>
+      <temporalCoverage>
+        <rangeOfDates>
+          <beginDate>
+            <calendarDate>1963-06-01</calendarDate>
+          </beginDate>
+          <endDate>
+            <calendarDate>2019-05-31</calendarDate>
+          </endDate>
+        </rangeOfDates>
+      </temporalCoverage>
+    </coverage>
+    <maintenance>
+      <description>ongoing</description>
+    </maintenance>
+    <contact>
+      <organizationName>Hubbard Brook Ecosystem Study</organizationName>
+      <electronicMailAddress>hbr-im@lternet.edu</electronicMailAddress>
+    </contact>
+    <publisher><organizationName>Environmental Data Initiative</organizationName><electronicMailAddress>info@environmentaldatainitiative.org</electronicMailAddress><onlineUrl>https://environmentaldatainitiative.org</onlineUrl></publisher><pubPlace>Environmental Data Initiative</pubPlace><methods>
+      <methodStep>
+        <description>
+          <para>
+  1. Site description-
+</para>
+          <para>
+  a. Site type: The site is an experimental forest located in the White
+  Mountains of New Hampshire, operated under the supervision of the
+  Northern Research Station of the United States Forest Service.
+</para>
+          <para>
+  b. Geography: The Hubbard Brook Experimental Forest (HBEF) is
+  approximately 32 km2 and ranges in altitude from 222 to 1,015 m.
+</para>
+          <para>
+  “The HBEF is located within the townships of North Woodstock (~60 %),
+  Ellsworth (~40 %), and Warren (&lt;1 %), NH, within the White Mountain
+  National Forest of north central New Hampshire. Coordinates of 43°56′
+  N, 71°45′W bisect the area. The Atlantic Ocean is about 116 km to the
+  southeast. The nearest town is West Thornton, NH.” (Likens 2013)
+</para>
+          <para>
+  c. Habitat: The ecosystem is a mixed temperate hardwood forest
+  dominated by sugar maple (Acer saccharum), American beech (Fagus
+  grandifolia) and yellow birch (Betula alleghaniensis).
+</para>
+          <para>
+  d. Geology: Bedrock geology is composed of quartz-mica schists and
+  quartzite of the Silurian Rangeley Formation. Significant glacial
+  deposits overlay much of the landscape. Soils are of the spodosol and
+  inceptosol orders.
+</para>
+          <para>
+  e. Watersheds/hydrology:
+</para>
+          <para>
+  “The experimental watershed-ecosystems range in size from 12 to 77 ha
+  and in altitude from 500 to 910 m. These headwater watersheds are all
+  steep (average slope of 20–30 %), with well-incised channels and
+  relatively distinct topographic divides. The height of the land
+  surrounding each watershed-ecosystems, the area, and the topography
+  all have been determined from ground surveys and aerial photography
+  and most recently augmented by Laser Imaging Detection and Ranging
+  (LIDAR). Experimental Watersheds 1–6 face S to SE; Watersheds 7–9 face
+  N to NE.” (Likens 2013)
+</para>
+          <para>
+  f. Site history: Secondary forest, logged ca. 1910. Extensive
+  treatment of the site history can be found in Holmes and Likens (2016)
+  and on the HBES web page (https://hubbardbrook.org).
+</para>
+          <para>
+  g. Climate: mean annual precipitation - 1434 mm, mean annual
+  temperature - 6°C
+</para>
+          <para>
+  2. Sampling design: The sampling design is exhaustively described in
+  the USFS technical report by Buso et al. (2000).
+</para>
+          <para>
+  Executive Summary of Methods: Water samples are collected every Monday
+  from all stream sites and rain gauges. Water is collected in acid
+  washed, HDPE bottles and returned to the lab for filtration. At the
+  time of collection, the field technician records gauge height for each
+  watershed and precipitation volume for each rain gauge. Stream samples
+  are always collected from the same location.
+</para>
+          <para>
+  Samples are returned to the USFS Pierce laboratory at Hubbard Brook
+  within hours of collection. There samples are analyzed for DIC, pH,
+  electrical conductivity. Beginning in 2017 they were also examined
+  spectrophotometrically at five wavelengths. A subsample is filtered
+  and shipped to the USFS Durham laboratory for subsequent analyses. The
+  remainder of the (unfiltered) sample is stored in the water sample
+  archive at USFS Pierce lab.
+</para>
+          <para>
+  Details on the Precipitation Chemistry Samples: Perhaps the most
+  important aspect to explain here is the way in which the precipitation
+  dataset is curated. Contamination issues always plague rain sampling
+  efforts, and the policy for the HBEF long-term record has been to
+  curate the dataset heavily so that only high quality sample
+  information is retained. To help explain this we provide the following
+  historical overview of the approach to QA/QC of precipitation samples.
+</para>
+          <para>
+  Precipitation Chemistry records within the dataset were compiled from
+  separate sites at Hubbard Brook to represent the “best” sample (read
+  “cleanest”) for each weekly collection period. In the early years of
+  the HBES, the issue of precipitation contamination by coarse particles
+  (e.g., seeds and leaves) was clearly seen as a potential problem in
+  open collectors. While not exclusively a ‘growing season’ problem, the
+  worst incidents tended to occur in the summer and fall. Several
+  attempts were made to eliminate foreign objects, such as screens, wads
+  of poly-wool, and use of wet-only automated collectors, but these were
+  problematic in their own way. Screens had to be kept clean, and
+  sometimes precipitation was ‘filtered’ through trapped debris. It was
+  eventually decided that for ecosystem inputs, a bulk (continuously
+  open) collector was the most appropriate choice. This required the
+  positioning of several collectors so that at least one sample
+  collected from at least one site each week would be reasonably clean.
+</para>
+          <para>
+  Although occasional grossly contaminated samples were not analyzed
+  (that is, thrown out after collection), most precipitation samples
+  were sent to the analytical lab for solute determination even in the
+  presence of amorphous fine particulates. It turned out that some fine
+  particulates seemed to dissolve and influence the analysis (probably
+  bird feces), while others appeared to be relatively inert (probably
+  fine pieces of bark or grit). There was no evidence, in the early days
+  of the record, that selecting chemistry from different sites around
+  HBEF would result in significant bias. In fact, the existence of
+  particulate contamination was considered a more important factor in
+  QA/QC than any potential difference in chemistry across the valley.
+  Long-term data since then bear this out as a general truth. Of course,
+  the resulting input flux values were always calculated using the
+  closest volumetric rain gauge, or a pattern of rain gauges in the case
+  of a whole watershed, since the variation in precipitation volume is
+  significant.
+</para>
+          <para>
+  From 1963-1969, South facing precipitation (samples labeled “S”)
+  samples were chosen from the “cleanest” precipitation data. After
+  1969, we report the raw data for all uncontaminated samples collected
+  from any rain gauge.
+</para>
+          <para>
+  Research methods for sample analysis: The analytical methods prior to
+  2009 are exhaustively described in the USFS technical report by Buso
+  et al. (2000). Samples were analyzed at the Cary Institute of
+  Ecosystem Studies (Millbrook, NY)
+</para>
+          <para>
+  As of June 2013, after careful inter-laboratory comparisons, chemical
+  analyses were transferred from the Cary Institute of Ecosystem Studies
+  to the USDA Forest Service Lab in Durham, NH.
+</para>
+          <para>
+  Current Protocols (2013 to present):
+</para>
+          <para>
+  Streamwater samples are collected weekly in watersheds 1-9 upstream of
+  the weirs, at the main stem of Hubbard Brook, and the M.Lake Outlet.
+  Dedicated, site-specific, pre-labeled collection bottles are
+  thoroughly DIW rinsed in between collection days and checked for
+  cleanliness (Sp.Cond ≤ 2uS/cm) prior to sample collection. During each
+  collection, a 1000 mL and a 60 mL LDPE bottle are filled and rinsed 3
+  times with streamwater prior to sample collection from the collection
+  site. Samples are collected with no headspace in the 60 mL bottle to
+  allow subsequent DIC analysis. A field temperature measurement is
+  taken with an Oakton Acorn series thermistor, and gage height readings
+  are recorded, along with any relevant field notes. One duplicate
+  sample is taken each week at a rotating site for QA/QC.
+</para>
+          <para>
+  Prior to water year 2013 (June 1, 2013), samples were not filtered or
+  frozen prior to analysis. Since June 1, 2013 samples are brought back
+  to the Pierce Lab, and immediately vacuum filtered through 0.7um GF/F
+  filter into two pre-labeled 60 mL bottles. One bottle is frozen and
+  the other is refrigerated before being shipped to the USFS Durham lab
+  for cation/anion analysis.
+</para>
+          <para>
+  DIC samples are immediately refrigerated and run within 24 hours of
+  collection on a Shimadzu 8A Gas Chromatograph. pH, ANC and Specific
+  Conductivity measurements are run at room temperature within 48 hours
+  of collection. pH measurements are made on an Orion 3 Star pH meter
+  with a glass Ross pH combination electrode. An additional pH
+  measurement is run in parallel, during ANC titrations run on a Metrohm
+  888 Titrando titration system. ANC's are run using Gran titration
+  methods with a titrant concentration of .02N HCl. Specific
+  Conductivity measurements are run on a YSI model 32 Conductance meter.
+</para>
+          <para>
+  Any remaining volume after lab analyses are completed is saved and
+  poured off into acid washed 250 mL LDPE bottles, which are labeled and
+  stored in the archive building.
+</para>
+          <para>
+  Precipitation samples are collected weekly at rain gage sites RG22,
+  RG1, RG4 (analyzed only if RG1 is contaminated), RG11, RG19, and RG23.
+  In the event that precip is falling on a sample day, collections are
+  postponed until the precipitation ends. A funnel/ bottle rain
+  collector setup is used during the summer months, and 5 gallon HDPE
+  snow buckets serve as collectors in the winter. All precip collection
+  gear is acid washed annually prior to field deployment. Collectors are
+  replaced weekly with a clean setup which has been tap water scrubbed
+  and rinsed in copious amounts of DIW. All precip bottles/snow buckets
+  are tightly capped and bagged at collection time to prevent
+  contamination in transit.
+</para>
+          <para>
+  Since June 1, 2013 filtered, frozen samples are thawed and then
+  analyzed for multiple analytes and a subsample of filtered unfrozen
+  water is analyzed for monomeric Aluminum and acidified and run on the
+  ICP(full suite listed in Table 1). All methods used prior to 2013 are
+  described in Buso et al. 2000 and have been recently updated the
+  following publication by the USDA Forest Service, Northern Research
+  Station 2019 (USFS Durham Lab water analysis method detection limit
+  (MDL) limit of quantification (LOQ), 2010 - present. Environmental
+  Data Initiative.
+  https://doi.org/10.6073/pasta/890b1fadb61d3e86dc6f3d9afea79705
+</para>
+          <para>
+  Throughout the history of HBWatER there have been changes in
+  analytical protocols as new instrumentation or new techniques became
+  available. The history of the record from inception to 2000 is well
+  documented in Buso et al. 2000 and USFS Report 2019.
+</para>
+          <para>
+  Project personnel:
+</para>
+          <para>
+  Current Contributors: Tammy Wooster is responsible for weekly sample
+  collection and sample analysis and processing in the Pierce lab. Geoff
+  Wilson regularly assists in the weekly rounds. Brenda Minicucci
+  assists with data entry, data QA/QC and routine data analysis. Jeff
+  Merriam is responsible for chemical analyses of samples. Emily
+  Bernhardt and Emma Rosi are responsible for recruiting funding to
+  sustain the record, approving data for publication, and data analysis
+  for scientific discovery. Marie Carolina Simao is responsible for the
+  creation and maintenance of a data visualization portal that allows
+  users to easily interact with the HB WatER dataset
+  (www.hbef.streampulse.org)
+</para>
+          <para>
+  Past Contributors: For more than thirty years of this fifty year
+  research effort Don C. Buso led the effort to collect, filter, and
+  analyze samples and was responsible for data QA/QC and analysis. This
+  record would not exist without Don’s careful attention to detail. Many
+  technical support staff contributed to the collection, analysis,
+  management and maintenance of these long-term biogeochemical data
+  including Thomas Butler (1978-present), John Eaton (1965-1988), Donald
+  Buso (1975-2015), Phyllis Likens (1973-2014), Lorie Burkes, Jonathan
+  Crowdes, Larry Derosia, Brian Dresser, Yalinka Falusi, Marilyn Fox,
+  Steffan Freeman, Michael Hallet, Roy Hamme, Herb Karsten, Alexia
+  Kelley, Sue Koppes, Michael Koterba, Sherry Leis, James Lowe, Chris
+  Masson, Ezra Morency, Olive McGregor, Alex McPhail, Scott Nolan,
+  Barbara Polan, Ginny Scarlet, Denise Schmidt, Phyllis Sprague, Kathie
+  Weathers and Roseanne Withington. Co- Founders, F. H. Bormann, N. M.
+  Johnson and R. S. Pierce were instrumental in the initiation and
+  conduct of this overall, long-term project (The Hubbard Brook
+  Ecosystem Study).
+</para>
+          <para>
+  Data verification: Quality analysis / quality control has been
+  performed as described in Buso et al. (2000). All collected data are
+  included in the dataset, including data that failed QA/QC controls;
+  data that are questionably reliable are marked as “FALSE” in the QAQC
+  column of the dataset, and should be treated with extreme caution.
+</para>
+          <para>
+  Field Notes and Analysis Records: Field notes and field data
+  collection notes are transcribed into weekly data sheets. When entered
+  into HBWatER database, we carefully check that date, time of sample
+  collection, temperature, gage height, precipitation amounts, codes and
+  site observations are correct and within reported range. All chemical
+  analyses conducted at the Pierce lab (pH, ANC, Specific Conductance
+  and DIC) are entered into HBWatER and compared to historic and recent
+  data ranges of lab analyses.
+</para>
+          <para>
+  All lab analyses are compiled, periodically forwarded to the the
+  Forest Service and archived. When chemical analyses are received from
+  the Forest Service lab, all data is examined for obvious outliers. A
+  team of the Forest Serve lab technician/lab manager, field
+  technician/lab manager and data entry/ manager meet and review all
+  results of chemical analyses. A list of reruns is complied of possible
+  contaminated samples or errors in analysis. When reruns are complete
+  and database is complete the new data are reviewed by the lead
+  investigators prior to posting. All field notes are archived at the
+  Hubbard Brook Forest Service office.
+</para>
+          <para>
+  Citations:
+</para>
+          <para>
+  Buso, D. C., G. E. Likens and J. S. Eaton. 2000. Chemistry of
+  precipitation, stream water, and lake water from the Hubbard Brook
+  Ecosystem Study: A record of sampling protocols and analytical
+  procedures. General Technical Report NE-275. Newtown Square, PA., USDA
+  Forest Service, Northeastern Research Station. 52 pp.
+</para>
+          <para>
+  Holmes, Richard, and Gene E. Likens. 2016. <emphasis>Hubbard Brook:
+  The Story of a Forest Ecosystem</emphasis>. Yale University Press.
+</para>
+          <para>
+  Likens, G. E. 2013. Biogeochemistry of a Forested Ecosystem. Springer
+  New York, New York, NY.
+</para>
+          <para>
+  Merriam, J., W. H. McDowell, and W. S. Currie. 1996. A
+  High-Temperature Catalytic Oxidation Technique for Determining Total
+  Dissolved Nitrogen. Soil Sci. Soc. Am. J. 60:1050-1055
+</para>
+        </description>
+      </methodStep>
+    </methods>
+    <project>
+      <title>LTREB: Streams to Screens: Bringing the Hubbard Brook Watershed Ecosystem Record (HB-WatER) into the 21st Century (2019-07-01 to 2024-06-30)</title>
+      <personnel>
+        <individualName>
+          <givenName>Emma</givenName>
+          <surName>Rosi</surName>
+        </individualName>
+        <organizationName>Cary Institute of Ecosystem Studies</organizationName>
+        <electronicMailAddress>rosie@caryinstitute.org</electronicMailAddress>
+        <userId
+            directory="https://orcid.org">https://orcid.org/0000-0002-3476-6368</userId>
+        <role>Principal Investigator</role>
+      </personnel>
+      <funding>NSF 1907683</funding>
+      <relatedProject>
+        <title>LTREB Renewal at Hubbard Brook: Hydrologic-nutrient cycle interaction in small, undisturbed and human-manipulated ecosystems (2013-03-01 to 2020-02-29)</title>
+        <personnel>
+          <individualName>
+            <givenName>Gene</givenName>
+            <surName>Likens</surName>
+          </individualName>
+          <organizationName>Cary Institute of Ecosystem Studies</organizationName>
+          <electronicMailAddress>likensg@caryinstitute.org</electronicMailAddress>
+          <userId
+            directory="https://orcid.org">https://orcid.org/0000-0002-0884-2726</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation (NSF) 1256696</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>Collaborative Research: Hydrologic-Nutrient Cycle Interaction in Small Undisturbed and Manmanipulated Ecosystems; Start Date:11/01/1984; Organization:New York Botanical Garden</title>
+        <personnel>
+          <individualName>
+            <givenName>Gene</givenName>
+            <surName>Likens</surName>
+          </individualName>
+          <organizationName>Cary Institute of Ecosystem Studies</organizationName>
+          <electronicMailAddress>likensg@caryinstitute.org</electronicMailAddress>
+          <userId
+            directory="https://orcid.org">https://orcid.org/0000-0002-0884-2726</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation (NSF) 8406632</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>Collaborative Research on Hydrologic-Nutrient Cycle Interaction in Small Undisturbed and Manipulated Ecosystems; Start Date:09/01/1983; Organization:New York Botanical Garden</title>
+        <personnel>
+          <individualName>
+            <givenName>Gene</givenName>
+            <surName>Likens</surName>
+          </individualName>
+          <organizationName>Cary Institute of Ecosystem Studies</organizationName>
+          <electronicMailAddress>likensg@caryinstitute.org</electronicMailAddress>
+          <userId
+            directory="https://orcid.org">https://orcid.org/0000-0002-0884-2726</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation (NSF) 8341136</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>Hydrologic-Nutrient Cycle Interaction in Undisturbed and Man-Manipulated Watersheds, Part I; Start Date:09/01/1974; Organization:Cornell University</title>
+        <personnel>
+          <individualName>
+            <givenName>Gene</givenName>
+            <surName>Likens</surName>
+          </individualName>
+          <organizationName>Cary Institute of Ecosystem Studies</organizationName>
+          <electronicMailAddress>likensg@caryinstitute.org</electronicMailAddress>
+          <userId
+            directory="https://orcid.org">https://orcid.org/0000-0002-0884-2726</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation (NSF) 7420561</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>Collaborative Research on the Hydrologic-Nutrient Cycle Interaction in Small Undisturbed and Man-Manipulated Ecosystems; Start Date:09/01/1978; Organization:Cornell University</title>
+        <personnel>
+          <individualName>
+            <givenName>Gene</givenName>
+            <surName>Likens</surName>
+          </individualName>
+          <organizationName>Cary Institute of Ecosystem Studies</organizationName>
+          <electronicMailAddress>likensg@caryinstitute.org</electronicMailAddress>
+          <userId
+            directory="https://orcid.org">https://orcid.org/0000-0002-0884-2726</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation (NSF) 7810719</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>LTREB: Hydrologic-Nutrient Cycle Interaction in Small Undisturbed and Human-Manipulated Ecosystems; Start Date:09/01/2003</title>
+        <personnel>
+          <individualName>
+            <givenName>Gene</givenName>
+            <surName>Likens</surName>
+          </individualName>
+          <organizationName>Cary Institute of Ecosystem Studies</organizationName>
+          <electronicMailAddress>likensg@caryinstitute.org</electronicMailAddress>
+          <userId
+            directory="https://orcid.org">https://orcid.org/0000-0002-0884-2726</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation (NSF) 315211</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>Continuation LTREB at Hubbard Brook: Hydrologic-nutrient cycle interaction in small undisturbed and human-manipulated ecosystems; Start Date:09/01/2008</title>
+        <personnel>
+          <individualName>
+            <givenName>Gene</givenName>
+            <surName>Likens</surName>
+          </individualName>
+          <organizationName>Cary Institute of Ecosystem Studies</organizationName>
+          <electronicMailAddress>likensg@caryinstitute.org</electronicMailAddress>
+          <userId
+            directory="https://orcid.org">https://orcid.org/0000-0002-0884-2726</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation (NSF) 814280</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>LTREB: Collaborative Research: Hydrologic-nutrient Cycle Interaction in Small, Undisturbed and Human-manipulated Ecosystems; Start Date:10/01/1993</title>
+        <personnel>
+          <individualName>
+            <givenName>Gene</givenName>
+            <surName>Likens</surName>
+          </individualName>
+          <organizationName>Cary Institute of Ecosystem Studies</organizationName>
+          <electronicMailAddress>likensg@caryinstitute.org</electronicMailAddress>
+          <userId
+            directory="https://orcid.org">https://orcid.org/0000-0002-0884-2726</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation (NSF) 9308089</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>LTREB: Collaborative Research: Hydrologic-Nutrient Cycle Interactions in Small, Undisturbed and Human-Manipulated Ecosystems; Start Date:10/01/1998</title>
+        <personnel>
+          <individualName>
+            <givenName>Gene</givenName>
+            <surName>Likens</surName>
+          </individualName>
+          <organizationName>Cary Institute of Ecosystem Studies</organizationName>
+          <electronicMailAddress>likensg@caryinstitute.org</electronicMailAddress>
+          <userId
+            directory="https://orcid.org">https://orcid.org/0000-0002-0884-2726</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation (NSF) 9806473</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>Long-Term Ecological Research at Hubbard Brook Experimental Forest (1988)</title>
+        <personnel>
+          <individualName>
+            <givenName>Timothy</givenName>
+            <surName>Fahey</surName>
+          </individualName>
+          <organizationName>Cornell University</organizationName>
+          <electronicMailAddress>tjf5@cornell.edu</electronicMailAddress>
+          <userId
+            directory="https://orcid.org">https://orcid.org/0000-0003-1283-1162</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation (NSF) 8702331</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>Long-term Ecological Research (LTER) at the Hubbard Brook Experimental Forest (1992)</title>
+        <personnel>
+          <individualName>
+            <givenName>Timothy</givenName>
+            <surName>Fahey</surName>
+          </individualName>
+          <organizationName>Cornell University</organizationName>
+          <electronicMailAddress>tjf5@cornell.edu</electronicMailAddress>
+          <userId
+            directory="https://orcid.org">https://orcid.org/0000-0003-1283-1162</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation (NSF) 9211768</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>LTER: Hubbard Brook Experimental Forest (1998)</title>
+        <personnel>
+          <individualName>
+            <givenName>Timothy</givenName>
+            <surName>Fahey</surName>
+          </individualName>
+          <organizationName>Cornell University</organizationName>
+          <electronicMailAddress>tjf5@cornell.edu</electronicMailAddress>
+          <userId
+            directory="https://orcid.org">https://orcid.org/0000-0003-1283-1162</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation (NSF) 9810221</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>Long-Term Ecological Research (LTER) at Hubbard Brook Experimental Forest (HBR-LTER) (2005)</title>
+        <personnel>
+          <individualName>
+            <givenName>Timothy</givenName>
+            <surName>Fahey</surName>
+          </individualName>
+          <organizationName>Cornell University</organizationName>
+          <electronicMailAddress>tjf5@cornell.edu</electronicMailAddress>
+          <userId
+            directory="https://orcid.org">https://orcid.org/0000-0003-1283-1162</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation (NSF) 0423259</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>Long-Term Ecological Research at Hubbard Brook Experimental Forest (2010)</title>
+        <personnel>
+          <individualName>
+            <givenName>Timothy</givenName>
+            <surName>Fahey</surName>
+          </individualName>
+          <organizationName>Cornell University</organizationName>
+          <electronicMailAddress>tjf5@cornell.edu</electronicMailAddress>
+          <userId
+            directory="https://orcid.org">https://orcid.org/0000-0003-1283-1162</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation (NSF) 1114804</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>LTER: Long Term Ecological Research at the Hubbard Brook Experimental Forest (2016)</title>
+        <personnel>
+          <individualName>
+            <givenName>Gary</givenName>
+            <surName>Lovett</surName>
+          </individualName>
+          <organizationName>Cary Institute of Ecosystem Studies</organizationName>
+          <electronicMailAddress>lovettg@caryinstitute.org</electronicMailAddress>
+          <userId
+            directory="https://orcid.org">https://orcid.org/0000-0002-8411-8027</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>National Science Foundation (NSF) 1637685</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>Mary Flagler Cary Charitable Trust</title>
+        <personnel>
+          <individualName>
+            <givenName>Gene</givenName>
+            <surName>Likens</surName>
+          </individualName>
+          <organizationName>Cary Institute of Ecosystem Studies</organizationName>
+          <userId
+            directory="https://orcid.org">https://orcid.org/0000-0002-0884-2726</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>Mary Flagler Cary Charitable Trust</funding>
+      </relatedProject>
+      <relatedProject>
+        <title>The Andrew W. Mellon Foundation</title>
+        <personnel>
+          <individualName>
+            <givenName>Gene</givenName>
+            <surName>Likens</surName>
+          </individualName>
+          <organizationName>Cary Institute of Ecosystem Studies</organizationName>
+          <electronicMailAddress>likensg@caryinstitute.org</electronicMailAddress>
+          <userId
+          directory="https://orcid.org">https://orcid.org/0000-0002-0884-2726</userId>
+          <role>Principal Investigator</role>
+        </personnel>
+        <funding>The Andrew W. Mellon Foundation</funding>
+      </relatedProject>
+    </project>
+    <dataTable>
+      <entityName>HubbardBrook_weekly_precipitation_chemistry_1963-2019</entityName>
+      <entityDescription>Hubbard Brook weekly precipitation chemistry 1963-2019</entityDescription>
+      <physical>
+        <objectName>HubbardBrook_weekly_precipitation_chemistry_1963-2019.csv</objectName>
+        <size
+          unit="bytes">1527068</size>
+        <authentication
+                    method="MD5">7259d8e6590ba9934c2e2f99b1d4221f</authentication>
+        <dataFormat>
+          <textFormat>
+            <numHeaderLines>1</numHeaderLines>
+            <recordDelimiter>\n</recordDelimiter>
+            <attributeOrientation>column</attributeOrientation>
+            <simpleDelimited>
+              <fieldDelimiter>,</fieldDelimiter>
+              <quoteCharacter>"</quoteCharacter>
+            </simpleDelimited>
+          </textFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/knb-lter-hbr/208/3/611a3a353bbcd9b0343fa8dfc963118b</url>
+          </online>
+        </distribution>
+      </physical>
+      <attributeList>
+        <attribute>
+          <attributeName>site</attributeName>
+          <attributeDefinition>location of sampling</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>location of sampling</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>date</attributeName>
+          <attributeDefinition>date of sampling, YYYY-MM-DD format</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>YYYY-MM-DD</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>timeEST</attributeName>
+          <attributeDefinition>24 hour Eastern standard Time</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>hh:mm</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>pH</attributeName>
+          <attributeDefinition>a measure of hydrogen ion concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">3.02</minimum>
+                  <maximum
+                    exclusive="false">8.09</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>DIC</attributeName>
+          <attributeDefinition>Dissolved inorganic carbon concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>micromolePerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>spCond</attributeName>
+          <attributeDefinition>a measure of specific conductivity, or the concentration of dissolved ions</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>microsiemensPerCentimeter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">1.7</minimum>
+                  <maximum
+                    exclusive="false">556</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>temp</attributeName>
+          <attributeDefinition>water temperature at sampling time</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ANC960</attributeName>
+          <attributeDefinition>acid neutralizing capacity measured on the Orion titration system, phased out after August 2017</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>microEquivalentPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0</minimum>
+                  <maximum
+                    exclusive="false">0</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ANCMet</attributeName>
+          <attributeDefinition>acid neutralizing capacity measured on the Metrohm titration system</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>microEquivalentPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>natural</numberType>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>precipCatch</attributeName>
+          <attributeDefinition>precipitation quantity over measurement period</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>millimeter</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.2</minimum>
+                  <maximum
+                    exclusive="false">187.5</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>fieldCode</attributeName>
+          <attributeDefinition>A code to describe field conditions during sample collection, or condition of the sample</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>888</code>
+                    <definition>Multiple Samples in a day</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>907</code>
+                    <definition>USFS Lab Chemistry (June 2013 began running cations and anions analysis)</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>920</code>
+                    <definition>Cary Lab Chemistry (May 2013 ended all analysis)</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>911</code>
+                    <definition>High flow streamwater sample; taken during specific event, not usually a routine weekly sample.</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>912</code>
+                    <definition>Low flow streamwater sample; taken with a syringe or cup from a standing pool of water, usually during a drought period.</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>955</code>
+                    <definition>Extremely low volume precipitation sample; applies to samples when volume is insufficient to conduct all analyses. -3 or -999.9 will be entered into the files as code for QNS (quantity not sufficient)</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>969</code>
+                    <definition>Possible analytical problem based on return lab data; flagged for further scrutiny and possible rejection. In most cases, suspect data are rejected (see code 970).</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>970</code>
+                    <definition>Sample contaminated; possible rejection based on further analytical data. This a flag code for future screening of the data. Protocol requires rejection of heavily tainted samples, but in many cases the degree of contamination is uncertain. NOTE if a code of 970 is retained in the database chemistry file, the flux program will ignore those data. All codes for 970’s must be re-checked.</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>319</code>
+                    <definition>ce Storm samples (Hubbard Brook 1998)</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>960</code>
+                    <definition>multiple samples on same day (W1 &amp; W6 2001-2003)</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>966</code>
+                    <definition>multiple samples on same day (W1 &amp; W6 2001-2003)</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>notes</attributeName>
+          <attributeDefinition>miscellaneous notes about data quality/sources. Notes that mention precipitation (e.g. ~1.83\ precip) refer to measurements in inches.</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>miscellaneous notes about data quality/sources. Notes that mention precipitation (e.g. ~1.83\ precip) refer to measurements in inches.</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>uniqueID</attributeName>
+          <attributeDefinition>unique identifier combining sampling site, date (YYYYMMDD), and time (hh:ss, military) information</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>unique identifier combining sampling site, date (YYYYMMDD), and time (hh:ss, military) information</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>waterYr</attributeName>
+          <attributeDefinition>Water Year June 1 thru to May 31</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>YYYY</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>datetime</attributeName>
+          <attributeDefinition>Date and time of sampling, MM-DD-YY hh:mm in military time format</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>YYYY-MM-DD hh:mm</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Ca</attributeName>
+          <attributeDefinition>calcium concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.005</minimum>
+                  <maximum
+                    exclusive="false">5.5</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Mg</attributeName>
+          <attributeDefinition>magnesium concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.001</minimum>
+                  <maximum
+                    exclusive="false">1.81</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>K</attributeName>
+          <attributeDefinition>potassium concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.002</minimum>
+                  <maximum
+                    exclusive="false">16.4</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Na</attributeName>
+          <attributeDefinition>sodium concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.002</minimum>
+                  <maximum
+                    exclusive="false">8.43</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>TMAl</attributeName>
+          <attributeDefinition>total monomeric aluminum concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.0025</minimum>
+                  <maximum
+                    exclusive="false">0.0358</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>OMAl</attributeName>
+          <attributeDefinition>organic monomeric aluminum concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.0025</minimum>
+                  <maximum
+                    exclusive="false">0.0342</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Al_ICP</attributeName>
+          <attributeDefinition>aluminum concentration measured on ICP</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.003</minimum>
+                  <maximum
+                    exclusive="false">1.62</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>NH4</attributeName>
+          <attributeDefinition>ammonium concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">-999.99</minimum>
+                  <maximum
+                    exclusive="false">15.97</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>SO4</attributeName>
+          <attributeDefinition>sulfate concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.01</minimum>
+                  <maximum
+                    exclusive="false">22.8</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>NO3</attributeName>
+          <attributeDefinition>nitrate concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.01</minimum>
+                  <maximum
+                    exclusive="false">19.9</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Cl</attributeName>
+          <attributeDefinition>chloride concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.002</minimum>
+                  <maximum
+                    exclusive="false">23.8</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>PO4</attributeName>
+          <attributeDefinition>soluble reactive phosphorus concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">-999.99</minimum>
+                  <maximum
+                    exclusive="false">10</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>DOC</attributeName>
+          <attributeDefinition>dissolved inorganic carbon concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0</minimum>
+                  <maximum
+                    exclusive="false">14.5829</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>TDN</attributeName>
+          <attributeDefinition>total dissolved nitrogen</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.02</minimum>
+                  <maximum
+                    exclusive="false">8.4535</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>DON</attributeName>
+          <attributeDefinition>dissolved organic nitrogen</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">-0.1471</minimum>
+                  <maximum
+                    exclusive="false">5.3724</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>SiO2</attributeName>
+          <attributeDefinition>silica concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.005</minimum>
+                  <maximum
+                    exclusive="false">4.6244</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Mn</attributeName>
+          <attributeDefinition>manganese concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.001</minimum>
+                  <maximum
+                    exclusive="false">0.1292</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Fe</attributeName>
+          <attributeDefinition>iron concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.0025</minimum>
+                  <maximum
+                    exclusive="false">0.3286</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>F</attributeName>
+          <attributeDefinition>fluoride concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.01</minimum>
+                  <maximum
+                    exclusive="false">0.2069</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>cationCharge</attributeName>
+          <attributeDefinition>sum of cations</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>microEquivalentPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.2291</minimum>
+                  <maximum
+                    exclusive="false">1117</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>anionCharge</attributeName>
+          <attributeDefinition>sum of anions</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>microEquivalentPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">-222.8721</minimum>
+                  <maximum
+                    exclusive="false">1020.6</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>theoryCond</attributeName>
+          <attributeDefinition>calculated specific conductance</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>microsiemensPerCentimeter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">-99.9</minimum>
+                  <maximum
+                    exclusive="false">2119.1</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ionError</attributeName>
+          <attributeDefinition>The difference between total cations and total anions expressed as a percentage</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>percent</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">-153.7</minimum>
+                  <maximum
+                    exclusive="false">184.5</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>duplicate</attributeName>
+          <attributeDefinition>duplicate sample taken at the same site, date, and time as another sample</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>duplicate sample taken at the same site, date, and time as another sample</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>sampleType</attributeName>
+          <attributeDefinition>describes frequency and type of sample collected i.e. routine, event grab, or ISCO autosampler</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>describes frequency and type of sample collected i.e. routine, event grab, or ISCO autosampler</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ionBalance</attributeName>
+          <attributeDefinition>The difference between total cations and total anions</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>microEquivalentPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">-256.2</minimum>
+                  <maximum
+                    exclusive="false">907.9</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>canonical</attributeName>
+          <attributeDefinition>Is this sample used in the canonical watershed mass balances from Hubbard Brook?</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>TRUE</code>
+                    <definition>Sample was used in the estimation of previously reported monthly and annual volume-weighted concentrations and in calculating watershed fluxes</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>FALSE</code>
+                    <definition>Sample was not used in the estimation of previously reported monthly and annual volume-weighted concentrations and in calculating watershed fluxes</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>pHmetrohm</attributeName>
+          <attributeDefinition>pH measured on Metrohm meter</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>pH</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">4.37</minimum>
+                  <maximum
+          exclusive="false">6.59</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>archived</attributeName>
+          <attributeDefinition>describes whether the sample is saved in the archive collection</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>describes whether the sample is saved in the archive collection</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+      </attributeList>
+      <numberOfRecords>6775</numberOfRecords>
+    </dataTable>
+    <dataTable>
+      <entityName>HubbardBrook_weekly_stream_chemistry_1963-2019</entityName>
+      <entityDescription>Hubbard Brook weekly stream chemistry 1963-2018</entityDescription>
+      <physical>
+        <objectName>HubbardBrook_weekly_stream_chemistry_1963-2019.csv</objectName>
+        <size
+          unit="bytes">5990814</size>
+        <authentication
+                    method="MD5">2f4e27062097fb07da5ad3a676f51bac</authentication>
+        <dataFormat>
+          <textFormat>
+            <numHeaderLines>1</numHeaderLines>
+            <recordDelimiter>\n</recordDelimiter>
+            <attributeOrientation>column</attributeOrientation>
+            <simpleDelimited>
+              <fieldDelimiter>,</fieldDelimiter>
+              <quoteCharacter>"</quoteCharacter>
+            </simpleDelimited>
+          </textFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/knb-lter-hbr/208/3/3fe44dc15ed3e4f24bd376b68c59657a</url>
+          </online>
+        </distribution>
+      </physical>
+      <attributeList>
+        <attribute>
+          <attributeName>site</attributeName>
+          <attributeDefinition>location of sampling</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>location of sampling</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>date</attributeName>
+          <attributeDefinition>date of sampling, YYYY-MM-DD format</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>YYYY-MM-DD</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>timeEST</attributeName>
+          <attributeDefinition>24 hour Eastern standard Time</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>hh:mm</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>pH</attributeName>
+          <attributeDefinition>a measure of hydrogen ion concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>dimensionless</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">3.7</minimum>
+                  <maximum
+                    exclusive="false">7.22</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>DIC</attributeName>
+          <attributeDefinition>Dissolved inorganic carbon concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>micromolePerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>whole</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0</minimum>
+                  <maximum
+                    exclusive="false">961</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>spCond</attributeName>
+          <attributeDefinition>a measure of specific conductivity, or the concentration of dissolved ions</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>microsiemensPerCentimeter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">3</minimum>
+                  <maximum
+                    exclusive="false">161</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>temp</attributeName>
+          <attributeDefinition>water temperature at sampling time</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>celsius</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">-3</minimum>
+                  <maximum
+                    exclusive="false">27.7</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ANC960</attributeName>
+          <attributeDefinition>acid neutralizing capacity measured on the Orion titration system, phased out after August 2017</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>microEquivalentPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">-999.9</minimum>
+                  <maximum
+                    exclusive="false">179.7</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ANCMet</attributeName>
+          <attributeDefinition>acid neutralizing capacity measured on the Metrohm titration system</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>microEquivalentPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">-125.8</minimum>
+                  <maximum
+                    exclusive="false">191.5</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>gageHt</attributeName>
+          <attributeDefinition>measurement of gage height, or elevation of water surface in weir basin</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <standardUnit>foot</standardUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0</minimum>
+                  <maximum
+                    exclusive="false">6.5</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>hydroGraph</attributeName>
+          <attributeDefinition>describes the gradient of hydrograph limb at the time of sampling (ex. rising/falling/level)</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>describes the gradient of hydrograph limb at the time of sampling (ex. rising/falling/level)</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>flowGageHt</attributeName>
+          <attributeDefinition>streamflow rate measured as volume per unit time and is proportional to watershed area</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>literPerSecond</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0</minimum>
+                  <maximum
+                    exclusive="false">2184.0394</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>fieldCode</attributeName>
+          <attributeDefinition>A code to describe field conditions during sample collection, or condition of the sample</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>888</code>
+                    <definition>Multiple Samples in a day</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>907</code>
+                    <definition>USFS Lab Chemistry (June 2013 began running cations and anions analysis)</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>920</code>
+                    <definition>Cary Lab Chemistry (May 2013 ended all analysis)</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>911</code>
+                    <definition>High flow streamwater sample; taken during specific event, not usually a routine weekly sample.</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>912</code>
+                    <definition>Low flow streamwater sample; taken with a syringe or cup from a standing pool of water, usually during a drought period.</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>955</code>
+                    <definition>Extremely low volume precipitation sample; applies to samples when volume is insufficient to conduct all analyses. -3 or -999.9 will be entered into the files as code for QNS (quantity not sufficient)</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>969</code>
+                    <definition>Possible analytical problem based on return lab data; flagged for further scrutiny and possible rejection. In most cases, suspect data are rejected (see code 970).</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>970</code>
+                    <definition>Sample contaminated; possible rejection based on further analytical data. This a flag code for future screening of the data. Protocol requires rejection of heavily tainted samples, but in many cases the degree of contamination is uncertain. NOTE if a code of 970 is retained in the database chemistry file, the flux program will ignore those data. All codes for 970’s must be re-checked.</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>319</code>
+                    <definition>ce Storm samples (Hubbard Brook 1998)</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>960</code>
+                    <definition>multiple samples on same day (W1 &amp; W6 2001-2003)</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>966</code>
+                    <definition>multiple samples on same day (W1 &amp; W6 2001-2003)</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>notes</attributeName>
+          <attributeDefinition>miscellaneous notes about data quality/sources. Notes that mention precipitation (e.g. ~1.83\ precip) refer to measurements in inches.</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>miscellaneous notes about data quality/sources. Notes that mention precipitation (e.g. ~1.83\ precip) refer to measurements in inches.</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>uniqueID</attributeName>
+          <attributeDefinition>unique identifier combining sampling site, date (YYYYMMDD), and time (hh:ss, military) information</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>unique identifier combining sampling site, date (YYYYMMDD), and time (hh:ss, military) information</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>waterYr</attributeName>
+          <attributeDefinition>Water Year June 1 thru to May 31</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>YYYY</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>datetime</attributeName>
+          <attributeDefinition>Date and time of sampling, YYYY-MM-DD hh:mm in military time format</attributeDefinition>
+          <storageType>date</storageType>
+          <measurementScale>
+            <dateTime>
+              <formatString>YYYY-MM-DD hh:mm</formatString>
+              <dateTimeDomain/>
+            </dateTime>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Ca</attributeName>
+          <attributeDefinition>calcium concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.005</minimum>
+                  <maximum
+                    exclusive="false">11.8</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Mg</attributeName>
+          <attributeDefinition>magnesium concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.005</minimum>
+                  <maximum
+                    exclusive="false">4.62</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>K</attributeName>
+          <attributeDefinition>potassium concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.003</minimum>
+                  <maximum
+                    exclusive="false">8.35</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Na</attributeName>
+          <attributeDefinition>sodium concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.005</minimum>
+                  <maximum
+                    exclusive="false">3.8405</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>TMAl</attributeName>
+          <attributeDefinition>total monomeric aluminum concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.008</minimum>
+                  <maximum
+                    exclusive="false">0.6049</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>OMAl</attributeName>
+          <attributeDefinition>organic monomeric aluminum concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.0058</minimum>
+                  <maximum
+                    exclusive="false">0.4789</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Al_ICP</attributeName>
+          <attributeDefinition>aluminum concentration measured on ICP</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0</minimum>
+                  <maximum
+                    exclusive="false">3.4</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>NH4</attributeName>
+          <attributeDefinition>ammonium concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.001</minimum>
+                  <maximum
+                    exclusive="false">1</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>SO4</attributeName>
+          <attributeDefinition>sulfate concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.05</minimum>
+                  <maximum
+                    exclusive="false">11.8</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>NO3</attributeName>
+          <attributeDefinition>nitrate concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.002</minimum>
+                  <maximum
+                    exclusive="false">82</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Cl</attributeName>
+          <attributeDefinition>chloride concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.005</minimum>
+                  <maximum
+                    exclusive="false">5.0592</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>PO4</attributeName>
+          <attributeDefinition>soluble reactive phosphorus concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">1e-04</minimum>
+                  <maximum
+                    exclusive="false">1.17</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>DOC</attributeName>
+          <attributeDefinition>dissolved inorganic carbon concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.9277</minimum>
+                  <maximum
+                    exclusive="false">26.6196</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>TDN</attributeName>
+          <attributeDefinition>total dissolved nitrogen</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.0494</minimum>
+                  <maximum
+                    exclusive="false">1.449</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>DON</attributeName>
+          <attributeDefinition>dissolved organic nitrogen</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">-0.4083</minimum>
+                  <maximum
+                    exclusive="false">1.1125</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>SiO2</attributeName>
+          <attributeDefinition>silica concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">-3</minimum>
+                  <maximum
+                    exclusive="false">15.3</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Mn</attributeName>
+          <attributeDefinition>manganese concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.001</minimum>
+                  <maximum
+                    exclusive="false">0.1344</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>Fe</attributeName>
+          <attributeDefinition>iron concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.0025</minimum>
+                  <maximum
+                    exclusive="false">1.0198</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>F</attributeName>
+          <attributeDefinition>fluoride concentration</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>milligramPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.0183</minimum>
+                  <maximum
+                    exclusive="false">0.8352</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>cationCharge</attributeName>
+          <attributeDefinition>sum of cations</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>microEquivalentPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">0.2399</minimum>
+                  <maximum
+                    exclusive="false">339.5408</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>anionCharge</attributeName>
+          <attributeDefinition>sum of anions</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>microEquivalentPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">-322.7736</minimum>
+                  <maximum
+                    exclusive="false">213</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>theoryCond</attributeName>
+          <attributeDefinition>calculated specific conductance</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>microsiemensPerCentimeter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">8.4575</minimum>
+                  <maximum
+                    exclusive="false">42.3126</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ionError</attributeName>
+          <attributeDefinition>The difference between total cations and total anions expressed as a percentage</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>percent</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">-21.7</minimum>
+                  <maximum
+                    exclusive="false">92.8</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>duplicate</attributeName>
+          <attributeDefinition>duplicate sample taken at the same site, date, and time as another sample</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>duplicate sample taken at the same site, date, and time as another sample</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>sampleType</attributeName>
+          <attributeDefinition>describes frequency and type of sample collected i.e. routine, event grab, or ISCO autosampler</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>describes frequency and type of sample collected i.e. routine, event grab, or ISCO autosampler</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>ionBalance</attributeName>
+          <attributeDefinition>The difference between total cations and total anions</attributeDefinition>
+          <storageType>float</storageType>
+          <measurementScale>
+            <ratio>
+              <unit>
+                <customUnit>microEquivalentPerLiter</customUnit>
+              </unit>
+              <numericDomain>
+                <numberType>real</numberType>
+                <bounds>
+                  <minimum
+                    exclusive="false">-267.9554</minimum>
+                  <maximum
+          exclusive="false">192.5</maximum>
+                </bounds>
+              </numericDomain>
+            </ratio>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>canonical</attributeName>
+          <attributeDefinition>Is this sample used in the canonical watershed mass balances from Hubbard Brook?</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <enumeratedDomain>
+                  <codeDefinition>
+                    <code>TRUE</code>
+                    <definition>Sample was used in the estimation of previously reported monthly and annual volume-weighted concentrations and in calculating watershed fluxes</definition>
+                  </codeDefinition>
+                  <codeDefinition>
+                    <code>FALSE</code>
+                    <definition>Sample was not used in the estimation of previously reported monthly and annual volume-weighted concentrations and in calculating watershed fluxes</definition>
+                  </codeDefinition>
+                </enumeratedDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>pHmetrohm</attributeName>
+          <attributeDefinition>pH measured on Metrohm meter</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>pH measured on Metrohm meter</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+        <attribute>
+          <attributeName>archived</attributeName>
+          <attributeDefinition>desribes whether the sample is saved in the archive collection</attributeDefinition>
+          <storageType>string</storageType>
+          <measurementScale>
+            <nominal>
+              <nonNumericDomain>
+                <textDomain>
+                  <definition>desribes whether the sample is saved in the archive collection</definition>
+                </textDomain>
+              </nonNumericDomain>
+            </nominal>
+          </measurementScale>
+          <missingValueCode>
+            <code>NA</code>
+            <codeExplanation>data unavailable</codeExplanation>
+          </missingValueCode>
+        </attribute>
+      </attributeList>
+      <numberOfRecords>25331</numberOfRecords>
+    </dataTable>
+    <otherEntity>
+      <entityName>WaterChemistryAnalyticalMethods</entityName>
+      <entityDescription>Water chemistry analytical methods</entityDescription>
+      <physical>
+        <objectName>WaterChemistryAnalyticalMethods.pdf</objectName>
+        <size
+          unit="bytes">112529</size>
+        <authentication
+          method="MD5">8199478824d35d887464e50cca8616b3</authentication>
+        <dataFormat>
+          <externallyDefinedFormat>
+            <formatName>unknown</formatName>
+          </externallyDefinedFormat>
+        </dataFormat>
+        <distribution>
+          <online>
+            <url>https://pasta.lternet.edu/package/data/eml/knb-lter-hbr/208/3/bb55c8e0a78d18381272966fe55a6d62</url>
+          </online>
+        </distribution>
+      </physical>
+      <entityType>unknown</entityType>
+    </otherEntity>
+  </dataset>
+  <additionalMetadata>
+    <metadata>
+      <unitList>
+        <unit
+          id="micromolePerLiter" name="micromolePerLiter" parentSI=""
+          unitType="">
+          <description>micromolePerLiter</description>
+        </unit>
+        <unit
+          id="microsiemensPerCentimeter"
+          name="microsiemensPerCentimeter" parentSI=""
+          unitType="">
+          <description>microsiemensPerCentimeter</description>
+        </unit>
+        <unit
+          id="microEquivalentPerLiter" name="microEquivalentPerLiter"
+          parentSI=""
+          unitType="">
+          <description>microEquivalentPerLiter</description>
+        </unit>
+        <unit
+          id="milligramPerLiter" name="milligramPerLiter" parentSI=""
+          unitType="">
+          <description>milligramPerLiter</description>
+        </unit>
+        <unit
+          id="pH" name="pH" parentSI=""
+          unitType="">
+          <description>pH</description>
+        </unit>
+        <unit
+          id="percent" name="percent" parentSI=""
+          unitType="">
+          <description>percent</description>
+        </unit>
+        <unit
+          id="literPerSecond" name="literPerSecond" parentSI="" unitType="">
+          <description>literPerSecond</description>
+        </unit>
+      </unitList>
+    </metadata>
+  </additionalMetadata>
+</eml:eml>
