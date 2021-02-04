@@ -22,10 +22,17 @@ CTstart <- as.POSIXct(paste0("1985-10-31", format = "%Y-%m-%d"))
 CTend <- as.POSIXct(paste0("2010-10-31", format = "%Y-%m-%d"))
 # 9130 days
 
+############
 # ELA
+############
+
 # units on Q are m3/s
 # units for solutes variable in ELA stream chemistry.xls::Units
 # no info on qualifiers
+
+############
+# GET CONC DATA
+############
 
 # ELA EIF
 ELA.eif <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/ELA"), 
@@ -63,6 +70,9 @@ ELA.nwif <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena2021013
 
 ggplot(ELA.nwif, aes(y = Q_m3s, mean_date)) +
   geom_point()
+############
+# SOLUTE DATA
+############
 
 # ELA chemistry
 # 1970-04-07 to 2017-03-23
@@ -109,7 +119,12 @@ ELA.chemL <- ELA.chem %>%
   pivot_longer(cols = CA_mgL:SO4_mgL, names_to = "solute", values_to = "conc") %>% 
   mutate(solute = as.factor(solute))
 
+############
 # COMBINE Q AND CHEM
+# CALCULATE FWMC
+############
+
+#EIF
 ELA.eif2 <- ELA.eif %>% 
   left_join(ELA.chemL %>% 
               filter(STATION == "EIF"), by = "dateC") %>% 
@@ -121,8 +136,9 @@ ELA.eif2 <- ELA.eif %>%
          FWMCbottom = (Q_m3s*60*60*24) * 1,
          # don't want to divide "top" by a larger number of days of bottom
          FWMCbottomUse = ifelse(!is.na(FWMCtop), FWMCbottom, as.numeric("NA"))) %>% # [(flow conv to d) * 1 day]
+  # AGGREGATE TO MONTHLY - summing
   group_by(Ym, solute, station) %>% 
-  summarize(across(c(FWMCtop, FWMCbottomUse), mean, na.rm = T)) %>% 
+  summarize(across(c(FWMCtop, FWMCbottomUse), sum, na.rm = T)) %>% 
   mutate(FWMC = FWMCtop/FWMCbottomUse) %>% 
   mutate(date = as.POSIXct(paste0(Ym,"-01"), format = "%Y-%m-%d")) %>% 
   #remove 301 NA's in solute
@@ -132,7 +148,7 @@ ggplot(ELA.eif2, aes(y = FWMC, x = date, color = solute)) +
   geom_point() +
   facet_wrap(vars(solute), scales = "free_y")
 
-
+#NEIF
 ELA.neif2 <- ELA.neif %>% 
   full_join(ELA.chemL %>% 
               filter(STATION == "NEIF"), by = "dateC")%>% 
@@ -145,7 +161,7 @@ ELA.neif2 <- ELA.neif %>%
          # don't want to divide "top" by a larger number of days of bottom
          FWMCbottomUse = ifelse(!is.na(FWMCtop), FWMCbottom, as.numeric("NA"))) %>% # [(flow conv to d) * 1 day]
   group_by(Ym, solute, station) %>% 
-  summarize(across(c(FWMCtop, FWMCbottomUse), mean, na.rm = T)) %>% 
+  summarize(across(c(FWMCtop, FWMCbottomUse), sum, na.rm = T)) %>% 
   mutate(FWMC = FWMCtop/FWMCbottomUse) %>% 
   mutate(date = as.POSIXct(paste0(Ym,"-01"), format = "%Y-%m-%d")) %>% 
   #remove NA's in solute
@@ -167,7 +183,7 @@ ELA.nwif2 <- ELA.nwif %>%
          # don't want to divide "top" by a larger number of days of bottom
          FWMCbottomUse = ifelse(!is.na(FWMCtop), FWMCbottom, as.numeric("NA"))) %>% # [(flow conv to d) * 1 day]
   group_by(Ym, solute, station) %>% 
-  summarize(across(c(FWMCtop, FWMCbottomUse), mean, na.rm = T)) %>% 
+  summarize(across(c(FWMCtop, FWMCbottomUse), sum, na.rm = T)) %>% 
   mutate(FWMC = FWMCtop/FWMCbottomUse) %>% 
   mutate(date = as.POSIXct(paste0(Ym,"-01"), format = "%Y-%m-%d")) %>% 
   #remove NA's in solute
