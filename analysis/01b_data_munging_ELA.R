@@ -1,5 +1,5 @@
 # This script calculates flow weighted means for all unmanaged sites
-# JMH started 30 Jan 2021
+# JMH started 30 Jan 2021, updated 18 May 21
 
 
 
@@ -99,21 +99,30 @@ ELA.chem <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena2021013
   # select solutes of interest
   #NH4 was labeled as NH3 in excel sheet:units
   select("SAMPLED", "SUBLOC", "STATION","CA","DOC","NH4","NO3","TDP","SO4") %>% 
-  rename(CA_mgL = "CA", DOC_uM = "DOC", NH4_ugL = "NH4",NO3_ugL ="NO3",TDP_ugL = "TDP",SO4_mgL = "SO4") %>% 
+  rename(Ca_mgL = "CA", DOC_uM = "DOC", NH4_ugL = "NH4",NO3_ugL ="NO3",TDP_ugL = "TDP",SO4_mgL = "SO4") %>% 
+  mutate(DOC_mgL = DOC_uM * 12.01 /1000,
+         NH4_mgL = NH4_ugL * (14/18.039) / 1000,
+         NO3_mgL = NO3_ugL * (14/62.0049) / 1000,
+         SRP_mgL = TDP_ugL * (31/94.97) / 1000,
+         SO4_mgL = SO4_mgL * (32.065/90.06)) %>% 
+  # select focal solutes
+  select("SAMPLED", "SUBLOC", "STATION", "Ca_mgL", DOC_mgL, NH4_mgL, NO3_mgL, SRP_mgL, SO4_mgL) %>% 
   # select focal catchments
   filter(STATION %in% c("EIF", "NWIF", "NEIF")) %>% 
   # remove solute values that are codes (all below zero)
-  mutate(across(CA_mgL:SO4_mgL, BadCodeNAfun)) %>% #ifelse(. <= 0, as.numeric("NA"),.)
+  mutate(across(Ca_mgL:SO4_mgL, BadCodeNAfun)) %>% #ifelse(. <= 0, as.numeric("NA"),.)
   mutate(dateC = as.character(as.Date(SAMPLED))) %>% 
   # more than one sample on some days - average them
   group_by(dateC, STATION) %>% 
-  summarize(across(c(CA_mgL:SO4_mgL), mean, na.rm = TRUE)) %>% 
-  mutate(mean_date = as.POSIXct(dateC, format = "%Y-%m-%d"))
+  summarize(across(c(Ca_mgL:SO4_mgL), mean, na.rm = TRUE)) %>% 
+  mutate(Date = as.POSIXct(dateC, format = "%Y-%m-%d")) %>% 
+  ungroup() %>% 
+  select(Date, WS = "STATION", Ca_mgL:SO4_mgL)
 
 ggplot(ELA.chem %>% 
-         pivot_longer(CA_mgL:SO4_mgL, names_to = "solutes", values_to = "values"), aes(y = values, x = mean_date, color = STATION)) +
+         pivot_longer(Ca_mgL:SO4_mgL, names_to = "solutes", values_to = "values"), aes(y = values, x = Date, color = WS)) +
   geom_point() +
-  facet_wrap(vars(solutes), scales = "free_y")
+  facet_grid(solutes ~ WS, scales = "free_y")
 
 ggpairs(ELA.chem[,3:8])
 
@@ -129,16 +138,18 @@ ELA.Q <- rbind(ELA.eif, ELA.neif, ELA.nwif) %>%
   mutate(subloc2 = as.factor(ifelse(sublocation == "ET","EIF",
                             ifelse(sublocation == "NET", "NEIF",
                               ifelse(sublocation == "NWT", "NWIF","blah")))),
-         site = as.factor("ELA")) %>% 
-  select(site, subloc2, mean_date, Q_m3s,qualifier, dateC)
+         Site = as.factor("ELA"),
+         Q_Ls = Q_m3s * 1000,
+         mean_date = as.Date(mean_date)) %>% 
+  select(Site, WS = "subloc2", Date = "mean_date", Q_Ls)
 
 ELA.f <- ELA.Q %>% 
-  left_join(ELA.chem, by = c("dateC", "subloc2" = "STATION"))
+  left_join(ELA.chem, by = c("Date", "WS"))
 
-ggplot(ELA.f%>% 
-         pivot_longer(cols = c(Q_m3s,CA_mgL:SO4_mgL), names_to = "meas", values_to = "value"), aes(y = value, x = mean_date.x)) +
+ggplot(ELA.f %>% 
+         pivot_longer(cols = c(Q_Ls:SO4_mgL), names_to = "meas", values_to = "value"), aes(y = value, x = Date)) +
   geom_point() +
-  facet_wrap(vars(meas), scales = "free_y")
+  facet_grid(meas ~ WS,  scales = "free_y")
 
 ggpairs(ELA.f[,c(4,7:12)])
 

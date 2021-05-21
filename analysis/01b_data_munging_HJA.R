@@ -1,5 +1,5 @@
 # This script combines all Q and chem data for all unmanaged HJA sites
-# JMH; 5 May 2021
+# JMH; 5 May 2021, 18 May 2021
 
 
 
@@ -36,7 +36,9 @@ HJA_Q <-  read_csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR D
                                     "HJA discharge daily.csv")) %>% 
             select(STCODE:MEAN_Q) %>% 
             # both 8 and 9 are undisturbed controls - checked since names were different
-            filter(SITECODE %in% c("GSWS08", "GSWS09"))
+            filter(SITECODE %in% c("GSWS08", "GSWS09")) %>% 
+            mutate(Q_Ls = MEAN_Q * 28.31) %>% 
+            select(Date = DATE, WS = SITECODE, Q_Ls)
 
 ggplot(HJA_Q, aes(y = log(MEAN_Q +1), x = DATE)) +
   geom_point()+
@@ -52,39 +54,37 @@ ggplot(HJA_Q, aes(y = log(MEAN_Q +1), x = DATE)) +
 
 HJA_chem <-  read_csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/HJA"), 
                             "HJA stream chemistry daily.csv")) %>% 
-          select(SITECODE, DATE_TIME, CA, DOC, NH3N, NO3N, TDP, SO4S) %>% 
-          filter(SITECODE %in% c("GSWS08", "GSWS09")) %>% 
-          mutate(DATE = as.character(strftime(DATE_TIME, format = "%Y-%m-%d")))
+          select(WS = SITECODE, DateTime = DATE_TIME, Ca_mgL = CA, DOC_mgL = DOC, NH4_mgL = NH3N, NO3_mgL = NO3N, SRP_ugL = TDP, SO4_mgL = SO4S) %>% 
+          mutate(SRP_mgL = SRP_ugL * (31/94.97) /1000) %>% 
+          filter(WS %in% c("GSWS08", "GSWS09")) %>% 
+          mutate(Date = as.Date(DateTime, format = "%Y-%m-%d")) %>% 
+          select(WS, Date, Ca_mgL, DOC_mgL, NH4_mgL, NO3_mgL, SRP_mgL, SO4_mgL)
 
 
 # STOPPED ABOBVE THIS
 
 
 ggplot(HJA_chem %>% 
-         pivot_longer(CA:SO4S, names_to = "solute", values_to = "conc"), aes(y = log(conc+1), x = DATE_TIME, color = SITECODE)) +
+         pivot_longer(Ca_mgL:SO4_mgL, names_to = "solute", values_to = "conc"), aes(y = log(conc+1), x = Date, color = WS)) +
   geom_point()+
   facet_wrap(vars(solute), scales = "free_y")
 
 ##########
-# COMBINE INTO DOR DF
+# COMBINE INTO HJA DF
 #########
 
-# Think times in here are messing up the joins - sometimes
-HJA_Q.j <-  HJA_Q %>% 
-          mutate(DATE = as.character(DATE))
-
-HJA.f <- HJA_Q.j %>% 
-          full_join(HJA_chem, by = c("DATE", "SITECODE")) %>% 
-          mutate(Date = as.POSIXct(DATE, format = "%Y-%m-%d"),
-                 WS = as.factor(SITECODE)) %>% 
-          select(SITECODE, Date, MEAN_Q, CA:SO4S) %>% 
+HJA.f <- HJA_Q %>% 
+          full_join(HJA_chem, by = c("Date", "WS")) %>% 
+          mutate(WS = as.factor(WS),
+                 Site = "HJA") %>% 
+          select(Site, WS, Date, Q_Ls:SO4_mgL) %>% 
           filter(Date >= CTstart & Date <= CTend)
 
 
 ggplot(HJA.f %>% 
-         pivot_longer(MEAN_Q:SO4S, names_to = "solute", values_to = "conc"), aes(y = log(conc+1), x = Date, color = SITECODE)) +
+         pivot_longer(Q_Ls:SO4_mgL, names_to = "solute", values_to = "conc"), aes(y = conc, x = Date, color = WS)) +
   geom_point()+
-  facet_wrap(vars(solute), scales = "free_y")
+  facet_grid(solute ~ WS, scales = "free_y")
 
 ggpairs(HJA.f[,3:9])
 

@@ -1,5 +1,5 @@
 # This script combines all Q and chem data for all unmanaged DOR sites
-# JMH; 4 May 2021
+# JMH; 4 May 2021, updated 18 May 21
 
 
 
@@ -51,8 +51,9 @@ ggplot(DOR_Q %>%
 DOR_Q.l <- DOR_Q %>% 
   pivot_longer(Q_HP3:Q_HP6A, names_to = "ColName", values_to = "Q_m3s") %>% 
   separate(ColName, sep = "_", into = c("ColName", "WS")) %>% 
-  mutate(WS = as.factor(WS)) %>% 
-  select(-ColName)
+  mutate(WS = as.factor(WS),
+         Q_Ls = Q_m3s * 1000) %>% 
+  select(Date, WS, Q_Ls)
 
 # CHEMISTRY
 # using TP here instead of TDP because there's no TDP data
@@ -105,13 +106,16 @@ DOR_chem_HP6A <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena20
                                   col_names = DOR_chem_names)  %>% 
                   mutate(WS = "HP6A")
 
-DOR_chem <- rbind(DOR_chem_HP3, DOR_chem_HP3A, DOR_chem_HP4, DOR_chem_HP5, DOR_chem_HP6, DOR_chem_HP6A) 
+DOR_chem <- rbind(DOR_chem_HP3, DOR_chem_HP3A, DOR_chem_HP4, DOR_chem_HP5, DOR_chem_HP6, DOR_chem_HP6A) %>% 
+            mutate(SRP_mgL = TP_mgPL * 31/94.97,
+                   SO4_mgL = SO4_mgSL * (14/18.039)) %>%  #guessing this is appropriate
+            select(WS, Date, Ca_mgL, DOC_mgL, NH4_mgL = "NH4_mgNL", NO3_mgL = "NO3_mgNL", SRP_mgL, SO4_mgL)
 
 
 ggplot(DOR_chem %>% 
-         pivot_longer(Ca_mgL:SO4_mgSL, names_to = "solute", values_to = "conc"), aes(y = log(conc+1), x = Date, color = stream)) +
+         pivot_longer(Ca_mgL:SO4_mgSL, names_to = "solute", values_to = "conc"), aes(y = log(conc+1), x = Date, color = WS)) +
   geom_point()+
-  facet_wrap(vars(solute), scales = "free_y")
+  facet_grid(solute ~ WS, scales = "free_y")
 
 ##########
 # COMBINE INTO DOR DF
@@ -127,8 +131,11 @@ DOR_chem.j <- DOR_chem %>%
 DOR.f <- DOR_Q.l.j %>% 
           full_join(DOR_chem.j, by = c("Date", "WS")) %>% 
           mutate(Date = as.POSIXct(Date, format = "%Y-%m-%d"),
-                 WS = as.factor(WS)) %>% 
-          filter(Date >= CTstart & Date <= CTend)
+                 WS = as.factor(WS),
+                 Site = "DOR") %>% 
+          filter(Date >= CTstart & Date <= CTend) %>% 
+          select(Site, WS, Date, Q_Ls:SO4_mgL)
+          
 
 
 
