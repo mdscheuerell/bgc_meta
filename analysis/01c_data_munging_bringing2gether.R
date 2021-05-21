@@ -181,8 +181,8 @@ write.csv(MARSdf, file.path(here::here("data/JMHnewMungedDat"),
                    "02_Dat4Mars.csv"))
 
 
-save.image(file.path(here::here("analysis"), 
-                     "01c_data_munging_bringing2getherRdat"))
+# save.image(file.path(here::here("analysis"), 
+#                      "01c_data_munging_bringing2getherRdat"))
 # load("01c_data_munging_bringing2getherRdat")
 
 
