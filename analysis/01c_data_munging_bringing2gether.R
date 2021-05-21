@@ -171,6 +171,15 @@ ggplot(solM, aes(y = FWMC, x = Date, color = Site)) +
   ylab("Flow-weighted mean conc (mg solute/L)")
 dev.off()
 
+# make dataframe for MARs
+MARSdf <- solM %>% 
+  ungroup() %>% 
+  select(Site, WS, Date, Solute, FWMC) %>% 
+  pivot_wider(names_from = "Solute", values_from = "FWMC")
+
+write.csv(MARSdf, file.path(here::here("data/JMHnewMungedDat"), 
+                   "02_Dat4Mars.csv"))
+
 
 save.image(file.path(here::here("analysis"), 
                      "01c_data_munging_bringing2getherRdat"))
