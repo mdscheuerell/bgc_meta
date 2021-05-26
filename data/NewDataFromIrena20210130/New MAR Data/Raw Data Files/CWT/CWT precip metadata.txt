@@ -1,0 +1,15 @@
+Raw Data					Data Source	
+RG20_daily_1962_2018 				Precipitation Data	
+RG96_daily_1943_2018 				https://www.fs.usda.gov/rds/archive/Catalog/RDS-2017-0031	
+						Raingauge / Basin map 	
+						https://www.srs.fs.usda.gov/coweeta/tools-and-data/CoweetaBasinMap.pdf	
+					
+Sites 	WS	RG	Code		
+Site 02	CWT02	RG20	P_RG20	*determined from map and public data avaliable 	
+Site 07	CWT06	RG20	P_RG20		
+Site 17	CWT17	RG96	P_RG96		
+Site 18	CWT18 	RG96	P_RG96		
+Site 27	CWT27 	RG55	P_RG55	
+
+Units
+inches	
