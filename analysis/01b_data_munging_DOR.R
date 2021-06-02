@@ -1,5 +1,5 @@
 # This script combines all Q and chem data for all unmanaged DOR sites
-# JMH; 4 May 2021, updated 18 May 21
+# JMH; 4 May 2021, updated 18 May 21, updated 2 June 21
 
 
 
@@ -107,13 +107,11 @@ DOR_chem_HP6A <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena20
                   mutate(WS = "HP6A")
 
 DOR_chem <- rbind(DOR_chem_HP3, DOR_chem_HP3A, DOR_chem_HP4, DOR_chem_HP5, DOR_chem_HP6, DOR_chem_HP6A) %>% 
-            mutate(SRP_mgL = TP_mgPL * 31/94.97,
-                   SO4_mgL = SO4_mgSL * (14/18.039)) %>%  #guessing this is appropriate
-            select(WS, Date, Ca_mgL, DOC_mgL, NH4_mgL = "NH4_mgNL", NO3_mgL = "NO3_mgNL", SRP_mgL, SO4_mgL)
+            select(WS, Date, Ca_mgL, DOC_mgL, NH4_mgL = "NH4_mgNL", NO3_mgL = "NO3_mgNL", SRP_mgL = TP_mgPL, SO4_mgL = SO4_mgSL)
 
 
 ggplot(DOR_chem %>% 
-         pivot_longer(Ca_mgL:SO4_mgSL, names_to = "solute", values_to = "conc"), aes(y = log(conc+1), x = Date, color = WS)) +
+         pivot_longer(Ca_mgL:SO4_mgL, names_to = "solute", values_to = "conc"), aes(y = log(conc+1), x = Date, color = WS)) +
   geom_point()+
   facet_grid(solute ~ WS, scales = "free_y")
 

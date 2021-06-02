@@ -1,5 +1,5 @@
 # This script combines all Q and chem data for all unmanaged HBEF sites
-# JMH; 12 May 2021, updated 18 May 2021
+# JMH; 12 May 2021, updated 18 May 2021, updated 2 May 2021
 
 
 
@@ -58,28 +58,42 @@ ggplot(HBEF_Q, aes(y = log(Q_Ls +1), x = DATE, color = Flag)) +
 # all values are in mg/L - not sure if it is N or NH4 - metadata say NH4 and NO3 concentration, not NH4-N...
 # samples before 2013 were not filtered or frozen prior to analysis
 # couldn't get DOC and PO4 to be numbers with read_csv
-HBEF_chem <-  read.csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/HBEF"), 
-                            "HubbardBrook_weekly_stream_chemistry_1963-2019.csv"), na = c("", "NA")) %>% 
-          select(site, Date = date, Ca_mgL = Ca, DOC_mgL = DOC, NH4_mgL = NH4, NO3_mgL = NO3, SRP_mgL = PO4, SO4_mgL = SO4) %>% 
-          mutate(NH4_mgL = NH4_mgL *  (14/18.039),
-                 NO3_mgL = NO3_mgL * (14/62.0049),
-                 SRP_mgL = SRP_mgL * (31/94.97),
-                 SO4_mgL = SO4_mgL * (32.065/90.06)) %>% 
-          filter(site %in% c("W6", "W7", "W8", "W9")) %>% 
-          mutate(Date = as.Date(Date, format = "%Y-%m-%d")) %>% 
-          mutate(WS = ifelse(site == "W6", "WS6",
-                        ifelse(site == "W7", "WS7",
-                          ifelse(site == "W8", "WS8",
-                            ifelse(site == "W9", "WS9","blah")))),
-                 WS = as.factor(WS)) %>% 
-          select(Date, WS, Ca_mgL:SO4_mgL)
+# David confirmed NH4 and NO3 as ions
+# no TDP
 
+# these are chemistry files provide by John Campbell
+HBEF_6_chem <-  read.csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/HBEF/Hubbard Brook R Files"), 
+                                 "ws6_stream_chem.csv"), na = c("", "NA")) 
+HBEF_7_chem <-  read.csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/HBEF/Hubbard Brook R Files"), 
+                                   "ws7_stream_chem.csv"), na = c("", "NA")) 
+HBEF_8_chem <-  read.csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/HBEF/Hubbard Brook R Files"), 
+                                   "ws8_stream_chem.csv"), na = c("", "NA")) 
+HBEF_9_chem <-  read.csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/HBEF/Hubbard Brook R Files"), 
+                                   "ws9_stream_chem.csv"), na = c("", "NA")) 
 
+HBEF_chem_comb <- rbind(HBEF_6_chem, HBEF_7_chem, HBEF_8_chem, HBEF_9_chem)%>% 
+  mutate(WS2 = paste0("WS",WS)) %>% 
+  select(WS2, Date, Ca_mgL = Ca, DOC_mgL = DOC, NH4_mgL = NH4, NO3_mgL = NO3, SRP_mgL = PO4, SO4_mgL = SO4) %>% 
+  #-888.88 indicates NA
+  mutate(across(where(is.numeric), ~ case_when(
+                            .x < -800 ~ as.numeric("NA"),
+                            .x > -800 ~ as.numeric(.x)))) %>% 
+  mutate(NH4_mgL = NH4_mgL *  (14/18.039),
+         NO3_mgL = NO3_mgL * (14/62.0049),
+         SO4_mgL = SO4_mgL * (32.065/90.06)) %>% 
+  mutate(Date = as.POSIXct(Date, format = "%m/%d/%Y"),
+         WS = as.factor(WS2)) %>% 
+  select(-WS2)
 
-ggplot(HBEF_chem %>% 
+ggplot(HBEF_chem_comb %>% 
          pivot_longer(Ca_mgL:SO4_mgL, names_to = "solute", values_to = "conc"), aes(y = conc, x = Date, color = WS)) +
   geom_point()+
   facet_grid(solute ~ WS, scales = "free_y")
+
+# seems like this doesn't have "all" the data for each site. - esp DOC
+# HBEF_chem <-  read.csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/HBEF"), 
+#                             "HubbardBrook_weekly_stream_chemistry_1963-2019.csv"), na = c("", "NA")) 
+
 
 ##########
 # COMBINE 
@@ -87,7 +101,7 @@ ggplot(HBEF_chem %>%
 
 HBEF <- HBEF_Q %>% 
   rename(Date = "DATE") %>% 
-  full_join(HBEF_chem, by = c("Date", "WS")) %>% 
+  full_join(HBEF_chem_comb, by = c("Date", "WS")) %>% 
   # loose the DOC data here
   filter(Date >= CTstart & Date <= CTend) %>%
   mutate(Site = "HBEF") %>% 
