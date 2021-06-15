@@ -339,6 +339,7 @@ dev.off()
 pdf(file.path(here::here("plots"),
               "FWMCPlotDOR.pdf"), width = 25, height = 10)
 ggplot(solM %>% 
+         mutate(Solute = recode(Solute, "SRP" = "TP")) %>% 
          filter(Site == "DOR"), aes(y = FWMC, x = Date, color = Site)) +
   geom_point()+
   facet_grid(Solute ~ SiteWs, scales = "free_y") +
@@ -349,6 +350,7 @@ dev.off()
 pdf(file.path(here::here("plots"),
               "FWMCPlotELA.pdf"), width = 15, height = 10)
 ggplot(solM %>% 
+         mutate(Solute = recode(Solute, "SRP" = "TDP")) %>% 
          filter(Site == "ELA"), aes(y = FWMC, x = Date, color = Site)) +
   geom_point()+
   facet_grid(Solute ~ SiteWs, scales = "free_y") +
@@ -369,6 +371,7 @@ dev.off()
 pdf(file.path(here::here("plots"),
               "FWMCPlotHJA.pdf"), width = 10, height = 10)
 ggplot(solM %>% 
+         mutate(Solute = recode(Solute, "SRP" = "TDP")) %>% 
          filter(Site == "HJA"), aes(y = FWMC, x = Date, color = Site)) +
   geom_point()+
   facet_grid(Solute ~ SiteWs, scales = "free_y") +
@@ -379,6 +382,7 @@ dev.off()
 pdf(file.path(here::here("plots"),
               "FWMCPlotMEF.pdf"), width = 10, height = 10)
 ggplot(solM %>% 
+         mutate(Solute = recode(Solute, "SRP" = "TDP")) %>% 
          filter(Site == "MEF"), aes(y = FWMC, x = Date, color = Site)) +
   geom_point()+
   facet_grid(Solute ~ SiteWs, scales = "free_y") +
@@ -409,6 +413,7 @@ dev.off()
 pdf(file.path(here::here("plots"),
               "FWMCPlotTLW.pdf"), width = 15, height = 10)
 ggplot(solM %>% 
+         mutate(Solute = recode(Solute, "SRP" = "TDP")) %>% 
          filter(Site == "TLW"), aes(y = FWMC, x = Date, color = Site)) +
   geom_point()+
   facet_grid(Solute ~ SiteWs, scales = "free_y") +
