@@ -59,6 +59,7 @@ ggplot(TLW_Q, aes(y = Q_Ls, Date)) +
 ############
 # SOLUTE DATA
 ############
+# david says TP = TDP
 
 # C32 chem
 # got this from David today after writing rest of script.
@@ -112,7 +113,7 @@ C38chem <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena20210130
 
 
 TLW_chem <- rbind(C32chem, C35chem, C38chem)  %>% 
-            mutate(SRP_mgL = as.numeric(SRP_mgL) * (31/94.97)) %>% 
+            mutate(SRP_mgL = as.numeric(SRP_mgL)) %>% 
             select(WS, Date, Ca_mgL:SO4_mgL)
 
 

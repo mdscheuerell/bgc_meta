@@ -1,5 +1,5 @@
 # This script combines all Q and chem data for all unmanaged MEF sites
-# JMH; 5 May 2021, 18 May 2021
+# JMH; 5 May 2021, 18 May 2021, 2 June 2021
 
 
 
@@ -58,8 +58,8 @@ ggplot(MEF_Q, aes(y = log(Q_Ls +1), x = Date)) +
 
 # CHEMISTRY
 # !!!!!!!!!!!!!!!!!!NO3 SAYS uM IN D1 AND MG/L IN D3!!!!!!!!!!!!!!!!!! <- DAvid indicated that NO3 and NH4 can't be trusted
-# THERE ARE 2 KINDS OF TOC HERE, NTO SURE WHICH ONE TO USE- SEEM TO ALTERNATE
-# TP HERE NOT TDP
+# THERE ARE 2 KINDS OF TOC HERE, NTO SURE WHICH ONE TO USE- SEEM TO ALTERNATE <- data provider indicates that these are exchangeable
+# TP: David indicates this is TDP
 
 MEF_chemNames <- c("Site", "Date", "TN_mgL", "NO3_mgL", "NH4_mgL", "TP_mgL", "Ca_mgL", "SO4_mgL", "TOC_NPOC_mgL", "TOC_TCIC_mgL")
 
@@ -72,10 +72,10 @@ MEF_chem <-  readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena202101
 # chem columns have "<" in there. In NO3 column these are not always the same less than first < 0.01 then < 0.02
 # going to replace "< x" with "x"
 MEF_chem2 <- MEF_chem %>%  
-          # deleted NO3 and NH4 data not trustworth
+          # deleted NO3 and NH4 data not trustworthy
           mutate(NO3_mgL = as.numeric("NA"),
                  NH4_mgL = as.numeric("NA"),
-                 TP_mgL = as.numeric(str_remove(TP_mgL, "<.")) * 31/94.97,
+                 TP_mgL = as.numeric(str_remove(TP_mgL, "<.")),
                  Ca_mgL = as.numeric(str_remove(Ca_mgL, "<.")),
                  SO4_mgL = as.numeric(str_remove(SO4_mgL, "<.")),
                  Site = as.factor(Site)) %>% 

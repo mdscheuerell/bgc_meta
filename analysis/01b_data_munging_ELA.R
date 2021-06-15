@@ -1,5 +1,5 @@
 # This script calculates flow weighted means for all unmanaged sites
-# JMH started 30 Jan 2021, updated 18 May 21
+# JMH started 30 Jan 2021, updated 18 May 21, 2 June 2021
 
 
 
@@ -70,6 +70,7 @@ ELA.nwif <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena2021013
 
 ggplot(ELA.nwif, aes(y = Q_m3s, mean_date)) +
   geom_point()
+
 ############
 # SOLUTE DATA
 ############
@@ -101,9 +102,9 @@ ELA.chem <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena2021013
   select("SAMPLED", "SUBLOC", "STATION","CA","DOC","NH4","NO3","TDP","SO4") %>% 
   rename(Ca_mgL = "CA", DOC_uM = "DOC", NH4_ugL = "NH4",NO3_ugL ="NO3",TDP_ugL = "TDP",SO4_mgL = "SO4") %>% 
   mutate(DOC_mgL = DOC_uM * 12.01 /1000,
-         NH4_mgL = NH4_ugL * (14/18.039) / 1000,
-         NO3_mgL = NO3_ugL * (14/62.0049) / 1000,
-         SRP_mgL = TDP_ugL * (31/94.97) / 1000,
+         NH4_mgL = NH4_ugL / 1000,
+         NO3_mgL = NO3_ugL / 1000,
+         SRP_mgL = TDP_ugL / 1000,
          SO4_mgL = SO4_mgL * (32.065/90.06)) %>% 
   # select focal solutes
   select("SAMPLED", "SUBLOC", "STATION", "Ca_mgL", DOC_mgL, NH4_mgL, NO3_mgL, SRP_mgL, SO4_mgL) %>% 
@@ -151,7 +152,7 @@ ggplot(ELA.f %>%
   geom_point() +
   facet_grid(meas ~ WS,  scales = "free_y")
 
-ggpairs(ELA.f[,c(4,7:12)])
+# ggpairs(ELA.f[,c(4,7:12)])
 
 ##########
 # EXPORT DATAFRAME
@@ -168,82 +169,3 @@ write_csv(ELA.f, file.path(here::here("data/JMHnewMungedDat/"), "01_ELAcomb.csv"
 
 
 
-# SAVING FOR LATER
-
-############
-# COMBINE Q AND CHEM
-# CALCULATE FWMC
-############
-
-#EIF
-ELA.eif2 <- ELA.eif %>% 
-  left_join(ELA.chemL %>% 
-              filter(STATION == "EIF"), by = "dateC") %>% 
-  select(dateC, date = "mean_date.x", Q_m3s, solute, conc) %>% 
-  mutate(station = "EIF",
-         Ym = as.character(strftime(date, format = "%Y-%m")), 
-         # using eq here: https://ncwqr.files.wordpress.com/2017/06/d-time-weighted-and-flow-weighted-mean-concentrations.pdf
-        FWMCtop = conc * (Q_m3s*60*60*24) * 1, #[conc * (flow converted to d) * 1day]
-         FWMCbottom = (Q_m3s*60*60*24) * 1,
-         # don't want to divide "top" by a larger number of days of bottom
-         FWMCbottomUse = ifelse(!is.na(FWMCtop), FWMCbottom, as.numeric("NA"))) %>% # [(flow conv to d) * 1 day]
-  # AGGREGATE TO MONTHLY - summing
-  group_by(Ym, solute, station) %>% 
-  summarize(across(c(FWMCtop, FWMCbottomUse), sum, na.rm = T)) %>% 
-  mutate(FWMC = FWMCtop/FWMCbottomUse) %>% 
-  mutate(date = as.POSIXct(paste0(Ym,"-01"), format = "%Y-%m-%d")) %>% 
-  #remove 301 NA's in solute
-  filter(solute != "NA")
-
-ggplot(ELA.eif2, aes(y = FWMC, x = date, color = solute)) +
-  geom_point() +
-  facet_wrap(vars(solute), scales = "free_y")
-
-#NEIF
-ELA.neif2 <- ELA.neif %>% 
-  full_join(ELA.chemL %>% 
-              filter(STATION == "NEIF"), by = "dateC")%>% 
-  select(dateC, date = "mean_date.x", Q_m3s, solute, conc) %>% 
-  mutate(station = "NEIF",
-         Ym = as.character(strftime(date, format = "%Y-%m")), 
-         # using eq here: https://ncwqr.files.wordpress.com/2017/06/d-time-weighted-and-flow-weighted-mean-concentrations.pdf
-         FWMCtop = conc * (Q_m3s*60*60*24) * 1, #[conc * (flow converted to d) * 1day]
-         FWMCbottom = (Q_m3s*60*60*24) * 1,
-         # don't want to divide "top" by a larger number of days of bottom
-         FWMCbottomUse = ifelse(!is.na(FWMCtop), FWMCbottom, as.numeric("NA"))) %>% # [(flow conv to d) * 1 day]
-  group_by(Ym, solute, station) %>% 
-  summarize(across(c(FWMCtop, FWMCbottomUse), sum, na.rm = T)) %>% 
-  mutate(FWMC = FWMCtop/FWMCbottomUse) %>% 
-  mutate(date = as.POSIXct(paste0(Ym,"-01"), format = "%Y-%m-%d")) %>% 
-  #remove NA's in solute
-  filter(solute != "NA")
-
-ggplot(ELA.neif2, aes(y = FWMC, x = date, color = solute)) +
-  geom_point() +
-  facet_wrap(vars(solute), scales = "free_y")
-
-ELA.nwif2 <- ELA.nwif %>% 
-  full_join(ELA.chemL %>% 
-              filter(STATION == "NWIF"), by = "dateC")%>% 
-  select(dateC, date = "mean_date.x", Q_m3s, solute, conc) %>% 
-  mutate(station = "NWIF",
-         Ym = as.character(strftime(date, format = "%Y-%m")), 
-         # using eq here: https://ncwqr.files.wordpress.com/2017/06/d-time-weighted-and-flow-weighted-mean-concentrations.pdf
-         FWMCtop = conc * (Q_m3s*60*60*24) * 1, #[conc * (flow converted to d) * 1day]
-         FWMCbottom = (Q_m3s*60*60*24) * 1,
-         # don't want to divide "top" by a larger number of days of bottom
-         FWMCbottomUse = ifelse(!is.na(FWMCtop), FWMCbottom, as.numeric("NA"))) %>% # [(flow conv to d) * 1 day]
-  group_by(Ym, solute, station) %>% 
-  summarize(across(c(FWMCtop, FWMCbottomUse), sum, na.rm = T)) %>% 
-  mutate(FWMC = FWMCtop/FWMCbottomUse) %>% 
-  mutate(date = as.POSIXct(paste0(Ym,"-01"), format = "%Y-%m-%d")) %>% 
-  #remove NA's in solute
-  filter(solute != "NA")
-
-ggplot(ELA.nwif2, aes(y = FWMC, x = date, color = solute)) +
-  geom_point() +
-  facet_wrap(vars(solute), scales = "free_y")
-
-########## NEED TO CHECK THIS #########
-
-                            
