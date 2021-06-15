@@ -60,16 +60,121 @@ sol <- rbind(BBWM, DOR, ELA, HBEF, HJA, MEF, SEF, SLP, TLW) %>%
   dim(sol[duplicated(sol[,c("SiteWs", "Date")]) == TRUE,])
 
   
-# Make conc plot
-pdf(file.path(here::here("data/JMHnewMungedDat"),
-             "RawConcPlot.pdf"), width = 25, height = 10)
+# Make conc plots
+# all sites
+  # NOTE: NOT ALL TDP VALUES ARE TDP SEE WATERSHED DATA NOTES SPREADSHEET
+pdf(file.path(here::here("plots"),
+             "RawConcPlotAllSites.pdf"), width = 25, height = 10)
 ggplot(sol %>%
+         rename(TDP_mgL = "SRP_mgL") %>% 
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
          mutate(solute = fct_relevel(solute,
                                      c("Q_Ls", "Ca_mgL", "DOC_mgL", "NH4_mgL", "NO3_mgL", "SRP_mgL", "SO4_mgL"))), aes(y = conc, x = Date, color = Site)) +
           geom_point(size = 0.5) +
         facet_grid(solute ~ SiteWs, scales = "free_y")
 
+dev.off()
+
+# TLW
+pdf(file.path(here::here("plots"),
+              "RawConcPlotTLW.pdf"), width = 15, height = 10)
+ggplot(sol %>%
+         rename(TDP_mgL = "SRP_mgL") %>% 
+         pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
+         mutate(solute = fct_relevel(solute,
+                                     c("Q_Ls", "Ca_mgL", "DOC_mgL", "NH4_mgL", "NO3_mgL", "SRP_mgL", "SO4_mgL"))) %>% 
+         filter(Site == "TLW"), aes(y = conc, x = Date, color = Site)) +
+  geom_point(size = 0.5) +
+  facet_grid(solute ~ SiteWs, scales = "free_y") 
+dev.off()
+
+# SLP
+# SRP here is very limited, not sure if SRP or TDP
+pdf(file.path(here::here("plots"),
+              "RawConcPlotSLP.pdf"), width = 5, height = 10)
+ggplot(sol %>%
+         pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
+         mutate(solute = fct_relevel(solute,
+                                     c("Q_Ls", "Ca_mgL", "DOC_mgL", "NH4_mgL", "NO3_mgL", "SRP_mgL", "SO4_mgL"))) %>% 
+         filter(Site == "SLP"), aes(y = conc, x = Date, color = Site)) +
+  geom_point(size = 0.5) +
+  facet_grid(solute ~ SiteWs, scales = "free_y")
+dev.off()
+
+# MEF
+pdf(file.path(here::here("plots"),
+              "RawConcPlotMEF.pdf"), width = 10, height = 10)
+ggplot(sol %>%
+         rename(TDP_mgL = "SRP_mgL") %>% 
+         pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
+         mutate(solute = fct_relevel(solute,
+                                     c("Q_Ls", "Ca_mgL", "DOC_mgL", "NH4_mgL", "NO3_mgL", "SRP_mgL", "SO4_mgL"))) %>% 
+         filter(Site == "MEF"), aes(y = conc, x = Date, color = Site)) +
+  geom_point(size = 0.5) +
+  facet_grid(solute ~ SiteWs, scales = "free_y")
+dev.off()
+
+# HJA
+pdf(file.path(here::here("plots"),
+              "RawConcPlotHJA.pdf"), width = 10, height = 10)
+ggplot(sol %>%
+         rename(TDP_mgL = "SRP_mgL") %>% 
+         pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
+         mutate(solute = fct_relevel(solute,
+                                     c("Q_Ls", "Ca_mgL", "DOC_mgL", "NH4_mgL", "NO3_mgL", "SRP_mgL", "SO4_mgL"))) %>% 
+         filter(Site == "HJA"), aes(y = conc, x = Date, color = Site)) +
+  geom_point(size = 0.5) +
+  facet_grid(solute ~ SiteWs, scales = "free_y")
+dev.off()
+
+# HBEF
+pdf(file.path(here::here("plots"),
+              "RawConcPlotHBEF.pdf"), width = 20, height = 10)
+ggplot(sol %>%
+         pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
+         mutate(solute = fct_relevel(solute,
+                                     c("Q_Ls", "Ca_mgL", "DOC_mgL", "NH4_mgL", "NO3_mgL", "SRP_mgL", "SO4_mgL"))) %>% 
+         filter(Site == "HBEF"), aes(y = conc, x = Date, color = Site)) +
+  geom_point(size = 0.5) +
+  facet_grid(solute ~ SiteWs, scales = "free_y")
+dev.off()
+
+# ELA
+pdf(file.path(here::here("plots"),
+              "RawConcPlotELA.pdf"), width = 12, height = 10)
+ggplot(sol %>%
+         rename(TDP_mgL = "SRP_mgL") %>% 
+         pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
+         mutate(solute = fct_relevel(solute,
+                                     c("Q_Ls", "Ca_mgL", "DOC_mgL", "NH4_mgL", "NO3_mgL", "SRP_mgL", "SO4_mgL"))) %>% 
+         filter(Site == "ELA"), aes(y = conc, x = Date, color = Site)) +
+  geom_point(size = 0.5) +
+  facet_grid(solute ~ SiteWs, scales = "free_y")
+dev.off()
+
+# DOR
+pdf(file.path(here::here("plots"),
+              "RawConcPlotDOR.pdf"), width = 25, height = 10)
+ggplot(sol %>%
+         rename(TP_mgL = "SRP_mgL") %>% 
+         pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
+         mutate(solute = fct_relevel(solute,
+                                     c("Q_Ls", "Ca_mgL", "DOC_mgL", "NH4_mgL", "NO3_mgL", "SRP_mgL", "SO4_mgL"))) %>% 
+         filter(Site == "DOR"), aes(y = conc, x = Date, color = Site)) +
+  geom_point(size = 0.5) +
+  facet_grid(solute ~ SiteWs, scales = "free_y")
+dev.off()
+
+# BBWM
+pdf(file.path(here::here("plots"),
+              "RawConcPlotBBWM.pdf"), width = 5, height = 10)
+ggplot(sol %>%
+         pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
+         mutate(solute = fct_relevel(solute,
+                                     c("Q_Ls", "Ca_mgL", "DOC_mgL", "NH4_mgL", "NO3_mgL", "SRP_mgL", "SO4_mgL"))) %>% 
+         filter(Site == "BBWM"), aes(y = conc, x = Date, color = Site)) +
+  geom_point(size = 0.5) +
+  facet_grid(solute ~ SiteWs, scales = "free_y")
 dev.off()
 
 
@@ -144,7 +249,7 @@ sol4 <- sol3 %>%
   mutate(FWMC = ifelse(Site == "HJA", mgL, FWMC))
 
 
-pdf(file.path(here::here("data/JMHnewMungedDat"),
+pdf(file.path(here::here("plots"),
               "IntervalsBWconcSmp.pdf"), width = 10, height = 25)
 ggplot(sol4, aes(y = log10(Interval), x = Date)) +
   geom_point()+
@@ -210,10 +315,101 @@ ggplot(solM, aes(y = FWMC, x = mgL, color = Solute)) +
   geom_point() +
   facet_wrap(vars(Solute), scales = "free")
 
-
-pdf(file.path(here::here("data/JMHnewMungedDat"),
-             "FWMCPlot.pdf"), width = 25, height = 10)
+# export FWMC plots
+# all site
+pdf(file.path(here::here("plots"),
+             "FWMCPlotAllSites.pdf"), width = 25, height = 10)
 ggplot(solM, aes(y = FWMC, x = Date, color = Site)) +
+  geom_point()+
+  facet_grid(Solute ~ SiteWs, scales = "free_y") +
+  ylab("Flow-weighted mean conc (mg solute/L)")
+dev.off()
+
+#BBWM
+pdf(file.path(here::here("plots"),
+              "FWMCPlotBBWM.pdf"), width = 5, height = 10)
+ggplot(solM %>% 
+         filter(Site == "BBWM"), aes(y = FWMC, x = Date, color = Site)) +
+  geom_point()+
+  facet_grid(Solute ~ SiteWs, scales = "free_y") +
+  ylab("Flow-weighted mean conc (mg solute/L)")
+dev.off()
+
+#DOR
+pdf(file.path(here::here("plots"),
+              "FWMCPlotDOR.pdf"), width = 25, height = 10)
+ggplot(solM %>% 
+         filter(Site == "DOR"), aes(y = FWMC, x = Date, color = Site)) +
+  geom_point()+
+  facet_grid(Solute ~ SiteWs, scales = "free_y") +
+  ylab("Flow-weighted mean conc (mg solute/L)")
+dev.off()
+
+#ELA
+pdf(file.path(here::here("plots"),
+              "FWMCPlotELA.pdf"), width = 15, height = 10)
+ggplot(solM %>% 
+         filter(Site == "ELA"), aes(y = FWMC, x = Date, color = Site)) +
+  geom_point()+
+  facet_grid(Solute ~ SiteWs, scales = "free_y") +
+  ylab("Flow-weighted mean conc (mg solute/L)")
+dev.off()
+
+#HBEF
+pdf(file.path(here::here("plots"),
+              "FWMCPlotHBEF.pdf"), width = 25, height = 10)
+ggplot(solM %>% 
+         filter(Site == "HBEF"), aes(y = FWMC, x = Date, color = Site)) +
+  geom_point()+
+  facet_grid(Solute ~ SiteWs, scales = "free_y") +
+  ylab("Flow-weighted mean conc (mg solute/L)")
+dev.off()
+
+#HJA
+pdf(file.path(here::here("plots"),
+              "FWMCPlotHJA.pdf"), width = 10, height = 10)
+ggplot(solM %>% 
+         filter(Site == "HJA"), aes(y = FWMC, x = Date, color = Site)) +
+  geom_point()+
+  facet_grid(Solute ~ SiteWs, scales = "free_y") +
+  ylab("Flow-weighted mean conc (mg solute/L)")
+dev.off()
+
+#MEF
+pdf(file.path(here::here("plots"),
+              "FWMCPlotMEF.pdf"), width = 10, height = 10)
+ggplot(solM %>% 
+         filter(Site == "MEF"), aes(y = FWMC, x = Date, color = Site)) +
+  geom_point()+
+  facet_grid(Solute ~ SiteWs, scales = "free_y") +
+  ylab("Flow-weighted mean conc (mg solute/L)")
+dev.off()
+
+#SEF - no data
+# pdf(file.path(here::here("data/plots"),
+#               "FWMCPlotSEF.pdf"), width = 25, height = 10)
+# ggplot(solM %>% 
+#          filter(Site == "SEF"), aes(y = FWMC, x = Date, color = Site)) +
+#   geom_point()+
+#   facet_grid(Solute ~ SiteWs, scales = "free_y") +
+#   ylab("Flow-weighted mean conc (mg solute/L)")
+# dev.off()
+
+#SLP
+pdf(file.path(here::here("plots"),
+              "FWMCPlotSLP.pdf"), width = 5, height = 10)
+ggplot(solM %>% 
+         filter(Site == "SLP"), aes(y = FWMC, x = Date, color = Site)) +
+  geom_point()+
+  facet_grid(Solute ~ SiteWs, scales = "free_y") +
+  ylab("Flow-weighted mean conc (mg solute/L)")
+dev.off()
+
+#TLW
+pdf(file.path(here::here("plots"),
+              "FWMCPlotTLW.pdf"), width = 15, height = 10)
+ggplot(solM %>% 
+         filter(Site == "TLW"), aes(y = FWMC, x = Date, color = Site)) +
   geom_point()+
   facet_grid(Solute ~ SiteWs, scales = "free_y") +
   ylab("Flow-weighted mean conc (mg solute/L)")
@@ -259,7 +455,8 @@ write.csv(MARSdf2, file.path(here::here("data/JMHnewMungedDat"),
 
 save.image(file.path(here::here("analysis"),
                      "01c_data_munging_bringing2getherRdat"))
-# load("01c_data_munging_bringing2getherRdat")
+# load(file.path(here::here("analysis"),
+#                "01c_data_munging_bringing2getherRdat"))
 
 
 
