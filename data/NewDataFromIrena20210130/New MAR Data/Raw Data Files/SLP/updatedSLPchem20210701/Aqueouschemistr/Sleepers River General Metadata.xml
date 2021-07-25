@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <idinfo>
+    <citation>
+      <citeinfo>
+        <origin>Matt, Serena</origin>
+        <origin>Shanley, J.B.</origin>
+        <origin>Chalmers, A.T.</origin>
+        <origin>Sebestyen, S.D.</origin>
+        <origin>Merriam, J.L.</origin>
+        <origin>Bailey, S.W.</origin>
+        <origin>Campbell, J.L.</origin>
+        <origin>Ryan, K.A.</origin>
+        <origin>Denner, J.C.</origin>
+        <origin>Clark, S.F.</origin>
+        <origin>Schuster, P.F.</origin>
+        <origin>T.E. Smith</origin>
+        <pubdate>20210419</pubdate>
+        <title>Aqueous chemistry database, Sleepers River Research Watershed, Danville, Vermont, 1991-2018</title>
+        <geoform>tabular digital data</geoform>
+        <onlink>https://doi.org/10.5066/P9380HQG</onlink>
+      </citeinfo>
+    </citation>
+    <descript>
+      <abstract>The Sleepers River Research Watershed, near Danville, Vermont, is a 111-square-kilometer watershed established in 1958 by the Agricultural Research Service.The research watershed has since been operated by three other federal agencies: National Weather Service, U.S. Army Cold Regions Research and Engineering Laboratory (CRREL), and U.S. Geological Survey (USGS). USGS started at the site in collaboration with CRREL in 1991 and has been the sole operating entity since 2000. From 1991 to 2017, the research watershed was part of the national 5-site network of the USGS Water, Energy, and Biogeochemical Budgets (WEBB) program. Since 2017 Sleepers has been funded by USGS Land Change Science to continue the core measurements at the small watershed scale while expanding the geographic scope to the larger Connecticut River basin.
+This data release brings together the analytical results from more than 15,000 samples into a single spreadsheet ("1. Sleepers River Aqueous Chemistry.csv;" located in file "Sleepers Chemistry Release Files.zip"). Five additional supporting files document different facets of a thorough quality-control effort. One of the challenges posed by this effort was to integrate results from 18 separate laboratories used over the course of the study. The project's operational model encouraged academic collaboration to augment federal funding, and, lacking its own laboratory, frequently relied on student researchers using university laboratories.  Harmonizing these various data sources was one objective of this data release effort. Continuity is provided by the U.S. Forest Service laboratory in Durham, New Hampshire, which has analyzed weekly precipitation and stream samples throughout the 30-year project history.
+The dataset includes major ion chemistry, select metals, and isotopic composition for atmospheric deposition, streamflow, and subsurface waters. The data release is structured as six pairs of data (.csv) and metadata (.xml) files: (1) the main chemistry and isotope dataset, (2) a description of the site names and sampling locations, (3) a description of the 18 individual laboratories used, (4) results of inter-laboratory comparisons, (5) statistics on replicate analyses, and (6) results of blank analyses.</abstract>
+      <purpose>The fundamental scientific goal of WEBB was to understand how hydrology and biogeochemical cycling would respond to changes in climate and atmospheric deposition. WEBB used the small watershed mass balance approach, which is based on quantifying water and solute inputs (atmospheric deposition) and outputs (streamflow) for a catchment. These fluxes establish the boundary conditions to understand processes affecting water and solute dynamics within the catchment, as augmented by internal catchment measurements. The 30-year span of the data also allows assessment of trends. Research thrusts over the life of the project have included organic carbon cycling, mercury biogeochemistry, acid deposition recovery, and identifying sources of streamflow based on chemistry and water isotopes.</purpose>
+      <supplinf>None.</supplinf>
+    </descript>
+    <timeperd>
+      <timeinfo>
+        <rngdates>
+          <begdate>19910801</begdate>
+          <enddate>20181231</enddate>
+        </rngdates>
+      </timeinfo>
+      <current>publication date</current>
+    </timeperd>
+    <status>
+      <progress>Complete</progress>
+      <update>Annually</update>
+    </status>
+    <spdom>
+      <bounding>
+        <westbc>-72.1877</westbc>
+        <eastbc>-72.0346</eastbc>
+        <northbc>44.5322</northbc>
+        <southbc>44.4289</southbc>
+      </bounding>
+    </spdom>
+    <keywords>
+      <theme>
+        <themekt>ISO 19115 Topic Category</themekt>
+        <themekey>location</themekey>
+      </theme>
+      <theme>
+        <themekt>None</themekt>
+        <themekey>Sleepers River</themekey>
+        <themekey>stream chemistry</themekey>
+        <themekey>climate change</themekey>
+        <themekey>precipitation</themekey>
+        <themekey>groundwater</themekey>
+        <themekey>soil water</themekey>
+        <themekey>snowmelt</themekey>
+        <themekey>W-9</themekey>
+        <themekey>concentration-discharge</themekey>
+        <themekey>accuracy</themekey>
+        <themekey>precision</themekey>
+        <themekey>detection limit</themekey>
+        <themekey>headwater</themekey>
+      </theme>
+      <theme>
+        <themekt>USGS Metadata Identifier</themekt>
+        <themekey>USGS:5c5c89b6e4b070828902d1c9</themekey>
+      </theme>
+      <place>
+        <placekt>None</placekt>
+        <placekey>Danville</placekey>
+        <placekey>Sleepers River</placekey>
+        <placekey>Connecticut River basin</placekey>
+        <placekey>Vermont</placekey>
+      </place>
+    </keywords>
+    <accconst>None.  Please see 'Distribution Info' for details.</accconst>
+    <useconst>None.  Users are advised to read the dataset's metadata thoroughly to understand appropriate use and data limitations.</useconst>
+    <ptcontac>
+      <cntinfo>
+        <cntperp>
+          <cntper>Serena Matt</cntper>
+          <cntorg>U.S. Geological Survey, NORTHEAST REGION</cntorg>
+        </cntperp>
+        <cntpos>Physical Scientist</cntpos>
+        <cntaddr>
+          <addrtype>mailing address</addrtype>
+          <address>PO Box 628</address>
+          <city>Montpelier</city>
+          <state>VT</state>
+          <postal>05601</postal>
+          <country>US</country>
+        </cntaddr>
+        <cntvoice>802-828-4512</cntvoice>
+        <cntfax>802-828-4465</cntfax>
+        <cntemail>smatt@usgs.gov</cntemail>
+      </cntinfo>
+    </ptcontac>
+    <datacred>U.S. Geological Survey Land Change Science</datacred>
+    <crossref>
+      <citeinfo>
+        <origin>James B. Shanley</origin>
+        <origin>Ann T Chalmers</origin>
+        <origin>Jon C Denner</origin>
+        <origin>Stewart F Clark</origin>
+        <pubdate>20210302</pubdate>
+        <title>Five-minute discharge; daily precipitation, stream runoff, and maximum and minimum air temperature; and annual precipitation and runoff for W-9 catchment, Sleepers River Research Watershed near Danville, Vermont, 1991-2018</title>
+        <geoform>dataset</geoform>
+        <pubinfo>
+          <pubplace>https://www.sciencebase.gov</pubplace>
+          <publish>U.S. Geological Survey</publish>
+        </pubinfo>
+        <onlink>https://doi.org/10.5066/p929kmvk</onlink>
+      </citeinfo>
+    </crossref>
+  </idinfo>
+  <dataqual>
+    <attracc>
+      <attraccr>Accuracy of the chemistry data reported in "1. Sleepers River Aqueous Chemistry.csv" is described in the following files as well as in their complementary metadata: "3. Sleepers River Laboratory Information.csv," "4. Sleepers River Interlaboratory Comparison.csv," "5. Sleepers River Replicate Statistics.csv," and "6. Sleepers River Blank Statistics.csv."</attraccr>
+    </attracc>
+    <logic>Data have been thoroughly checked.</logic>
+    <complete>Dataset is considered complete for the information presented 08/01/1991-12/31/2018.</complete>
+    <lineage>
+      <procstep>
+        <procdesc>NA</procdesc>
+        <procdate>20210304</procdate>
+      </procstep>
+    </lineage>
+  </dataqual>
+  <distinfo>
+    <distrib>
+      <cntinfo>
+        <cntperp>
+          <cntper>GS ScienceBase</cntper>
+          <cntorg>U.S. Geological Survey</cntorg>
+        </cntperp>
+        <cntaddr>
+          <addrtype>mailing address</addrtype>
+          <address>Denver Federal Center, Building 810, Mail Stop 302</address>
+          <city>Denver</city>
+          <state>CO</state>
+          <postal>80225</postal>
+          <country>United States</country>
+        </cntaddr>
+        <cntvoice>1-888-275-8747</cntvoice>
+        <cntemail>sciencebase@usgs.gov</cntemail>
+      </cntinfo>
+    </distrib>
+    <distliab>Unless otherwise stated, all data, metadata and related materials are considered to satisfy the quality standards relative to the purpose for which the data were collected. Although these data and associated metadata have been reviewed for accuracy and completeness and approved for release by the U.S. Geological Survey (USGS), no warranty expressed or implied is made regarding the display or utility of the data on any other system or for general or scientific purposes, nor shall the act of distribution constitute any such warranty.  Any use of trade, firm, or product names is for descriptive purposes only and does not imply endorsement by the U.S. Government.</distliab>
+    <stdorder>
+      <digform>
+        <digtinfo>
+          <formname>Digital Data</formname>
+        </digtinfo>
+        <digtopt>
+          <onlinopt>
+            <computer>
+              <networka>
+                <networkr>https://doi.org/10.5066/P9380HQG</networkr>
+              </networka>
+            </computer>
+          </onlinopt>
+        </digtopt>
+      </digform>
+      <fees>None</fees>
+    </stdorder>
+  </distinfo>
+  <metainfo>
+    <metd>20210421</metd>
+    <metc>
+      <cntinfo>
+        <cntperp>
+          <cntper>Serena Matt</cntper>
+          <cntorg>U.S. Geological Survey, NORTHEAST REGION</cntorg>
+        </cntperp>
+        <cntpos>Physical Scientist</cntpos>
+        <cntaddr>
+          <addrtype>mailing address</addrtype>
+          <address>PO Box 628</address>
+          <city>Montpelier</city>
+          <state>VT</state>
+          <postal>05601</postal>
+          <country>US</country>
+        </cntaddr>
+        <cntvoice>802-828-4512</cntvoice>
+        <cntfax>802-828-4465</cntfax>
+        <cntemail>smatt@usgs.gov</cntemail>
+      </cntinfo>
+    </metc>
+    <metstdn>FGDC Content Standard for Digital Geospatial Metadata</metstdn>
+    <metstdv>FGDC-STD-001-1998</metstdv>
+  </metainfo>
+</metadata>

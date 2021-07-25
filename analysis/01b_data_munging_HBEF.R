@@ -1,5 +1,5 @@
 # This script combines all Q and chem data for all unmanaged HBEF sites
-# JMH; 12 May 2021, updated 18 May 2021, updated 2 May 2021
+# JMH; 12 May 2021, updated 18 May 2021, updated 2 May 2021, updated 14 July 2021
 
 
 
@@ -61,14 +61,14 @@ ggplot(HBEF_Q, aes(y = log(Q_Ls +1), x = DATE, color = Flag)) +
 # David confirmed NH4 and NO3 as ions
 # no TDP
 
-# these are chemistry files provide by John Campbell
-HBEF_6_chem <-  read.csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/HBEF/Hubbard Brook R Files"), 
+# these are chemistry files provide by John Campbell which remove bad data - updated 14 July 2021
+HBEF_6_chem <-  read.csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/HBEF/updatedChem20210705"), 
                                  "ws6_stream_chem.csv"), na = c("", "NA")) 
-HBEF_7_chem <-  read.csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/HBEF/Hubbard Brook R Files"), 
+HBEF_7_chem <-  read.csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/HBEF/updatedChem20210705"), 
                                    "ws7_stream_chem.csv"), na = c("", "NA")) 
-HBEF_8_chem <-  read.csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/HBEF/Hubbard Brook R Files"), 
+HBEF_8_chem <-  read.csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/HBEF/updatedChem20210705"), 
                                    "ws8_stream_chem.csv"), na = c("", "NA")) 
-HBEF_9_chem <-  read.csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/HBEF/Hubbard Brook R Files"), 
+HBEF_9_chem <-  read.csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/HBEF/updatedChem20210705"), 
                                    "ws9_stream_chem.csv"), na = c("", "NA")) 
 
 HBEF_chem_comb <- rbind(HBEF_6_chem, HBEF_7_chem, HBEF_8_chem, HBEF_9_chem)%>% 
