@@ -1,5 +1,5 @@
 # This script combines all Q and chem data for all unmanaged MEF sites
-# JMH; 5 May 2021, 18 May 2021, 2 June 2021
+# JMH; 5 May 2021, 18 May 2021, 2 June 2021, 14 Jul 21 (dropping SRP)
 
 
 
@@ -51,6 +51,23 @@ MEF_Qs5 <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena20210130
   
 MEF_Q <- rbind(MEF_Qs2, MEF_Qs5)
 
+# compare data used to data paper
+# downloaded from: https://www.fs.usda.gov/rds/archive/Catalog/RDS-2018-0009
+MEF_Qdd <- read.csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/MEF"), 
+                              "Daily_streamflowDOWNLOAD.csv")) 
+
+names(MEF_Qdd) <- c("Date", "WS", "FlowLsDD", "FlowCFS", "FlowCmDay")
+
+Qtest <- MEF_Q %>% 
+  mutate(Date = as.character(Date)) %>% 
+  left_join(MEF_Qdd, by = c("Date", "WS"))%>% 
+  mutate(Date = as.POSIXct(Date, format = "%Y-%m-%d"))
+
+
+ggplot(Qtest, aes(y = FlowLsDD, x = Q_Ls)) +
+  geom_point()
+
+
 ggplot(MEF_Q, aes(y = log(Q_Ls +1), x = Date)) +
   geom_point()+
   facet_wrap(vars(WS), scales = "free_y")
@@ -60,6 +77,7 @@ ggplot(MEF_Q, aes(y = log(Q_Ls +1), x = Date)) +
 # !!!!!!!!!!!!!!!!!!NO3 SAYS uM IN D1 AND MG/L IN D3!!!!!!!!!!!!!!!!!! <- DAvid indicated that NO3 and NH4 can't be trusted
 # THERE ARE 2 KINDS OF TOC HERE, NTO SURE WHICH ONE TO USE- SEEM TO ALTERNATE <- data provider indicates that these are exchangeable
 # TP: David indicates this is TDP
+# dropping TDP: they do not filter or preserve their samples
 
 MEF_chemNames <- c("Site", "Date", "TN_mgL", "NO3_mgL", "NH4_mgL", "TP_mgL", "Ca_mgL", "SO4_mgL", "TOC_NPOC_mgL", "TOC_TCIC_mgL")
 
@@ -73,9 +91,10 @@ MEF_chem <-  readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena202101
 # going to replace "< x" with "x"
 MEF_chem2 <- MEF_chem %>%  
           # deleted NO3 and NH4 data not trustworthy
+          # deleted TP, also not trustworthy
           mutate(NO3_mgL = as.numeric("NA"),
                  NH4_mgL = as.numeric("NA"),
-                 TP_mgL = as.numeric(str_remove(TP_mgL, "<.")),
+                 TP_mgL = as.numeric("NA"),
                  Ca_mgL = as.numeric(str_remove(Ca_mgL, "<.")),
                  SO4_mgL = as.numeric(str_remove(SO4_mgL, "<.")),
                  Site = as.factor(Site)) %>% 
