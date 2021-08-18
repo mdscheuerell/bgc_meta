@@ -103,7 +103,7 @@ HBEF <- HBEF_Q %>%
   rename(Date = "DATE") %>% 
   full_join(HBEF_chem_comb, by = c("Date", "WS")) %>% 
   # loose the DOC data here
-  filter(Date >= CTstart & Date <= CTend) %>%
+  # filter(Date >= CTstart & Date <= CTend) %>%
   mutate(Site = "HBEF") %>% 
   select(Site, WS, Date, Q_Ls:SO4_mgL)
 

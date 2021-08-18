@@ -75,8 +75,8 @@ HJA.f <- HJA_Q %>%
           full_join(HJA_chem, by = c("Date", "WS")) %>% 
           mutate(WS = as.factor(WS),
                  Site = "HJA") %>% 
-          select(Site, WS, Date, Q_Ls:SO4_mgL) %>% 
-          filter(Date >= CTstart & Date <= CTend)
+          select(Site, WS, Date, Q_Ls:SO4_mgL) #%>% 
+          # filter(Date >= CTstart & Date <= CTend)
 
 
 ggplot(HJA.f %>% 

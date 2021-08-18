@@ -40,7 +40,7 @@ ELA.eif <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena20210130
         mutate_at(vars(data_set:station,qualifier), factor) %>% 
   mutate(mean_date = as.POSIXct(mean_date, format = "%Y-%m-%d")) %>% 
   # for some reason I can only get the start date if I have >= the day before i start
-  filter(mean_date >= CTstart & mean_date <= CTend) %>% 
+  # filter(mean_date >= CTstart & mean_date <= CTend) %>% 
   mutate(dateC = as.character(as.Date(mean_date))) %>% 
   rename("Q_m3s" = "mean_daily_discharge")
 
@@ -52,7 +52,7 @@ ELA.neif <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena2021013
                                        "ELA NEIF discharge.xlsx"),1) %>% 
   mutate_at(vars(data_set:station,qualifier), factor) %>% 
   mutate(mean_date = as.POSIXct(mean_date, format = "%Y-%m-%d")) %>% 
-  filter(mean_date >= CTstart & mean_date <= CTend) %>% 
+  # filter(mean_date >= CTstart & mean_date <= CTend) %>% 
   mutate(dateC = as.character(as.Date(mean_date)))%>% 
   rename("Q_m3s" = "mean_daily_discharge")
 
@@ -64,7 +64,7 @@ ELA.nwif <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena2021013
                                         "ELA NWIF discharge.xlsx"),1) %>% 
   mutate_at(vars(data_set:station,qualifier), factor) %>% 
   mutate(mean_date = as.POSIXct(mean_date, format = "%Y-%m-%d")) %>% 
-  filter(mean_date >= CTstart & mean_date <= CTend)%>% 
+  # filter(mean_date >= CTstart & mean_date <= CTend)%>% 
   mutate(dateC = as.character(as.Date(mean_date)))%>% 
   rename("Q_m3s" = "mean_daily_discharge")
 
@@ -95,7 +95,7 @@ BadCodeNAfun <- function(x){
 ELA.chem <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/ELA"), 
                                         "ELA stream chemistry.xlsx"),2)%>% 
   mutate(SAMPLED = as.POSIXct(SAMPLED, format = "%Y-%m-%d")) %>% 
-  filter(SAMPLED >= CTstart & SAMPLED <= CTend) %>%
+  # filter(SAMPLED >= CTstart & SAMPLED <= CTend) %>%
   mutate_at(vars(TYPE:STATION), factor) %>% 
   # select solutes of interest
   #NH4 was labeled as NH3 in excel sheet:units
@@ -127,9 +127,9 @@ ggplot(ELA.chem %>%
 
 ggpairs(ELA.chem[,3:8])
 
-ELA.chemL <- ELA.chem %>% 
-  pivot_longer(cols = CA_mgL:SO4_mgL, names_to = "solute", values_to = "conc") %>% 
-  mutate(solute = as.factor(solute))
+# ELA.chemL <- ELA.chem %>% 
+#   pivot_longer(cols = CA_mgL:SO4_mgL, names_to = "solute", values_to = "conc") %>% 
+#   mutate(solute = as.factor(solute))
 
 
 ##########

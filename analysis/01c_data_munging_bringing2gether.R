@@ -10,7 +10,8 @@ library(openxlsx)
 
 # Common time period
 CTstart <- as.POSIXct(paste0("1985-10-31", format = "%Y-%m-%d"))
-CTend <- as.POSIXct(paste0("2010-10-31", format = "%Y-%m-%d"))
+# changed this to include more data 26 Jul 21
+CTend <- as.POSIXct(paste0("2021-10-31", format = "%Y-%m-%d"))
 # 9130 days
 
 
@@ -69,7 +70,7 @@ sol <- rbind(BBWM, DOR, ELA, HBEF, HJA, MEF, SEF, SLP, TLW) %>%
 # all sites
   # NOTE: NOT ALL TDP VALUES ARE TDP SEE WATERSHED DATA NOTES SPREADSHEET
 pdf(file.path(here::here("plots"),
-             "RawConcPlotAllSites20210725.pdf"), width = 25, height = 10)
+             "RawConcPlotAllSites20210726.pdf"), width = 25, height = 10)
 ggplot(sol %>%
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
          mutate(solute = fct_relevel(solute,
@@ -81,7 +82,7 @@ dev.off()
 
 # TLW
 pdf(file.path(here::here("plots"),
-              "RawConcPlotTLW_20210725.pdf"), width = 15, height = 10)
+              "RawConcPlotTLW_20210726.pdf"), width = 15, height = 10)
 ggplot(sol %>%
          # rename(TDP_mgL = "SRP_mgL") %>% 
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
@@ -108,7 +109,7 @@ dev.off()
 
 # MEF
 pdf(file.path(here::here("plots"),
-              "RawConcPlotMEF_20210725.pdf"), width = 10, height = 10)
+              "RawConcPlotMEF_20210726.pdf"), width = 10, height = 10)
 ggplot(sol %>%
          # rename(TDP_mgL = "SRP_mgL") %>% 
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
@@ -121,7 +122,7 @@ dev.off()
 
 # HJA
 pdf(file.path(here::here("plots"),
-              "RawConcPlotHJA_20210725.pdf"), width = 10, height = 10)
+              "RawConcPlotHJA_20210726.pdf"), width = 10, height = 10)
 ggplot(sol %>%
          # rename(TDP_mgL = "SRP_mgL") %>% 
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
@@ -134,7 +135,7 @@ dev.off()
 
 # HBEF
 pdf(file.path(here::here("plots"),
-              "RawConcPlotHBEF_20210725.pdf"), width = 20, height = 10)
+              "RawConcPlotHBEF_20210726.pdf"), width = 20, height = 10)
 ggplot(sol %>%
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
          mutate(solute = fct_relevel(solute,
@@ -146,7 +147,7 @@ dev.off()
 
 # ELA
 pdf(file.path(here::here("plots"),
-              "RawConcPlotELA_20210725.pdf"), width = 12, height = 10)
+              "RawConcPlotELA_20210726.pdf"), width = 12, height = 10)
 ggplot(sol %>%
          # rename(TDP_mgL = "SRP_mgL") %>% 
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
@@ -159,7 +160,7 @@ dev.off()
 
 # DOR
 pdf(file.path(here::here("plots"),
-              "RawConcPlotDOR_20210725.pdf"), width = 25, height = 10)
+              "RawConcPlotDOR_20210726.pdf"), width = 25, height = 10)
 ggplot(sol %>%
          # rename(TP_mgL = "SRP_mgL") %>% 
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
@@ -172,7 +173,7 @@ dev.off()
 
 # BBWM
 pdf(file.path(here::here("plots"),
-              "RawConcPlotBBWM_20210725.pdf"), width = 5, height = 10)
+              "RawConcPlotBBWM_20210726.pdf"), width = 5, height = 10)
 ggplot(sol %>%
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
          mutate(solute = fct_relevel(solute,
@@ -257,7 +258,7 @@ sol4 <- sol3 %>%
 
 
 pdf(file.path(here::here("plots"),
-              "IntervalsBWconcSmp_20210725.pdf"), width = 10, height = 25)
+              "IntervalsBWconcSmp_20210726.pdf"), width = 10, height = 25)
 ggplot(sol4, aes(y = log10(Interval), x = Date)) +
   geom_point()+
   facet_grid(SiteWs ~ Solute, scales = "free_y") +
@@ -320,12 +321,13 @@ solM <- solM_Qconc %>%
    
 ggplot(solM, aes(y = FWMC, x = mgL, color = Solute)) +
   geom_point() +
-  facet_wrap(vars(Solute), scales = "free")
+  facet_wrap(vars(Solute), scales = "free") +
+  geom_abline(intercept = 0, slope = 1)
 
 # export FWMC plots
 # all site
 pdf(file.path(here::here("plots"),
-             "FWMCPlotAllSites_20210725.pdf"), width = 25, height = 10)
+             "FWMCPlotAllSites_20210726.pdf"), width = 25, height = 10)
 ggplot(solM, aes(y = FWMC, x = Date, color = Site)) +
   geom_point()+
   facet_grid(Solute ~ SiteWs, scales = "free_y") +
@@ -334,7 +336,7 @@ dev.off()
 
 #BBWM
 pdf(file.path(here::here("plots"),
-              "FWMCPlotBBWM_20210725.pdf"), width = 5, height = 10)
+              "FWMCPlotBBWM_20210726.pdf"), width = 5, height = 10)
 ggplot(solM %>% 
          filter(Site == "BBWM"), aes(y = FWMC, x = Date, color = Site)) +
   geom_point()+
@@ -344,7 +346,7 @@ dev.off()
 
 #DOR
 pdf(file.path(here::here("plots"),
-              "FWMCPlotDOR_20210725.pdf"), width = 25, height = 10)
+              "FWMCPlotDOR_20210726.pdf"), width = 25, height = 10)
 ggplot(solM %>% 
          mutate(Solute = recode(Solute, "SRP" = "TP")) %>% 
          filter(Site == "DOR"), aes(y = FWMC, x = Date, color = Site)) +
@@ -355,7 +357,7 @@ dev.off()
 
 #ELA
 pdf(file.path(here::here("plots"),
-              "FWMCPlotELA_20210725.pdf"), width = 15, height = 10)
+              "FWMCPlotELA_20210726.pdf"), width = 15, height = 10)
 ggplot(solM %>% 
          mutate(Solute = recode(Solute, "SRP" = "TDP")) %>% 
          filter(Site == "ELA"), aes(y = FWMC, x = Date, color = Site)) +
@@ -366,7 +368,7 @@ dev.off()
 
 #HBEF
 pdf(file.path(here::here("plots"),
-              "FWMCPlotHBEF_20210725.pdf"), width = 25, height = 10)
+              "FWMCPlotHBEF_20210726.pdf"), width = 25, height = 10)
 ggplot(solM %>% 
          filter(Site == "HBEF"), aes(y = FWMC, x = Date, color = Site)) +
   geom_point()+
@@ -376,7 +378,7 @@ dev.off()
 
 #HJA
 pdf(file.path(here::here("plots"),
-              "FWMCPlotHJA_20210725.pdf"), width = 10, height = 10)
+              "FWMCPlotHJA_20210726.pdf"), width = 10, height = 10)
 ggplot(solM %>% 
          mutate(Solute = recode(Solute, "SRP" = "TDP")) %>% 
          filter(Site == "HJA"), aes(y = FWMC, x = Date, color = Site)) +
@@ -387,7 +389,7 @@ dev.off()
 
 #MEF
 pdf(file.path(here::here("plots"),
-              "FWMCPlotMEF_20210725.pdf"), width = 10, height = 10)
+              "FWMCPlotMEF_20210726.pdf"), width = 10, height = 10)
 ggplot(solM %>% 
          mutate(Solute = recode(Solute, "SRP" = "TDP")) %>% 
          filter(Site == "MEF"), aes(y = FWMC, x = Date, color = Site)) +
@@ -408,7 +410,7 @@ dev.off()
 
 #SLP
 pdf(file.path(here::here("plots"),
-              "FWMCPlotSLP_20210725.pdf"), width = 5, height = 10)
+              "FWMCPlotSLP_20210726.pdf"), width = 5, height = 10)
 ggplot(solM %>% 
          filter(Site == "SLP"), aes(y = FWMC, x = Date, color = Site)) +
   geom_point()+
@@ -418,7 +420,7 @@ dev.off()
 
 #TLW
 pdf(file.path(here::here("plots"),
-              "FWMCPlotTLW_20210725.pdf"), width = 15, height = 10)
+              "FWMCPlotTLW_20210726.pdf"), width = 15, height = 10)
 ggplot(solM %>% 
          mutate(Solute = recode(Solute, "SRP" = "TDP")) %>% 
          filter(Site == "TLW"), aes(y = FWMC, x = Date, color = Site)) +
@@ -429,13 +431,13 @@ dev.off()
 
 # export dataframe
 write.csv(solM, file.path(here::here("data/JMHnewMungedDat"), 
-                            "02_MonthlyQConcFWMCallSites.csv"))
+                            "02_MonthlyQConcFWMCallSites_2mostRecent.csv"))
 ###########
 # make dataframe for MARs
 ##########
 # create blank df with every month
 
-TSxts <- as.character(seq(as.Date("1985-11-01"), length = 301, by = "months"))
+TSxts <- as.character(seq(as.Date("1985-11-01"), length = 428, by = "months"))
 # add in site_WS
 SiteWs <- levels(solM$SiteWs)
 TSxts2 <- rep(TSxts, times = length(SiteWs))
@@ -472,23 +474,23 @@ MARSmissingDataBySite <- MARSmissingDataByWS %>%
 
 # export MARS data
 write.csv(MARSdf2, file.path(here::here("data/JMHnewMungedDat"), 
-                   "02_Dat4Mars.csv"))
+                   "02_Dat4Mars_2mostRecent.csv"))
 
 # NA's by WS
 write.csv(MARSmissingDataByWS, file.path(here::here("data/JMHnewMungedDat"), 
-                             "MARSmissingDataByWS.csv"))
+                             "MARSmissingDataByWS_2mostRecent.csv"))
 
 # NA's by site
 write.csv(MARSmissingDataBySite, file.path(here::here("data/JMHnewMungedDat"), 
-                             "MARSmissingDataBySite.csv"))
+                             "MARSmissingDataBySite_2mostRecent.csv"))
 
 
 save.image(file.path(here::here("analysis"),
                      "01c_data_munging_bringing2getherRdat"))
 
 
-load(file.path(here::here("analysis"),
-               "01c_data_munging_bringing2getherRdat"))
+# load(file.path(here::here("analysis"),
+#                "01c_data_munging_bringing2getherRdat"))
 
 
 

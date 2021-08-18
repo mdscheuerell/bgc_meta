@@ -121,8 +121,8 @@ SLPall2 <- SLPall %>%
   mutate(across(c(Ca_mgL:SO4_mgL), abs)) %>% 
   # Average across Dates to remove reps: 4258 to 2241 rows yikes
   group_by(Site, WS, Date) %>% 
-  summarize(across(Q_Ls:SO4_mgL, mean, na.rm = TRUE)) %>% 
-  filter(Date > CTstart & Date < CTend)
+  summarize(across(Q_Ls:SO4_mgL, mean, na.rm = TRUE)) #%>% 
+  # filter(Date > CTstart & Date < CTend)
 
 
 # much of NH4 is close to detection limit
