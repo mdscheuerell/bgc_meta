@@ -102,7 +102,7 @@ MEF_chem2 <- MEF_chem %>%
           rowwise() %>% 
           # data provider has evidence that these are the same
           mutate(DOC_mgL = mean(c(TOC_NPOC_mgL, TOC_TCIC_mgL), na.rm = TRUE)) %>% 
-          filter(Date >= CTstart & Date <= CTend) %>% 
+          # filter(Date >= CTstart & Date <= CTend) %>% 
           droplevels() %>% 
           rename("WS" = "Site") %>% 
           # just reorganizing
@@ -123,7 +123,7 @@ ggplot(MEF_chem2 %>%
 
 MEF.f <- MEF_Q %>% 
           full_join(MEF_chem2, by = c("Date", "WS")) %>% 
-          filter(Date >= CTstart & Date <= CTend) %>% 
+          # filter(Date >= CTstart & Date <= CTend) %>% 
           mutate(WS = as.factor(WS),
                  Site = "MEF") %>% 
           select(Site, WS, Date, Q_Ls, Ca_mgL:SO4_mgL)

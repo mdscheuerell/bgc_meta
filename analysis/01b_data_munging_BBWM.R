@@ -92,7 +92,7 @@ BBWM <- BBWM_Q %>%
   mutate(Site = as.factor(Site),
          WS = as.factor(WS)) %>%
     # loose the DOC data here
-  filter(Date >= CTstart & Date <= CTend) %>% 
+  # filter(Date >= CTstart & Date <= CTend) %>% 
   select(-Watershed, -Flag) %>% 
   select(Site, WS, Date, Q_Ls:SO4_mgL)
 

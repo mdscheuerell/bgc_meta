@@ -75,7 +75,7 @@ C32chem <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena20210130
                      "SO4_mgL" = "c32 SO4-S") %>% 
               mutate(Date = as.Date(Date, format = "%Y-%m-%d"),
                        WS = "C32")%>% 
-              filter(Date >= CTstart & Date <= CTend) %>% 
+              # filter(Date >= CTstart & Date <= CTend) %>% 
               droplevels()
 
 #35
@@ -90,7 +90,7 @@ C35chem <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena20210130
                      "SO4_mgL" = "c35 SO4-S") %>% 
               mutate(Date = as.Date(Date, format = "%Y-%m-%d"),
                      WS = "C35")%>% 
-              filter(Date >= CTstart & Date <= CTend) %>% 
+              # filter(Date >= CTstart & Date <= CTend) %>% 
               droplevels()
 
 #38
@@ -105,7 +105,7 @@ C38chem <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena20210130
                      "SO4_mgL" = "c38 SO4-S") %>% 
               mutate(Date = as.Date(Date, format = "%Y-%m-%d"),
                      WS = "C38")%>% 
-              filter(Date >= CTstart & Date <= CTend) %>% 
+              # filter(Date >= CTstart & Date <= CTend) %>% 
               droplevels()
 
 
@@ -126,7 +126,7 @@ TLW_chem <- rbind(C32chem, C35chem, C38chem)  %>%
 
 TLW <- TLW_Q %>% 
   full_join(TLW_chem, by = c("Date", "WS")) %>% 
-  filter(Date >= CTstart & Date <= CTend) %>% 
+  # filter(Date >= CTstart & Date <= CTend) %>% 
   mutate(Site = "TLW") %>% 
   select(Site, WS, Date, Q_Ls:SO4_mgL)
 

@@ -40,8 +40,8 @@ DOR_Q <-  readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena20210130/
                           col_names = DORnames) %>% 
         # Y,M,D columns are all dates with only Y,M,D showing; Y coming out weird but M and D the same using D
         select(D:Q_HP6A) %>% 
-        rename(Date = "D") %>% 
-        filter(Date >= CTstart & Date <= CTend)
+        rename(Date = "D") #%>% 
+        # filter(Date >= CTstart & Date <= CTend)
 
 ggplot(DOR_Q %>% 
          pivot_longer(Q_HP3:Q_HP6A, names_to = "station", values_to = "Q"), aes(y = Q, x = Date)) +
@@ -131,7 +131,7 @@ DOR.f <- DOR_Q.l.j %>%
           mutate(Date = as.POSIXct(Date, format = "%Y-%m-%d"),
                  WS = as.factor(WS),
                  Site = "DOR") %>% 
-          filter(Date >= CTstart & Date <= CTend) %>% 
+          # filter(Date >= CTstart & Date <= CTend) %>% 
           select(Site, WS, Date, Q_Ls:SO4_mgL)
           
 
