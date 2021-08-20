@@ -73,7 +73,7 @@ SO4.pl <- ggplot(data = dat, aes(x = Date, y = SO4_mgL, color = WS)) +
   facet_wrap(~Site, ncol = 3, scales = "free_y")
 
 dir.create(here("plots", "LOQ"))
-ggsave(SO4.pl, path = here("plots", "LOQ"), file = "SO4.LOQ.pdf", width = 12, height = 10, units = "in")
+ggsave(Ca.pl, path = here("plots", "LOQ"), file = "Ca.LOQ.pdf", width = 12, height = 10, units = "in")
 
 ## geom segment for time-varying LOQ @ TLW
 
