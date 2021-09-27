@@ -107,7 +107,9 @@ DOR_chem_HP6A <- readxl::read_xlsx(file.path(here::here("data/NewDataFromIrena20
                   mutate(WS = "HP6A")
 
 DOR_chem <- rbind(DOR_chem_HP3, DOR_chem_HP3A, DOR_chem_HP4, DOR_chem_HP5, DOR_chem_HP6, DOR_chem_HP6A) %>% 
-            select(WS, Date, Ca_mgL, DOC_mgL, NH4_mgL = "NH4_mgNL", NO3_mgL = "NO3_mgNL", SRP_mgL = TP_mgPL, SO4_mgL = SO4_mgSL)
+            select(WS, Date, Ca_mgL, DOC_mgL, NH4_mgL = "NH4_mgNL", NO3_mgL = "NO3_mgNL", SRP_mgL = TP_mgPL, SO4_mgL = SO4_mgSL) %>% 
+            # mistake in "raw data" excel sheet. They /1000 but didn't change the units
+            mutate(SO4_mgL = SO4_mgL*1000)
 
 
 ggplot(DOR_chem %>% 
