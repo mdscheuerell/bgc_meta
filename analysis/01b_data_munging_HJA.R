@@ -1,5 +1,5 @@
 # This script combines all Q and chem data for all unmanaged HJA sites
-# JMH; 5 May 2021, 18 May 2021, 16 Sept 21
+# JMH; 5 May 2021, 18 May 2021, 16 Sept 21, 27 sept 21
 
 
 
@@ -47,15 +47,15 @@ ggplot(HJA_Q, aes(y = Q_Ls, x = Date)) +
 
 # CHEMISTRY
 # metadata: http://andlter.forestry.oregonstate.edu/data/attributesdetail.aspx?dbcode=CF002&entnum=1
-# CA mg/L; DOC: mg/L; NH4: mg/L; NO3: mg/L; TDP: ug/L; SO4: mg/L <- these data are flow-weighted means see email from S. Johnson (fwd T. Harms)
+# CA mg/L; DOC: mg/L; NH4: mg/L; NO3: mg/L; TDP: mg/L; SO4: mg/L <- these data are flow-weighted means see email from S. Johnson (fwd T. Harms)
+# new dataset has TDP as mg/L not ug/L - 27 Sept. 2021
 # samples are collected roughly every 20 days (with little variation)
 # DOC data starts much later, SO4 is pretty sparse before late 80's
 # I"m not sure how MEAN_LPS was calculated
 
 HJA_chem <-  read_csv(file.path(here::here("data/NewDataFromIrena20210130/New MAR Data/Raw Data Files/HJA"), 
                             "HJA stream chemistry daily.csv")) %>% 
-          select(WS = SITECODE, DateTime = DATE_TIME, Ca_mgL = CA, DOC_mgL = DOC, NH4_mgL = NH3N, NO3_mgL = NO3N, SRP_ugL = TDP, SO4_mgL = SO4S) %>% 
-          mutate(SRP_mgL = SRP_ugL *1000) %>% 
+          select(WS = SITECODE, DateTime = DATE_TIME, Ca_mgL = CA, DOC_mgL = DOC, NH4_mgL = NH3N, NO3_mgL = NO3N, SRP_mgL = TDP, SO4_mgL = SO4S) %>% 
           filter(WS %in% c("GSWS08", "GSWS09")) %>% 
           mutate(Date = as.Date(DateTime, format = "%Y-%m-%d")) %>% 
           select(WS, Date, Ca_mgL, DOC_mgL, NH4_mgL, NO3_mgL, SRP_mgL, SO4_mgL)

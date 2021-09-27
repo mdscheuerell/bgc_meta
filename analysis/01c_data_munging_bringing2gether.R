@@ -238,14 +238,17 @@ dev.off()
            TDP_mgL = TDP_mgL.u, SO4_mgL = SO4_mgL.u) %>% 
     mutate(NH4_mgL = ifelse(SiteWs %in% WStoDropNH4, as.numeric("NA"), NH4_mgL),
            NO3_mgL = ifelse(SiteWs == WStoDropNO3, as.numeric("NA"), NO3_mgL),
-           TDP_mgL = ifelse(SiteWs %in% WStoDropTDP, as.numeric("NA"), TDP_mgL))
+           TDP_mgL = ifelse(SiteWs %in% WStoDropTDP, as.numeric("NA"), TDP_mgL)) %>% 
+    # remove some super high outliers
+    mutate(TDP_mgL = ifelse(Site == "HJA" & TDP_mgL > 0.1, as.numeric("NA"), TDP_mgL)) %>% # removes 2 points
+    mutate(NH4_mgL = ifelse(Site == "TLW" & NH4_mgL > 0.2, as.numeric("NA"), NH4_mgL)) # removes 1 point
 
   
 # Make conc plots
 # all sites
   # NOTE: NOT ALL TDP VALUES ARE TDP SEE WATERSHED DATA NOTES SPREADSHEET
 pdf(file.path(here::here("plots"),
-             "RawConcPlotAllSites20210926.pdf"), width = 25, height = 10)
+             "RawConcPlotAllSites20210927.pdf"), width = 25, height = 10)
 ggplot(sol %>%
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
          mutate(solute = fct_relevel(solute,
@@ -257,7 +260,7 @@ dev.off()
 
 # TLW
 pdf(file.path(here::here("plots"),
-              "RawConcPlotTLW_20210926.pdf"), width = 15, height = 10)
+              "RawConcPlotTLW_20210927.pdf"), width = 15, height = 10)
 ggplot(sol %>%
          # rename(TDP_mgL = "SRP_mgL") %>% 
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
@@ -284,7 +287,7 @@ dev.off()
 
 # MEF
 pdf(file.path(here::here("plots"),
-              "RawConcPlotMEF_20210926.pdf"), width = 10, height = 10)
+              "RawConcPlotMEF_20210927.pdf"), width = 10, height = 10)
 ggplot(sol %>%
          # rename(TDP_mgL = "SRP_mgL") %>% 
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
@@ -297,7 +300,7 @@ dev.off()
 
 # HJA
 pdf(file.path(here::here("plots"),
-              "RawConcPlotHJA_20210926.pdf"), width = 10, height = 10)
+              "RawConcPlotHJA_20210927.pdf"), width = 10, height = 10)
 ggplot(sol %>%
          # rename(TDP_mgL = "SRP_mgL") %>% 
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
@@ -310,7 +313,7 @@ dev.off()
 
 # HBEF
 pdf(file.path(here::here("plots"),
-              "RawConcPlotHBEF_20210926.pdf"), width = 20, height = 10)
+              "RawConcPlotHBEF_20210927.pdf"), width = 20, height = 10)
 ggplot(sol %>%
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
          mutate(solute = fct_relevel(solute,
@@ -322,7 +325,7 @@ dev.off()
 
 # ELA
 pdf(file.path(here::here("plots"),
-              "RawConcPlotELA_20210926.pdf"), width = 12, height = 10)
+              "RawConcPlotELA_20210927.pdf"), width = 12, height = 10)
 ggplot(sol %>%
          # rename(TDP_mgL = "SRP_mgL") %>% 
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
@@ -335,7 +338,7 @@ dev.off()
 
 # DOR
 pdf(file.path(here::here("plots"),
-              "RawConcPlotDOR_20210926.pdf"), width = 25, height = 10)
+              "RawConcPlotDOR_20210927.pdf"), width = 25, height = 10)
 ggplot(sol %>%
          # rename(TP_mgL = "SRP_mgL") %>% 
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
@@ -348,7 +351,7 @@ dev.off()
 
 # BBWM
 pdf(file.path(here::here("plots"),
-              "RawConcPlotBBWM_20210926.pdf"), width = 5, height = 10)
+              "RawConcPlotBBWM_20210927.pdf"), width = 5, height = 10)
 ggplot(sol %>%
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
          mutate(solute = fct_relevel(solute,
@@ -433,7 +436,7 @@ solFW3 <- solFW2 %>%
 
 
 pdf(file.path(here::here("plots"),
-              "IntervalsBWconcSmp_20210926.pdf"), width = 10, height = 25)
+              "IntervalsBWconcSmp_20210927.pdf"), width = 10, height = 25)
 ggplot(solFW3, aes(y = log10(Interval), x = Date)) +
   geom_point()+
   facet_grid(SiteWs ~ Solute, scales = "free_y") +
@@ -505,7 +508,7 @@ ggplot(solM, aes(y = FWMC, x = mgL, color = Solute)) +
 # export FWMC plots
 # all site
 pdf(file.path(here::here("plots"),
-             "FWMCPlotAllSites_20210926.pdf"), width = 25, height = 10)
+             "FWMCPlotAllSites_20210927.pdf"), width = 25, height = 10)
 ggplot(solM, aes(y = FWMC, x = Date, color = Site)) +
   geom_point()+
   facet_grid(Solute ~ SiteWs, scales = "free_y") +
@@ -514,7 +517,7 @@ dev.off()
 
 #BBWM
 pdf(file.path(here::here("plots"),
-              "FWMCPlotBBWM_20210926.pdf"), width = 5, height = 10)
+              "FWMCPlotBBWM_20210927.pdf"), width = 5, height = 10)
 ggplot(solM %>% 
          filter(Site == "BBWM"), aes(y = FWMC, x = Date)) +
   geom_point()+
@@ -524,7 +527,7 @@ dev.off()
 
 #DOR
 pdf(file.path(here::here("plots"),
-              "FWMCPlotDOR_20210926.pdf"), width = 25, height = 10)
+              "FWMCPlotDOR_20210927.pdf"), width = 25, height = 10)
 ggplot(solM %>% 
          filter(Site == "DOR"), aes(y = FWMC, x = Date)) +
   geom_point()+
@@ -534,7 +537,7 @@ dev.off()
 
 #ELA
 pdf(file.path(here::here("plots"),
-              "FWMCPlotELA_20210926.pdf"), width = 15, height = 10)
+              "FWMCPlotELA_20210927.pdf"), width = 15, height = 10)
 ggplot(solM %>% 
          filter(Site == "ELA"), aes(y = FWMC, x = Date)) +
   geom_point()+
@@ -544,7 +547,7 @@ dev.off()
 
 #HBEF
 pdf(file.path(here::here("plots"),
-              "FWMCPlotHBEF_20210926.pdf"), width = 25, height = 10)
+              "FWMCPlotHBEF_20210927.pdf"), width = 25, height = 10)
 ggplot(solM %>% 
          filter(Site == "HBEF"), aes(y = FWMC, x = Date)) +
   geom_point()+
@@ -554,7 +557,7 @@ dev.off()
 
 #HJA
 pdf(file.path(here::here("plots"),
-              "FWMCPlotHJA_20210926.pdf"), width = 10, height = 10)
+              "FWMCPlotHJA_20210927.pdf"), width = 10, height = 10)
 ggplot(solM %>% 
          filter(Site == "HJA"), aes(y = FWMC, x = Date)) +
   geom_point()+
@@ -564,7 +567,7 @@ dev.off()
 
 #MEF
 pdf(file.path(here::here("plots"),
-              "FWMCPlotMEF_20210926.pdf"), width = 10, height = 10)
+              "FWMCPlotMEF_20210927.pdf"), width = 10, height = 10)
 ggplot(solM %>% 
          filter(Site == "MEF"), aes(y = FWMC, x = Date)) +
   geom_point()+
@@ -594,7 +597,7 @@ dev.off()
 
 #TLW
 pdf(file.path(here::here("plots"),
-              "FWMCPlotTLW_20210926.pdf"), width = 15, height = 10)
+              "FWMCPlotTLW_20210927.pdf"), width = 15, height = 10)
 ggplot(solM %>% 
          filter(Site == "TLW"), aes(y = FWMC, x = Date)) +
   geom_point()+
@@ -646,7 +649,21 @@ MARSdf <- solM %>%
 MARSdf2 <- BlankTS %>% 
   mutate(Date = as.Date(Date, format = "%Y-%m-%d")) %>% 
   full_join(MARSdf, by = c("SiteWs", "Date")) %>% 
-  separate(SiteWs, sep = "_", into= c("Site", "WS"), remove = FALSE) 
+  separate(SiteWs, sep = "_", into= c("Site", "WS"), remove = FALSE) %>% 
+  # terminate and end of last water year
+  filter(Date <= as.POSIXct(paste0("2019-10-31", format = "%Y-%m-%d")))
+
+# One last check
+pdf(file.path(here::here("plots"),
+              "MARSdataAllSites.pdf"), width = 25, height = 10)
+ggplot(MARSdf2 %>% 
+         pivot_longer(cols = Ca:TDP, names_to = "Solute", values_to = "FWMC_mgL"), aes(y =  FWMC_mgL, x = Date, color = WS)) +#log(FWMC_mgL + 1)
+  geom_point()+
+  geom_line()+
+  scale_y_log10() +
+  facet_grid(Solute ~ Site, scales = "free_y") +
+  ylab("Flow-weighted mean conc (mg element/L)")
+dev.off()
 
 ######################
 # How much data is missing for each WS?
@@ -700,8 +717,7 @@ write.csv(MARSdf2, file.path(here::here("data/JMHnewMungedDat"),
 
 save.image(file.path(here::here("analysis"),
                      "01c_data_munging_bringing2getherRdat"))
-
-
+# 
 # load(file.path(here::here("analysis"),
 #                "01c_data_munging_bringing2getherRdat"))
 
