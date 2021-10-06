@@ -1,4 +1,4 @@
-# updated: JMH 27 Sept. 21
+# updated: JMH 6 Oct. 21
 ##-------------------
 ## required packages
 ##-------------------
@@ -11,8 +11,8 @@ library(openxlsx)
 
 # Common time period
 CTstart <- as.POSIXct(paste0("1985-10-31", format = "%Y-%m-%d"))
-# changed this to include more data 26 Jul 21
-CTend <- as.POSIXct(paste0("2021-10-31", format = "%Y-%m-%d"))
+# changed this to include more data, stopping at last full water year
+CTend <- as.POSIXct(paste0("2019-10-31", format = "%Y-%m-%d"))
 # 13,149 - updated 24 sept 21
 
 
@@ -29,6 +29,10 @@ names(LOQ1) <- c("Site", "SiteCode", "DL_Ca_mgL", "DL_DOC_mgL", "DL_NH4_N_mgL", 
 
 # HBEF NO3 detection limit updated by J. Campbell
 LOQ1[LOQ1$SiteCode == "HBEF","DL_NO3_N_mgL"] <- as.character("0.013")
+# Sleepers NH4 detection limit updated by Serena Matt
+# BUT THEY'VE ALREADY IMPLEMENTED THIS (ALL VALUES WERE -0.028 WHICH I CHANGED TO + IN EARLIER SCRIPT)
+# Entering 0.029 here so that those 0.28 will be considered below the DL
+LOQ1[LOQ1$SiteCode == "SLP", "DL_NH4_N_mgL"] <- as.character("0.029") 
 
 LOQ <- LOQ1 %>% 
   mutate(across(DL_NH4_N_mgL:DL_TP_TDP_PO4_P_mgL, as.numeric)) %>% 
@@ -81,7 +85,7 @@ sol2 <- rbind(BBWM, DOR, ELA, HBEF, HJA, MEF, SEF, SLP, TLW) %>%
           # average to day to get rid of a couple replicate samples
           group_by(SiteWs, Date) %>% 
           summarise(across(Q_Ls:SO4_mgL, ~ mean(.x, na.rm = TRUE))) %>% 
-          # truncate to focal dates, but not really triming at end
+          # truncate to focal dates, but at end only trimming to the end of water year 2020
           filter(Date >= CTstart & Date <= CTend) %>% 
           separate(SiteWs, sep =  "_", into = c("Site", "WS"), remove = FALSE) %>% 
           mutate(Site = as.factor(Site),
@@ -137,9 +141,8 @@ sol1s <- rbind(sol1 %>% select(SiteWs:WS, LtDl = Ca_LtDl, mgL.u = Ca_mgL.u) %>% 
                  GT_DL = ifelse(is.na(GT_DL), 0, GT_DL),
                  PerBelowDL = LT_DL/(LT_DL + GT_DL) *100)
 
-# 50%: Ca = 0, DOC = 0, NH4 = 6, NO3 = 1, SO4 = 0, TDP = 5
-# 75%: Ca = 0, DOC = 0, NH4 = 2, NO3 = 0, SO4 = 0, TDP = 4
-# 90%: Ca = 0, DOC = 0, NH4 = 1, NO3 = 0, SO4 = 6, TDP = 4
+# 50%: Ca = 0, DOC = 0, NH4 = 7, NO3 = 1, SO4 = 0, TDP = 5
+
 
 # issues
 # NO3 for HBEF seems high - fixed error in units
@@ -149,13 +152,9 @@ ggplot(sol1s, aes(y = PerBelowDL, x = SiteWs)) +
   geom_bar(stat = "identity")+
   facet_wrap(vars(sol)) +
   theme(axis.text.x = element_text(angle = 90)) +
-  geom_hline(yintercept = 90)
+  geom_hline(yintercept = 50) # this is our threshold for exclusion
 dev.off()
   
-
-# %>%
-#         # drop DL and RV's
-#         select(-c(DL_Ca_mgL:RV_SO4_S_mgL))
 
 # NEED TO RUN THESE CHECKS
   # Calcium
@@ -180,7 +179,8 @@ dev.off()
     facet_wrap(vars(SiteWs), scales = "free_y") 
   
   # Checking out sleepers flatline for NH4 - samples less than DL were converted to the -DL by data providers
-  # I swtiched back to positive. Min here is 0.028, but our SLP DL is 0.004  
+  # I swtiched back to positive. Min here is 0.028, but our SLP DL is 0.004  <- this has now been changed to 0.028
+  # following conversations with data providers
   ggplot() +
     geom_point(data = sol1 %>% 
                  filter(SiteWs == "SLP_W9"), aes(y = NH4_mgL, x = Date)) +
@@ -225,7 +225,7 @@ dev.off()
 # remove raw data from dataframe
 # also remove any datasets where > 50% of samples are > DL
   # NH4 = 
-  WStoDropNH4 <-  c("BBWM_EB", "HBEF_WS6", "HJA_GSWS08", "HJA_GSWS09", "TLW_C32", "TLW_C35")
+  WStoDropNH4 <-  c("BBWM_EB", "HBEF_WS6", "HJA_GSWS08", "HJA_GSWS09", "SLP_W9", "TLW_C32", "TLW_C35")
   # NO3 = 
   WStoDropNO3 <- "HBEF_WS6"
   # TDP = 
@@ -248,7 +248,7 @@ dev.off()
 # all sites
   # NOTE: NOT ALL TDP VALUES ARE TDP SEE WATERSHED DATA NOTES SPREADSHEET
 pdf(file.path(here::here("plots"),
-             "RawConcPlotAllSites20210927.pdf"), width = 25, height = 10)
+             "RawConcPlotAllSites20210406.pdf"), width = 25, height = 10)
 ggplot(sol %>%
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
          mutate(solute = fct_relevel(solute,
@@ -260,7 +260,7 @@ dev.off()
 
 # TLW
 pdf(file.path(here::here("plots"),
-              "RawConcPlotTLW_20210927.pdf"), width = 15, height = 10)
+              "RawConcPlotTLW_20210406.pdf"), width = 15, height = 10)
 ggplot(sol %>%
          # rename(TDP_mgL = "SRP_mgL") %>% 
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
@@ -287,7 +287,7 @@ dev.off()
 
 # MEF
 pdf(file.path(here::here("plots"),
-              "RawConcPlotMEF_20210927.pdf"), width = 10, height = 10)
+              "RawConcPlotMEF_20210406.pdf"), width = 10, height = 10)
 ggplot(sol %>%
          # rename(TDP_mgL = "SRP_mgL") %>% 
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
@@ -300,7 +300,7 @@ dev.off()
 
 # HJA
 pdf(file.path(here::here("plots"),
-              "RawConcPlotHJA_20210927.pdf"), width = 10, height = 10)
+              "RawConcPlotHJA_20210406.pdf"), width = 10, height = 10)
 ggplot(sol %>%
          # rename(TDP_mgL = "SRP_mgL") %>% 
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
@@ -313,7 +313,7 @@ dev.off()
 
 # HBEF
 pdf(file.path(here::here("plots"),
-              "RawConcPlotHBEF_20210927.pdf"), width = 20, height = 10)
+              "RawConcPlotHBEF_20210406.pdf"), width = 20, height = 10)
 ggplot(sol %>%
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
          mutate(solute = fct_relevel(solute,
@@ -325,7 +325,7 @@ dev.off()
 
 # ELA
 pdf(file.path(here::here("plots"),
-              "RawConcPlotELA_20210927.pdf"), width = 12, height = 10)
+              "RawConcPlotELA_20210406.pdf"), width = 12, height = 10)
 ggplot(sol %>%
          # rename(TDP_mgL = "SRP_mgL") %>% 
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
@@ -338,7 +338,7 @@ dev.off()
 
 # DOR
 pdf(file.path(here::here("plots"),
-              "RawConcPlotDOR_20210927.pdf"), width = 25, height = 10)
+              "RawConcPlotDOR_20210406.pdf"), width = 25, height = 10)
 ggplot(sol %>%
          # rename(TP_mgL = "SRP_mgL") %>% 
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
@@ -351,7 +351,7 @@ dev.off()
 
 # BBWM
 pdf(file.path(here::here("plots"),
-              "RawConcPlotBBWM_20210927.pdf"), width = 5, height = 10)
+              "RawConcPlotBBWM_20210406.pdf"), width = 5, height = 10)
 ggplot(sol %>%
          pivot_longer(col = c(Q_Ls:SO4_mgL), names_to = "solute", values_to = "conc") %>%
          mutate(solute = fct_relevel(solute,
@@ -436,7 +436,7 @@ solFW3 <- solFW2 %>%
 
 
 pdf(file.path(here::here("plots"),
-              "IntervalsBWconcSmp_20210927.pdf"), width = 10, height = 25)
+              "IntervalsBWconcSmp_20210406.pdf"), width = 10, height = 25)
 ggplot(solFW3, aes(y = log10(Interval), x = Date)) +
   geom_point()+
   facet_grid(SiteWs ~ Solute, scales = "free_y") +
@@ -492,8 +492,7 @@ solM <- solM_Qconc %>%
   filter(!(Site == "MEF" & Solute == "NH4")) %>% 
   #no SRP data
   filter(!(Site == "BBWM" & Solute == "SRP")) %>% 
-  # conc flatlined at 0.028, which is highe than our DL of 0.004
-  # maybe they forced it to a different DL?
+  # too many NA's
   filter(!(Site == "SLP" & Solute == "NH4"))
   
   
@@ -508,7 +507,7 @@ ggplot(solM, aes(y = FWMC, x = mgL, color = Solute)) +
 # export FWMC plots
 # all site
 pdf(file.path(here::here("plots"),
-             "FWMCPlotAllSites_20210927.pdf"), width = 25, height = 10)
+             "FWMCPlotAllSites_20210406.pdf"), width = 25, height = 10)
 ggplot(solM, aes(y = FWMC, x = Date, color = Site)) +
   geom_point()+
   facet_grid(Solute ~ SiteWs, scales = "free_y") +
@@ -517,7 +516,7 @@ dev.off()
 
 #BBWM
 pdf(file.path(here::here("plots"),
-              "FWMCPlotBBWM_20210927.pdf"), width = 5, height = 10)
+              "FWMCPlotBBWM_20210406.pdf"), width = 5, height = 10)
 ggplot(solM %>% 
          filter(Site == "BBWM"), aes(y = FWMC, x = Date)) +
   geom_point()+
@@ -527,7 +526,7 @@ dev.off()
 
 #DOR
 pdf(file.path(here::here("plots"),
-              "FWMCPlotDOR_20210927.pdf"), width = 25, height = 10)
+              "FWMCPlotDOR_20210406.pdf"), width = 25, height = 10)
 ggplot(solM %>% 
          filter(Site == "DOR"), aes(y = FWMC, x = Date)) +
   geom_point()+
@@ -537,7 +536,7 @@ dev.off()
 
 #ELA
 pdf(file.path(here::here("plots"),
-              "FWMCPlotELA_20210927.pdf"), width = 15, height = 10)
+              "FWMCPlotELA_20210406.pdf"), width = 15, height = 10)
 ggplot(solM %>% 
          filter(Site == "ELA"), aes(y = FWMC, x = Date)) +
   geom_point()+
@@ -547,7 +546,7 @@ dev.off()
 
 #HBEF
 pdf(file.path(here::here("plots"),
-              "FWMCPlotHBEF_20210927.pdf"), width = 25, height = 10)
+              "FWMCPlotHBEF_20210406.pdf"), width = 25, height = 10)
 ggplot(solM %>% 
          filter(Site == "HBEF"), aes(y = FWMC, x = Date)) +
   geom_point()+
@@ -557,7 +556,7 @@ dev.off()
 
 #HJA
 pdf(file.path(here::here("plots"),
-              "FWMCPlotHJA_20210927.pdf"), width = 10, height = 10)
+              "FWMCPlotHJA_20210406.pdf"), width = 10, height = 10)
 ggplot(solM %>% 
          filter(Site == "HJA"), aes(y = FWMC, x = Date)) +
   geom_point()+
@@ -567,7 +566,7 @@ dev.off()
 
 #MEF
 pdf(file.path(here::here("plots"),
-              "FWMCPlotMEF_20210927.pdf"), width = 10, height = 10)
+              "FWMCPlotMEF_20210406.pdf"), width = 10, height = 10)
 ggplot(solM %>% 
          filter(Site == "MEF"), aes(y = FWMC, x = Date)) +
   geom_point()+
@@ -587,7 +586,7 @@ dev.off()
 
 #SLP
 pdf(file.path(here::here("plots"),
-              "FWMCPlotSLP_20210927.pdf"), width = 5, height = 10)
+              "FWMCPlotSLP_20210406.pdf"), width = 5, height = 10)
 ggplot(solM %>% 
          filter(Site == "SLP"), aes(y = FWMC, x = Date)) +
   geom_point()+
@@ -597,7 +596,7 @@ dev.off()
 
 #TLW
 pdf(file.path(here::here("plots"),
-              "FWMCPlotTLW_20210927.pdf"), width = 15, height = 10)
+              "FWMCPlotTLW_20210406.pdf"), width = 15, height = 10)
 ggplot(solM %>% 
          filter(Site == "TLW"), aes(y = FWMC, x = Date)) +
   geom_point()+
@@ -619,8 +618,7 @@ dev.off()
 
 # export dataframe
 write.csv(solM, file.path(here::here("data/JMHnewMungedDat"), 
-                            "02_MonthlyQConcFWMCallSites_20210927.csv"))
-
+                            "02_MonthlyQConcFWMCallSites_20210406.csv"))
 
 
 ###########
@@ -628,8 +626,8 @@ write.csv(solM, file.path(here::here("data/JMHnewMungedDat"),
 ##########
 # Need to align data with a df with no missing months
 # create blank df with every month
-# 1985-11-01 to 2020-06-01
-TSxts <- as.character(seq(as.Date("1985-11-01"), length = 415, by = "months"))
+# 1985-11-01 to 2019-10-31 - 407 months and 30 days
+TSxts <- as.character(seq(as.Date("1985-11-01"), length = 408, by = "months"))
 # add in site_WS
 SiteWs <- levels(solM$SiteWs)
 TSxts2 <- rep(TSxts, times = length(SiteWs))
@@ -687,17 +685,22 @@ dev.off()
 
 MARSmissingDataByWS <- MARSdf2 %>% 
   group_by(Site, WS) %>% 
-  summarise(across(Date:TDP, ~round(sum(is.na(.))/415*100,0))) %>%  #there should be 415 rows for each WS
-  mutate(NH4 = ifelse((Site == "BBWM" & WS == "EB") |
-                        (Site == "HBEF" & WS == "WS6") |
-                        (Site == "HJA" & WS %in% c("GSWS08", "GSWS09") )|
-                        (Site == "TLW" & WS %in% c("C32", "C35")) |
-                        (Site == "MEF" & WS %in% c("S2", "S5")) |
-                        (Site == "SLP"), as.numeric("NA"), NH4)) %>% 
-  mutate(NO3 = ifelse(((Site == "HBEF" & WS == "WS6") |
-                        Site == "MEF"), as.numeric("NA"), NO3)) %>% 
-  mutate(TDP = ifelse((Site == "HBEF" & WS %in% c("WS6", "WS7", "WS8", "WS9") |
-                          (Site == "SLP" | Site == "BBWM" | Site == "MEF")),as.numeric("NA"), TDP))
+  # turn on to check number of rows in each WS
+  # summarise(across(Date, ~n()))
+  # Calcs the % missing rows for each solute
+  summarise(across(Ca:TDP, ~round(sum(is.na(.))/408*100,0))) #%>%  #there should be 408 rows for each WS
+  # this just forces these to clear NA's
+  # but not needed
+  # mutate(NH4 = ifelse((Site == "BBWM" & WS == "EB") |
+  #                       (Site == "HBEF" & WS == "WS6") |
+  #                       (Site == "HJA" & WS %in% c("GSWS08", "GSWS09") )|
+  #                       (Site == "TLW" & WS %in% c("C32", "C35")) |
+  #                       (Site == "MEF" & WS %in% c("S2", "S5")) |
+  #                       (Site == "SLP"), as.numeric("NA"), NH4)) %>% 
+  # mutate(NO3 = ifelse(((Site == "HBEF" & WS == "WS6") |
+  #                       Site == "MEF"), as.numeric("NA"), NO3)) %>% 
+  # mutate(TDP = ifelse((Site == "HBEF" & WS %in% c("WS6", "WS7", "WS8", "WS9") |
+  #                         (Site == "SLP" | Site == "BBWM" | Site == "MEF")),as.numeric("NA"), TDP))
 
 # export this table
 write.csv(MARSmissingDataByWS, file.path(here::here("data/JMHnewMungedDat"), 
