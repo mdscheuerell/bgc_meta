@@ -27,6 +27,8 @@ CTend <- as.POSIXct(paste0("2010-10-31", format = "%Y-%m-%d"))
 # MEF
 ############
 
+### New MEF data from SS 3/22 ###
+MEFin <- read.csv(here("data", "NewDataFromIrena20210130", "New MAR Data", "Raw Data Files", "MEF", "2022.03.04_S2LaggPool_ToHarmsT.csv"))
 # DISCHARGE
 # Q in cfs
 
