@@ -80,3 +80,4 @@ MARSmissingDataByWS <- MARSdf2 %>%
 # write.csv(MARSmissingDataByWS, file.path(here::here("data/JMHnewMungedDat"), "01g_NumberOfNAsInMARSdf.csv"))
 # write.csv(MARSmissingDataByWS, file.path(here::here("data/JMHnewMungedDat"), "01g_Dat4MARS_FWMCmgElementL.csv"))
 # save.image(file.path(here::here("analysis"), "01gg_MARSdataPrep_Rdat"))
+load(file.path(here::here("analysis"), "01gg_MARSdataPrep_Rdat"))
