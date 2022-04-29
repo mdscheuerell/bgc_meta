@@ -16,7 +16,15 @@ library(MARSS)
 ## load solutes data
 # df <- readr::read_csv(here::here("data", "tbl_solutes_unmanaged_mon.csv"))
 # df <- readr::read_csv(file.path(here::here("data"), "tbl_solutes_mon.csv"))
-df <- readr::read_csv(here::here("data", "JMHnewMungedDat", "01g_Dat4MARS_FWMCmgElementL.csv"))
+df <- readr::read_csv(here::here("data", "JMHnewMungedDat", "01g_Dat4MARS_FWMCmgElementL.csv")) %>%
+  select(!("...1":"SiteWs"))
+
+colnames(df)[1:3] <- c("site", "catchment", "date")
+
+
+df$date[1:20] %>%
+  format("%m") %>%
+  as.numeric()
 
 
 ## CAVEATS
