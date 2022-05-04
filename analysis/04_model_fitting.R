@@ -4,7 +4,7 @@
 ## necessary user inputs
 ##-----------------------
 
-yr_first <- 1984
+yr_first <- 1986
 yr_last <- 2010
 
 
@@ -16,15 +16,7 @@ library(MARSS)
 ## load solutes data
 # df <- readr::read_csv(here::here("data", "tbl_solutes_unmanaged_mon.csv"))
 # df <- readr::read_csv(file.path(here::here("data"), "tbl_solutes_mon.csv"))
-df <- readr::read_csv(here::here("data", "JMHnewMungedDat", "01g_Dat4MARS_FWMCmgElementL.csv")) %>%
-  select(!("...1":"SiteWs"))
-
-colnames(df)[1:3] <- c("site", "catchment", "date")
-
-
-df$date[1:20] %>%
-  format("%m") %>%
-  as.numeric()
+df <- readr::read_csv(here::here("data", "tbl_solutes_unmanaged_mon_v2.csv"))
 
 
 ## CAVEATS
@@ -51,7 +43,8 @@ seas_2 <- cos(2 * pi * seq(n_months) / 12)
 
 ## names of solutes
 solutes <- df %>%
-  select(starts_with("FWA")) %>%
+  # select(starts_with("FWA")) %>%
+  select(!c(1:4)) %>%
   colnames
 
 ## empty lists for model fits
@@ -71,7 +64,8 @@ for(i in 1:length(solutes)) {
   df_tmp <- df
   
   ## screen for lack of TDP data
-  if(solutes[i] == "FWATDPmgL") {
+  # if(solutes[i] == "FWATDPmgL") {
+  if(solutes[i] == "TDP") {
     df_tmp <- df_tmp %>%
       filter(site != "BBWM" & site != "SLP")
   }
