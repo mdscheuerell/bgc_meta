@@ -5,9 +5,9 @@
 library(tidyverse)
 
 # data ----
-solM <- read.csv(file.path(here::here("data/JMHnewMungedDat"), 
-                          "01e_ProcessedConcQFwmc_AllSites.csv"), row.names = 1) %>% 
-                mutate(Date = as.POSIXct(Date, format = "%Y-%m-%d"))
+solM <- read.csv(here::here("data", "JMHnewMungedDat", "01e_ProcessedConcQFwmc_AllSites.csv"),
+                 row.names = 1) %>% 
+  mutate(Date = as.POSIXct(Date, format = "%Y-%m-%d"))
 
 
 # df for MARs ----
@@ -37,9 +37,34 @@ MARSdf <- solM %>%
 MARSdf2 <- BlankTS %>% 
   mutate(Date = as.Date(Date, format = "%Y-%m-%d")) %>% 
   full_join(MARSdf, by = c("SiteWs", "Date")) %>% 
-  separate(SiteWs, sep = "_", into= c("Site", "WS"), remove = FALSE) %>% 
+  separate(SiteWs, sep = "_", into= c("Site", "WS")) %>% 
   # terminate and end of last water year
   filter(Date <= as.POSIXct(paste0("2019-10-31", format = "%Y-%m-%d")))
+
+## clean up colnames
+colnames(MARSdf2)[1:3] <- c("site", "catchment", "date")
+
+## create decimal water year
+MARSdf2 <- MARSdf2 %>%
+  mutate(year = as.numeric(format(date, "%Y")),
+         month = as.numeric(format(date, "%m")),
+         dec_water_yr = case_when(
+           month >= 10 ~ (year + 1) + (month - 10) / 12,
+           month < 10 ~ year + (month + 2) / 12),
+         .after = catchment) %>%
+  select(!c(year, month, date))
+
+## assign regions to sites
+MARSdf2 <- MARSdf2 %>%
+  mutate(region = case_when(
+    site == "HJA" ~ "NW",
+    site == "ELA" | site == "MEF" | site == "TLW" | site == "DOR" ~ "NF",
+    site == "HBEF" | site == "SLP" ~ "NF",
+    site == "BBWM" | site == "CWT" | site == "SEF" ~ "EF",
+    site == "LEF" ~ "PR"
+  ), .before = site) %>%
+  arrange(region, site, catchment, dec_water_yr)
+
 
 ## Plot MARS data ----
 pdf(file.path(here::here("plots"),
@@ -78,6 +103,7 @@ MARSmissingDataByWS <- MARSdf2 %>%
 
 # export/save ----
 # write.csv(MARSmissingDataByWS, file.path(here::here("data/JMHnewMungedDat"), "01g_NumberOfNAsInMARSdf.csv"))
-# write.csv(MARSmissingDataByWS, file.path(here::here("data/JMHnewMungedDat"), "01g_Dat4MARS_FWMCmgElementL.csv"))
+write.csv(MARSdf2, here::here("data", "tbl_solutes_unmanaged_mon_v2.csv"),
+          row.names = FALSE)
 # save.image(file.path(here::here("analysis"), "01gg_MARSdataPrep_Rdat"))
-load(file.path(here::here("analysis"), "01gg_MARSdataPrep_Rdat"))
+# load(file.path(here::here("analysis"), "01gg_MARSdataPrep_Rdat"))

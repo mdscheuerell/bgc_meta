@@ -4,7 +4,7 @@
 ## necessary user inputs
 ##-----------------------
 
-yr_first <- 1984
+yr_first <- 1986
 yr_last <- 2010
 
 
@@ -14,8 +14,9 @@ library(dplyr)
 library(MARSS)
 
 ## load solutes data
-df <- readr::read_csv(file.path(here::here("data"), "tbl_solutes_unmanaged_mon.csv"))
+# df <- readr::read_csv(here::here("data", "tbl_solutes_unmanaged_mon.csv"))
 # df <- readr::read_csv(file.path(here::here("data"), "tbl_solutes_mon.csv"))
+df <- readr::read_csv(here::here("data", "tbl_solutes_unmanaged_mon_v2.csv"))
 
 
 ## CAVEATS
@@ -42,7 +43,8 @@ seas_2 <- cos(2 * pi * seq(n_months) / 12)
 
 ## names of solutes
 solutes <- df %>%
-  select(starts_with("FWA")) %>%
+  # select(starts_with("FWA")) %>%
+  select(!c(1:4)) %>%
   colnames
 
 ## empty lists for model fits
@@ -62,7 +64,8 @@ for(i in 1:length(solutes)) {
   df_tmp <- df
   
   ## screen for lack of TDP data
-  if(solutes[i] == "FWATDPmgL") {
+  # if(solutes[i] == "FWATDPmgL") {
+  if(solutes[i] == "TDP") {
     df_tmp <- df_tmp %>%
       filter(site != "BBWM" & site != "SLP")
   }
@@ -206,24 +209,24 @@ for(i in 1:length(solutes)) {
 ## save results
 ## unique states
 saveRDS(mod_set_RW,
-        file = file.path(here::here("analysis"), "fitted_seas_unique_states_RW.rds"))
+        file = here::here("analysis", "fitted_seas_unique_states_RW.rds"))
 saveRDS(mod_set_RW_b,
-        file = file.path(here::here("analysis"), "fitted_seas_unique_states_RW_b.rds"))
+        file = here::here("analysis", "fitted_seas_unique_states_RW_b.rds"))
 ## site states
 saveRDS(mod_set_site_RW,
-        file = file.path(here::here("analysis"), "fitted_seas_site_state_RW.rds"))
+        file = here::here("analysis", "fitted_seas_site_state_RW.rds"))
 saveRDS(mod_set_site_RW_b,
-        file = file.path(here::here("analysis"), "fitted_seas_site_state_RW_b.rds"))
+        file = here::here("analysis", "fitted_seas_site_state_RW_b.rds"))
 ## regional states
 saveRDS(mod_set_region_RW,
-        file = file.path(here::here("analysis"), "fitted_seas_region_state_RW.rds"))
+        file = here::here("analysis", "fitted_seas_region_state_RW.rds"))
 saveRDS(mod_set_region_RW_b,
-        file = file.path(here::here("analysis"), "fitted_seas_region_state_RW_b.rds"))
+        file = here::here("analysis", "fitted_seas_region_state_RW_b.rds"))
 ## global N Am state
 saveRDS(mod_set_one_RW,
-        file = file.path(here::here("analysis"), "fitted_seas_one_state_RW.rds"))
+        file = here::here("analysis", "fitted_seas_one_state_RW.rds"))
 saveRDS(mod_set_one_RW_b,
-        file = file.path(here::here("analysis"), "fitted_seas_one_state_RW_b.rds"))
+        file = here::here("analysis", "fitted_seas_one_state_RW_b.rds"))
 
 ## model selection table
 tbl_mod_aic <- data.frame(model = c("unique states", "unique states + bias",
