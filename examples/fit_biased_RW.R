@@ -75,6 +75,8 @@ sen_resid <- yb - y_hat
 # y_hat <- fitted(fit_lm)
 # confint(fit_lm)
 
+ww_hat <- residuals(fit_brw, type = "tT")
+ww_hat <- subset(ww_hat, name=="model")$.resids
 
 ## plots of fits, residuals, and ACF
 pdf("biased_rw_ex.pdf", width = 7, height = 5)
@@ -88,11 +90,11 @@ text(x = 0, y = 12.5, expression(paste(hat(b), " = 0.36 (0.10, 0.62)")), pos = 4
 lines(t(fit_brw$states), col = "dodgerblue", lwd = 2)
 mtext("A", 3, line = 0.5, adj = 0, cex = 0.8)
 ## BRW residuals
-plot.ts(t(residuals(fit_brw)$model), lwd = 2, las = 1, col = "dodgerblue",
+plot.ts(ww_hat, lwd = 2, las = 1, col = "dodgerblue",
         ylim = range(sen_resid), ylab = "Residuals")
 mtext("B", 3, line = 0.5, adj = 0, cex = 0.8)
 ## BRW ACF
-acf(t(residuals(fit_brw)$model), las = 1, lag.max = 10,
+acf(ww_hat, las = 1, lag.max = 10,
     xlim = c(1,10), ylim = c(-0.6, 0.6))
 mtext("C", 3, line = 0.5, adj = 0, cex = 0.8)
 
