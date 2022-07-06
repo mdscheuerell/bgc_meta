@@ -128,7 +128,8 @@ SoluteList <- unique(states$solute)
 #                     expression(paste(NH[4]^{"+3"},"-N state (± 1 SE)")),
 #                     expression(paste(NO[3]^{"-4"},"-N state (± 1 SE)")),
 #                     expression(paste(NH[4]^{"+5"},"-N state (± 1 SE)")))
-pdf(file = file.path(here::here("plots"), "TestPlots.pdf"), paper = "letter")
+
+pdf(file = file.path(here::here("plots"), "MARSS_StatePlots.pdf"), paper = "letter")
 for(i in 1:length(SoluteList)){
   SoluteList_i <- SoluteList[i]
   # SoluteList_i <- SoluteList[6]
@@ -160,37 +161,66 @@ dev.off()
 
 
 # Bias plot ----
-
-# ----------------
-# NEED TO COME BACK TO THIS AND SEE WHAT I WANT TO DO
-# ----------------
-
 # load the MARS data
-# I will only have a row for Ca at site states
+MARSS_BiasCoefs <- as.data.frame(matrix(nrow = 1, ncol = 5))
+names(MARSS_BiasCoefs) <- c("U", "U_lowCI", "U_upCI", "site", "solute")
 
-MARSmodCoefs.Ca <- MARSSparamCIs(MarsSeasSiteState[[1]], method = "hessian", alpha = 0.05, nboot = 1000)
+for(i in 1:length(SoluteList)){
+  # i = 1
+  solute_i <- SoluteList[i]
+  # For i = 3, 5, 6: Hessian could not be inverted to compute the parameter var-cov matrix
+  # do I need the nboot for the hessian?
+  MARSmodCoefs.i <- MARSSparamCIs(MarsSeasSiteState[[i]], method = "hessian", alpha = 0.05)
+
+  MARScoef.df <- as.data.frame(cbind(MARSmodCoefs.i$par$U, 
+                                     MARSmodCoefs.i$par.lowCI$U,
+                                     MARSmodCoefs.i$par.upCI$U)) #coefs and par return the same values
+  names(MARScoef.df) <- c("U", "U_lowCI", "U_upCI")
+  MARScoef.df$site <- rownames(MARScoef.df)
+  MARScoef.df2 <- MARScoef.df %>% 
+    filter(!str_detect(site, "seas")) %>% 
+    mutate(solute = solute_i)
+  MARSS_BiasCoefs <- rbind(MARSS_BiasCoefs, MARScoef.df2)
+}
 
 
 
-CaCoef <- as.data.frame(MARSmodCoefs.Ca$coef[2:22]) 
+
 names(CaCoef) <- "Bias"
 CaCoef$site <- rownames(CaCoef)
 
-CaCoef2 <- CaCoef %>% 
+MARSS_BiasCoefs2 <- MARSS_BiasCoefs[-1,] %>% 
   mutate(
-         #still not sure this is right
-          Bias_ug.L.mo = (exp(Bias)-1)*1000, #units mg/L/mo to ug/L/mo
-          site = as.factor(site),
-         site = fct_relevel(site, c("U.HJA", "U.ELA", "U.MEF", "U.TLW", "U.DOR", "U.HBEF", "U.BBWM"))) %>% 
-  arrange(site)
+         #still not sure this is right 
+         # NEED TO FIGURE OUT HOW TO CONVERT THIS TERM TO MEANINGFUL UNITS
+          U_ug.L.mo = (exp(U)-1)*1000, #units mg/L/mo to ug/L/mo
+          ) %>% 
+  separate(site, sep = "_", into= c("region", "site", "watershed")) %>% 
+  mutate_at("region", str_replace, "X.", "") %>% 
+  mutate_at(c("region", "site", "watershed"), factor)  %>% 
+  mutate(site = fct_relevel(site, c("HJA", "ELA", "MEF", "TLW", "DOR", "HBEF", "BBWM")),
+         watershed = fct_relevel(watershed,
+                                 c("GSWS08", "GSWS09",
+                                   "EIF", "NEIF", "NWIF",
+                                   "S2", "S5",
+                                   "C32", "C35", "C38",
+                                   "HP3", "HP3A", "HP4", "HP5", "HP6", "HP6A",
+                                   "WS6", "WS7", "WS8", "WS9",
+                                   "EB")))
 
-# see below for bias plot code
+ggplot() +
+  geom_pointrange(data = MARSS_BiasCoefs2, aes(y = U, x = watershed, color = site,
+                                               ymin = U_lowCI,
+                                               ymax = U_upCI)) +
+  facet_grid(solute ~., scales = "free_y")
 
 
+save.image("07_JMHplots_Rdat")
 
-###########################
-# Seasonality Plots
-###########################
+#### STOPPED HERE ####
+
+# Seasonality Plots ----
+
 
 # FUCTIONS TO BUILD SEASONAL DATASET
 # https://stackoverflow.com/questions/24384179/how-to-determine-whether-two-variables-have-the-same-sign-in-r/24384436
