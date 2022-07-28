@@ -256,7 +256,7 @@ for(i in 1:length(solutes)) {
 tbl_mod_aic
 
 ## bootstrap biased RW models by site
-bias_bootstrap <- lapply(mod_set_site_RW_b, MARSSparamCIs, nboot = 1000)
+bias_bootstrap <- lapply(mod_set_site_RW_b, MARSSparamCIs, method = "parametric", nboot = 1000)
 
 ## create table of bias estimates (+/- CI) 
 tmp <- list()
