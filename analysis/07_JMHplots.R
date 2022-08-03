@@ -6,9 +6,9 @@ library(ggpubr)
 
 
 # Timeseries plots ----
-TimeSeriesLength <- 288
+TimeSeriesLength <- 408
 BlankTS.01 <- as.data.frame(seq(1,TimeSeriesLength, by = 1))
-BlankTS.0 <- seq.Date(from = as.Date("1986/11/01"), to = as.Date("2010/10/31"), "months")
+BlankTS.0 <- seq.Date(from = as.Date("1986/11/01"), to = as.Date("2020/10/31"), "months")
 BlankTS <- cbind(BlankTS.01, BlankTS.0)
 names(BlankTS) <- c("TimeNum", "Date")
 
@@ -165,12 +165,31 @@ dev.off()
 MARSS_BiasCoefs <- as.data.frame(matrix(nrow = 1, ncol = 5))
 names(MARSS_BiasCoefs) <- c("U", "U_lowCI", "U_upCI", "site", "solute")
 
+# THIST TAKES A LONG TIME
+
+ERRORS
+# 1: In MARSShessian(MLEobj, method = hessian.fun) :
+#   MARSShessian: Hessian could not be inverted to compute the parameter var-cov matrix. parSigma set to NULL.  See MARSSinfo("HessianNA").
+# 
+# 2: In MARSSparamCIs(MarsSeasSiteState[[i]], method = "hessian", alpha = 0.05,  :
+#  MARSSparamCIs: No parSigma element returned by Hessian function.  See marssMLE object errors (MLEobj$errors)
+# 3: In MARSShessian(MLEobj, method = hessian.fun) :
+#    MARSShessian: Hessian could not be inverted to compute the parameter var-cov matrix. parSigma set to NULL.  See MARSSinfo("HessianNA").
+#                     
+#4: In MARSSparamCIs(MarsSeasSiteState[[i]], method = "hessian", alpha = 0.05,  :
+#    MARSSparamCIs: No parSigma element returned by Hessian function.  See marssMLE object errors (MLEobj$errors)
+# 5: In MARSShessian(MLEobj, method = hessian.fun) :
+#    MARSShessian: Hessian could not be inverted to compute the parameter var-cov matrix. parSigma set to NULL.  See MARSSinfo("HessianNA").
+#                                         
+#6: In MARSSparamCIs(MarsSeasSiteState[[i]], method = "hessian", alpha = 0.05,  :
+#    MARSSparamCIs: No parSigma element returned by Hessian function.  See marssMLE object errors (MLEobj$errors)
+
 for(i in 1:length(SoluteList)){
   # i = 1
   solute_i <- SoluteList[i]
   # For i = 3, 5, 6: Hessian could not be inverted to compute the parameter var-cov matrix
   # do I need the nboot for the hessian?
-  MARSmodCoefs.i <- MARSSparamCIs(MarsSeasSiteState[[i]], method = "hessian", alpha = 0.05)
+  MARSmodCoefs.i <- MARSSparamCIs(MarsSeasSiteState[[i]], method = "hessian", alpha = 0.05, nboot = 1000)
 
   MARScoef.df <- as.data.frame(cbind(MARSmodCoefs.i$par$U, 
                                      MARSmodCoefs.i$par.lowCI$U,
@@ -193,8 +212,9 @@ MARSS_BiasCoefs2 <- MARSS_BiasCoefs[-1,] %>%
   mutate(
          #still not sure this is right 
          # NEED TO FIGURE OUT HOW TO CONVERT THIS TERM TO MEANINGFUL UNITS
-          U_ug.L.mo = (exp(U)-1)*1000, #units mg/L/mo to ug/L/mo
-          ) %>% 
+          U_perChange_y = (exp(U)-1)*12*100, #units percent decline/mo to percent decline/yr
+          U_perChange_y_lowCI = (exp(U_lowCI)-1)*12*100,
+          U_perChange_y_upCI = (exp(U_upCI)-1)*12*100) %>% 
   separate(site, sep = "_", into= c("region", "site", "watershed")) %>% 
   mutate_at("region", str_replace, "X.", "") %>% 
   mutate_at(c("region", "site", "watershed"), factor)  %>% 
@@ -206,16 +226,26 @@ MARSS_BiasCoefs2 <- MARSS_BiasCoefs[-1,] %>%
                                    "C32", "C35", "C38",
                                    "HP3", "HP3A", "HP4", "HP5", "HP6", "HP6A",
                                    "WS6", "WS7", "WS8", "WS9",
-                                   "EB")))
+                                   "EB"))) %>% 
+  mutate(Sig = ifelse(is.na(U_perChange_y_lowCI),
+                      "Hessian issues",
+                      0 >= U_lowCI & 0 >= U_upCI),
+         Sig2 = ifelse(Sig == "TRUE", "Significant",
+                       ifelse(Sig == "FALSE", "Not significant", Sig)))
 
+png(file = file.path(here::here("plots"), "MARSS_BiasPlots.png"), units="in", width= 8, height=6, res=300)
 ggplot() +
-  geom_pointrange(data = MARSS_BiasCoefs2, aes(y = U, x = watershed, color = site,
-                                               ymin = U_lowCI,
-                                               ymax = U_upCI)) +
-  facet_grid(solute ~., scales = "free_y")
+  geom_hline(yintercept = 0) +
+  geom_pointrange(data = MARSS_BiasCoefs2, aes(y = U_perChange_y, x = watershed, color = site,
+                                               ymin = U_perChange_y_lowCI,
+                                               ymax = U_perChange_y_upCI,
+                                               shape = Sig2)) +
+  facet_grid(solute ~., scales = "free_y") +
+  theme(axis.text.x = element_text(angle = 90)) +
+  ylab(expression(paste("Bias ± 95% CI (% change ", y^-1,")"))) 
+dev.off()
 
 
-save.image("07_JMHplots_Rdat")
 
 #### STOPPED HERE ####
 
@@ -229,7 +259,7 @@ SigFun <- function(a,b) {ifelse(a == 0 | b == 0,"FALSE",!xor(sign(a)+1,sign(b)+1
 # for the models with site states
 SeasDatFun.Site <- function(MarsMod, SitesList){
   # for testing
-  # MarsMod <- MarsSeasSiteStateB[[1]]
+  # MarsMod <- MarsSeasSiteState[[1]]
   
   Modpar <- MARSSparamCIs(MarsMod, method = "hessian", alpha = 0.05, nboot = 1000)
   ModCcoefs <- data.frame(coefs = as.factor(as.character(row.names(Modpar$par$U))),
@@ -312,7 +342,7 @@ seasPlotFun.Site <- function(periodS, MarsDF, solute){
 # For catchments
 seasPlotFun.Unique <- function(periodS, MarsDF, solute){
   # set up sin and cos matrix
-  periodS <- 12# TEST
+  # periodS <- 12# TEST
   PeriodStart <- 1
   PeriodEnd <- periodS
   monthNum <- seq(PeriodStart, PeriodEnd, by = 1)
@@ -321,7 +351,7 @@ seasPlotFun.Unique <- function(periodS, MarsDF, solute){
   sin.t <- sin(2 * pi * monthNum/periodS)
   #sin is seas_1, cos is seas_2
   c.Four <- rbind(sin.t, cos.t) # if these get switched in C output they have to be switched
-  MarsDF <- Seas.SO4.Unique # TEST
+  # MarsDF <- Seas.SO4.Unique # TEST
   coefs <- as.matrix(MarsDF[,c("C_seas_1", "C_seas_2")])
   
   # calculate seasonality
@@ -346,54 +376,51 @@ SitesList_Not4Tdp <- levels(states$site)
   # c("BBWM","HBEF","MEF","TLW","DOR","ELA","HJA")
 SitesList_4Tdp <- c("HBEF","MEF","TLW","DOR","ELA","HJA")
 
-Seas.Ca <- SeasDatFun.Site(MarsSeasSiteState[[1]], SitesList_Not4Tdp)
-Seas.Ca.df <- seasPlotFun.Site(12, Seas.Ca, "Ca")
+# for the ones with hessian issues I need to write a different function that uses
+# MARSSparamCIs() with method = "parametric"
+# That will take forever
+Seas.Ca <- SeasDatFun.Unique(MarsSeasSiteState[[1]], SitesList_Not4Tdp)
+Seas.Ca.df <- seasPlotFun.Unique(12, Seas.Ca, "Ca")
 
-Seas.Doc <- SeasDatFun.Site(MarsSeasSiteState[[2]], SitesList_Not4Tdp)
-Seas.Doc.df <- seasPlotFun.Site(12, Seas.Doc, "DOC")
+Seas.Doc <- SeasDatFun.Unique(MarsSeasSiteState[[2]], SitesList_Not4Tdp)
+Seas.Doc.df <- seasPlotFun.Unique(12, Seas.Doc, "DOC")
 
-Seas.NH4 <- SeasDatFun.Site(MarsSeasSiteState[[3]], SitesList_Not4Tdp)
-Seas.NH4.df <- seasPlotFun.Site(12, Seas.NH4, "NH4")
+Seas.NH4 <- SeasDatFun.Unique(MarsSeasSiteState[[3]], SitesList_Not4Tdp) #hessian issues
+Seas.NH4.df <- seasPlotFun.Unique(12, Seas.NH4, "NH4")
 
-Seas.NO3 <- SeasDatFun.Site(MarsSeasSiteState[[4]], SitesList_Not4Tdp)
-Seas.NO3.df <- seasPlotFun.Site(12, Seas.NO3, "NO3")
+Seas.NO3 <- SeasDatFun.Unique(MarsSeasSiteState[[4]], SitesList_Not4Tdp)
+Seas.NO3.df <- seasPlotFun.Unique(12, Seas.NO3, "NO3")
 
-Seas.TDP <- SeasDatFun.Site(MarsSeasSiteState[[5]], SitesList_4Tdp)
-Seas.TDP.df <- seasPlotFun.Site(12, Seas.TDP, "TDP") 
+Seas.TDP <- SeasDatFun.Unique(MarsSeasSiteState[[5]], SitesList_4Tdp) #hessian issues
+Seas.TDP.df <- seasPlotFun.Unique(12, Seas.TDP, "TDP") 
 
-# SO4: BEST MODEL UNIQUE SITES BEST HERE SO DOING IT BOTH WAYS
-  # Sites
-    Seas.SO4.Site <- SeasDatFun.Site(MarsSeasSiteState[[6]], SitesList_Not4Tdp)
-    Seas.SO4.Site.df <- seasPlotFun.Site(12, Seas.SO4.Site, "SO4")
+Seas.SO4 <- SeasDatFun.Unique(MarsSeasSiteState[[6]], SitesList_Not4Tdp) #hessian issues
+Seas.SO4.df <- seasPlotFun.Unique(12, Seas.SO4, "SO4")
 
-  # Catchments
-    Seas.SO4.Unique <- SeasDatFun.Unique(SeasUniqState[[6]], SitesList_Not4Tdp)
-    # NEED TO FIGURE OUT IF I CAN USE THIS
-    Seas.SO4.Unique.df <- seasPlotFun.Unique(12, Seas.SO4.Unique, "SO4") 
-    
-  # join site and catchment DF
+# join site and catchment DF
     Seas.So4.Both.df <- Seas.SO4.Unique.df %>% 
       full_join(Seas.SO4.Site.df, by = c("sites","solute", "month"), suffix = c("_catch","_sites"))
     
   # Compare site & catchment fits
   # checked BBWM has one catchment  - EB
 
-  pdf(file = file.path(here::here("plots"), "07p_SeasCompOfSiteCatch_so4.pdf"), height = 10, width = 5)
-    ggplot() +
-      geom_line(data = Seas.So4.Both.df, 
-                 aes(y = seas_catch, x = month, color = catchment))+
-      geom_line(data = Seas.So4.Both.df, 
-                aes(y = seas_sites, x = month)) +
-      # scale_color_brewer(palette = "Set2")+
-      facet_grid(sites ~.)
-  dev.off()
+  # pdf(file = file.path(here::here("plots"), "07p_SeasCompOfSiteCatch_so4.pdf"), height = 10, width = 5)
+  #   ggplot() +
+  #     geom_line(data = Seas.So4.Both.df, 
+  #                aes(y = seas_catch, x = month, color = catchment))+
+  #     geom_line(data = Seas.So4.Both.df, 
+  #               aes(y = seas_sites, x = month)) +
+  #     # scale_color_brewer(palette = "Set2")+
+  #     facet_grid(sites ~.)
+  # dev.off()
       
 
 # COMBINE ALL SITE MODELS
 
-SeasDat <- rbind(Seas.Ca.df, Seas.Doc.df, Seas.NH4.df, Seas.NO3.df, Seas.TDP.df, Seas.SO4.Site.df) %>% 
+SeasDat <- rbind(Seas.Ca.df, Seas.Doc.df, Seas.NH4.df, Seas.NO3.df, Seas.TDP.df, Seas.SO4.df) %>% 
             mutate(sites = fct_relevel(sites, c("HJA", "ELA", "MEF", "TLW", "DOR", "HBEF", "BBWM")),
-                   Sig2 = fct_relevel(Sig2, c("no", "one", "both")),
+                   Sig2 = fct_recode(Sig2, "Hessian issues" = "blah"),
+                   Sig2 = fct_relevel(Sig2, c("Hessian issues", "no", "one", "both")),
                    solute = fct_relevel(solute, c("Ca", "DOC", "NH4", "NO3", "TDP", "SO4")), 
                    #corrected for water year
                    month2 = ifelse(month == "1", "10",
@@ -421,10 +448,10 @@ SeasDat <- rbind(Seas.Ca.df, Seas.Doc.df, Seas.NH4.df, Seas.NO3.df, Seas.TDP.df,
   
 pdf(file = file.path(here::here("plots"), "07p_SeasBySolute.pdf"), height = 8, width = 10)
   ggplot(SeasDat, 
-         aes(y = seas, x = DateIsh, color = sites, linetype = Sig2)) +
+         aes(y = seas, x = DateIsh, color = catchment, linetype = Sig2)) +
     geom_line(size = 1.25) +
-    scale_color_brewer(palette = "Set2", name = "Sites")+
-    scale_linetype_manual(values = c("dotted" ,"dashed", "solid"), name = "Significant coef") +
+    # scale_color_brewer(palette = "Set2", name = "Sites")+
+    scale_linetype_manual(values = c("dotted" ,"dashed", "longdash", "solid"), name = "Significant coef") +
     scale_x_datetime(date_labels = "%b") +
     facet_wrap(vars(solute2), nrow = 3, ncol = 3) +
     xlab(NULL) +
@@ -438,17 +465,24 @@ pdf(file = file.path(here::here("plots"), "07p_SeasBySolute.pdf"), height = 8, w
 dev.off()
 
 
-pdf(file = file.path(here::here("plots"), "07p_SeasBySite.pdf"), height = 8, width = 10)
-  ggplot(SeasDat, 
-         aes(y = seas, x = DateIsh, color = solute, linetype = Sig2)) +
-    geom_line(size = 1.25) +
-    scale_x_datetime(date_labels = "%b") +
-    xlab(NULL) +
-    scale_linetype_manual(values = c("dotted" ,"dashed", "solid")) +
-    scale_color_brewer(palette = "Set2")+
-    facet_wrap(vars(sites), nrow = 3, ncol = 3) +
-    theme_bw()
-dev.off()
+# THIS DOESN'T REALLY WORK - TOO MANY CATCHMENTS
+# pdf(file = file.path(here::here("plots"), "07p_SeasBySite.pdf"), height = 8, width = 10)
+#   ggplot(SeasDat, 
+#          aes(y = seas, x = DateIsh, color = solute, linetype = Sig2)) +
+#     geom_line(size = 1.25) +
+#     scale_x_datetime(date_labels = "%b") +
+#     xlab(NULL) +
+#     scale_linetype_manual(values = c("dotted" ,"dashed", "longdash", "solid")) +
+#     scale_color_brewer(palette = "Set2")+
+#     facet_wrap(vars(sites), nrow = 3, ncol = 3) +
+#     theme_bw()
+# dev.off()
+
+
+
+
+#STOPPED HERE
+# save.image("analysis/07_JMHplots_Rdat")
 
 
 # RAW TIMESERIES DATA
