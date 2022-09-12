@@ -277,4 +277,5 @@ tbl_bias_bootstrap[, -c(1:2)] <- signif(tbl_bias_bootstrap[, -c(1:2)], 3)
 rownames(tbl_bias_bootstrap) <- NULL
 tbl_bias_bootstrap
 
-
+readr::write_csv(tbl_bias_bootstrap,
+                 file = here::here("analysis", "bias_bootstrapped_values.csv"))
