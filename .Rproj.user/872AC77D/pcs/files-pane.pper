@@ -2,7 +2,7 @@
     "sortOrder": [
         {
             "columnIndex": 2,
-            "ascending": false
+            "ascending": true
         }
     ],
     "path": "~/Dropbox/JMH_dropbox/stephanson2/projects/6_Research/IrenasPaper/bgc_meta/analysis"
