@@ -20,6 +20,9 @@ df <- readr::read_csv(here::here("data", "tbl_solutes_unmanaged_mon_v2.csv"))
 # this is the "best" model for all solutes
 MarsSeasSiteState <- readRDS(file = file.path(here::here("analysis"), "fitted_seas_unique_states_RW_b.rds"))
 
+# Bias bootstraps
+biasBS <- readr::read_csv(here::here("analysis", "bias_bootstrapped_values.csv"))
+
 
 ## Calcium ----
 Ca <- as.data.frame(t(MarsSeasSiteState[[1]]$states)) %>% 
@@ -62,11 +65,11 @@ SO4.se <- as.data.frame(t(MarsSeasSiteState[[4]]$states.se))%>%
 ## NH4-N
 NH4N <- as.data.frame(t(MarsSeasSiteState[[5]]$states)) %>% 
   mutate(TimeNum = seq(1,TimeSeriesLength, by = 1)) %>% 
-  pivot_longer(cols = X.EF_BBWM_EB:X.NW_HJA_GSWS09, names_to = "WA", values_to = "NH4N")
+  pivot_longer(cols = X.NF_DOR_HP3:X.NF_TLW_C38, names_to = "WA", values_to = "NH4N")
 
 NH4N.se <- as.data.frame(t(MarsSeasSiteState[[5]]$states.se)) %>% 
   mutate(TimeNum = seq(1,TimeSeriesLength, by = 1))%>% 
-  pivot_longer(cols = X.EF_BBWM_EB:X.NW_HJA_GSWS09, names_to = "WA", values_to = "NH4N.se")
+  pivot_longer(cols = X.NF_DOR_HP3:X.NF_TLW_C38, names_to = "WA", values_to = "NH4N.se")
 
 ## TDP
 TDP <- as.data.frame(t(MarsSeasSiteState[[6]]$states)) %>% 
@@ -106,18 +109,22 @@ states <- states0.s %>%
           mutate_at("region", str_replace, "X.", "") %>% 
           mutate_at(c("region", "site", "watershed"), factor)  %>% 
           full_join(BlankTS, by = "TimeNum") %>% 
-          mutate(site = fct_relevel(site, c("HJA", "ELA", "MEF", "TLW", "DOR", "HBEF", "BBWM")),
-                 Date = as.POSIXct(Date, format = "%Y-%m-%d"), 
-                 watershed = fct_relevel(watershed,
-                                         c("GSWS08", "GSWS09",
-                                           "EIF", "NEIF", "NWIF",
-                                           "S2", "S5",
-                                           "C32", "C35", "C38",
-                                           "HP3", "HP3A", "HP4", "HP5", "HP6", "HP6A",
-                                           "WS6", "WS7", "WS8", "WS9",
-                                           "EB")))
+          mutate(Date = as.POSIXct(Date, format = "%Y-%m-%d"))
+
+# site = fct_relevel(site, c("HJA", "ELA", "MEF", "TLW", "DOR", "HBEF", "BBWM")),
+# , 
+# watershed = fct_relevel(watershed,
+#                         c("GSWS08", "GSWS09",
+#                           "EIF", "NEIF", "NWIF",
+#                           "S2", "S5",
+#                           "C32", "C35", "C38",
+#                           "HP3", "HP3A", "HP4", "HP5", "HP6", "HP6A",
+#                           "WS6", "WS7", "WS8", "WS9",
+#                           "EB"))
 
 SiteList <- states %>% select(site, watershed) %>% distinct()
+
+states %>% select(site, watershed, states, solute) %>% filter(is.na(states)) %>% distinct()
 
 
 # Make plot
@@ -129,7 +136,7 @@ SoluteList <- unique(states$solute)
 #                     expression(paste(NO[3]^{"-4"},"-N state (± 1 SE)")),
 #                     expression(paste(NH[4]^{"+5"},"-N state (± 1 SE)")))
 
-pdf(file = file.path(here::here("plots"), "MARSS_StatePlots.pdf"), paper = "letter")
+pdf(file = file.path(here::here("plots"), "MARSS_StatePlots_20220914.pdf"), paper = "letter")
 for(i in 1:length(SoluteList)){
   SoluteList_i <- SoluteList[i]
   # SoluteList_i <- SoluteList[6]
@@ -142,14 +149,14 @@ for(i in 1:length(SoluteList)){
                                                       ymax = states + states.se, 
                                                       x = Date, fill= watershed), 
                 alpha = 0.25, color = "transparent") +
-    facet_grid(site ~., scales = "free_x") +
+    facet_grid(site ~., scales = "free_y") +
     theme_bw() +
     ylab(SoluteList_i) +
     xlab("Time") +
-    scale_x_datetime(date_labels = "%b-%y", date_breaks = "5 years") +
+    scale_x_datetime(date_labels = "%Y", date_breaks = "5 years") +
     # scale_y_continuous(breaks = c(-7.5, 0, 7.5), limits = c(-7.5,7.5)) +
     theme(axis.title = element_text(size = 20),
-          axis.text = element_text(size = 14),
+          axis.text = element_text(size = 12),
           strip.text = element_text(size = 12),
           panel.grid.minor = element_blank(),
           panel.spacing = unit(1,"lines"))
@@ -165,9 +172,9 @@ dev.off()
 MARSS_BiasCoefs <- as.data.frame(matrix(nrow = 1, ncol = 5))
 names(MARSS_BiasCoefs) <- c("U", "U_lowCI", "U_upCI", "site", "solute")
 
-# THIST TAKES A LONG TIME
+# THIS TAKES A LONG TIME
 
-ERRORS
+# ERRORS
 # 1: In MARSShessian(MLEobj, method = hessian.fun) :
 #   MARSShessian: Hessian could not be inverted to compute the parameter var-cov matrix. parSigma set to NULL.  See MARSSinfo("HessianNA").
 # 
@@ -184,40 +191,41 @@ ERRORS
 #6: In MARSSparamCIs(MarsSeasSiteState[[i]], method = "hessian", alpha = 0.05,  :
 #    MARSSparamCIs: No parSigma element returned by Hessian function.  See marssMLE object errors (MLEobj$errors)
 
-for(i in 1:length(SoluteList)){
-  # i = 1
-  solute_i <- SoluteList[i]
-  # For i = 3, 5, 6: Hessian could not be inverted to compute the parameter var-cov matrix
-  # do I need the nboot for the hessian?
-  MARSmodCoefs.i <- MARSSparamCIs(MarsSeasSiteState[[i]], method = "hessian", alpha = 0.05, nboot = 1000)
 
-  MARScoef.df <- as.data.frame(cbind(MARSmodCoefs.i$par$U, 
-                                     MARSmodCoefs.i$par.lowCI$U,
-                                     MARSmodCoefs.i$par.upCI$U)) #coefs and par return the same values
-  names(MARScoef.df) <- c("U", "U_lowCI", "U_upCI")
-  MARScoef.df$site <- rownames(MARScoef.df)
-  MARScoef.df2 <- MARScoef.df %>% 
-    filter(!str_detect(site, "seas")) %>% 
-    mutate(solute = solute_i)
-  MARSS_BiasCoefs <- rbind(MARSS_BiasCoefs, MARScoef.df2)
-}
+# currently do not need this because I'm using Mark's bootstrapped data
+# for(i in 1:length(SoluteList)){
+#   # i = 1
+#   solute_i <- SoluteList[i]
+#   # For i = 3, 5, 6: Hessian could not be inverted to compute the parameter var-cov matrix
+#   # do I need the nboot for the hessian?
+#   MARSmodCoefs.i <- MARSSparamCIs(MarsSeasSiteState[[i]], method = "hessian", alpha = 0.05, nboot = 1000)
+# 
+#   MARScoef.df <- as.data.frame(cbind(MARSmodCoefs.i$par$U, 
+#                                      MARSmodCoefs.i$par.lowCI$U,
+#                                      MARSmodCoefs.i$par.upCI$U)) #coefs and par return the same values
+#   names(MARScoef.df) <- c("U", "U_lowCI", "U_upCI")
+#   MARScoef.df$site <- rownames(MARScoef.df)
+#   MARScoef.df2 <- MARScoef.df %>% 
+#     filter(!str_detect(site, "seas")) %>% 
+#     mutate(solute = solute_i)
+#   MARSS_BiasCoefs <- rbind(MARSS_BiasCoefs, MARScoef.df2)
+# }
 
 
-
+biasBS
 
 names(CaCoef) <- "Bias"
 CaCoef$site <- rownames(CaCoef)
 
-MARSS_BiasCoefs2 <- MARSS_BiasCoefs[-1,] %>% 
+MARSS_BiasCoefs2 <- MARSS_BiasCoefs[-1,] %>%
   mutate(
-         #still not sure this is right 
-         # NEED TO FIGURE OUT HOW TO CONVERT THIS TERM TO MEANINGFUL UNITS
+         #still not sure this is right
           U_perChange_y = (exp(U)-1)*12*100, #units percent decline/mo to percent decline/yr
           U_perChange_y_lowCI = (exp(U_lowCI)-1)*12*100,
-          U_perChange_y_upCI = (exp(U_upCI)-1)*12*100) %>% 
-  separate(site, sep = "_", into= c("region", "site", "watershed")) %>% 
-  mutate_at("region", str_replace, "X.", "") %>% 
-  mutate_at(c("region", "site", "watershed"), factor)  %>% 
+          U_perChange_y_upCI = (exp(U_upCI)-1)*12*100) %>%
+  separate(site, sep = "_", into= c("region", "site", "watershed")) %>%
+  mutate_at("region", str_replace, "X.", "") %>%
+  mutate_at(c("region", "site", "watershed"), factor)  %>%
   mutate(site = fct_relevel(site, c("HJA", "ELA", "MEF", "TLW", "DOR", "HBEF", "BBWM")),
          watershed = fct_relevel(watershed,
                                  c("GSWS08", "GSWS09",
@@ -226,12 +234,16 @@ MARSS_BiasCoefs2 <- MARSS_BiasCoefs[-1,] %>%
                                    "C32", "C35", "C38",
                                    "HP3", "HP3A", "HP4", "HP5", "HP6", "HP6A",
                                    "WS6", "WS7", "WS8", "WS9",
-                                   "EB"))) %>% 
+                                   "EB"))) %>%
   mutate(Sig = ifelse(is.na(U_perChange_y_lowCI),
                       "Hessian issues",
                       0 >= U_lowCI & 0 >= U_upCI),
          Sig2 = ifelse(Sig == "TRUE", "Significant",
                        ifelse(Sig == "FALSE", "Not significant", Sig)))
+
+# biasBS2 <- 
+  
+  ggplot(biasBS, aes(y = bias, x = site, color = solute)) +geom_point()
 
 png(file = file.path(here::here("plots"), "MARSS_BiasPlots.png"), units="in", width= 8, height=6, res=300)
 ggplot() +
@@ -283,8 +295,8 @@ SeasDatFun.Site <- function(MarsMod, SitesList){
 # for models with catchment (unique) states
 SeasDatFun.Unique <- function(MarsMod, SitesList){
   # for testing
-  # MarsMod <- SeasUniqState[[6]]
-  # SitesList <- SitesList_Not4Tdp
+  # MarsMod <- MarsSeasSiteState[[6]]
+  # SitesList <- as.vector(SitesList_TDP)
   
   Modpar <- MARSSparamCIs(MarsMod, method = "hessian", alpha = 0.05, nboot = 1000)
   ModCcoefs <- data.frame(coefs = as.factor(as.character(row.names(Modpar$par$U))),
@@ -372,30 +384,40 @@ seasPlotFun.Unique <- function(periodS, MarsDF, solute){
 
 
 # PREPARE DATASETS
-SitesList_Not4Tdp <- levels(states$site)
+# SitesList_Not4Tdp <- levels(states$site)
+SitesList_Ca <- as.vector(unique(states[states$solute == "Ca" & !is.na(states$states),]$site))
+SitesList_DOC <- as.vector(unique(states[states$solute == "DOC" & !is.na(states$states),]$site))
+SitesList_NH4 <- as.vector(unique(states[states$solute == "NH4N" & !is.na(states$states),]$site))
+SitesList_NO3 <- as.vector( unique(states[states$solute == "NO3N" & !is.na(states$states),]$site))
+SitesList_SO4 <- as.vector(unique(states[states$solute == "SO4" & !is.na(states$states),]$site))
+SitesList_TDP <- as.vector(unique(states[states$solute == "TDP" & !is.na(states$states),]$site))
   # c("BBWM","HBEF","MEF","TLW","DOR","ELA","HJA")
-SitesList_4Tdp <- c("HBEF","MEF","TLW","DOR","ELA","HJA")
+
 
 # for the ones with hessian issues I need to write a different function that uses
 # MARSSparamCIs() with method = "parametric"
 # That will take forever
-Seas.Ca <- SeasDatFun.Unique(MarsSeasSiteState[[1]], SitesList_Not4Tdp)
+
+# Order of models in MARSS model list
+# "Ca"  "DOC" "NO3" "SO4" "NH4" "TDP"
+
+Seas.Ca <- SeasDatFun.Unique(MarsSeasSiteState[[1]], SitesList_Ca)
 Seas.Ca.df <- seasPlotFun.Unique(12, Seas.Ca, "Ca")
 
-Seas.Doc <- SeasDatFun.Unique(MarsSeasSiteState[[2]], SitesList_Not4Tdp)
+Seas.Doc <- SeasDatFun.Unique(MarsSeasSiteState[[2]], SitesList_DOC)
 Seas.Doc.df <- seasPlotFun.Unique(12, Seas.Doc, "DOC")
 
-Seas.NH4 <- SeasDatFun.Unique(MarsSeasSiteState[[3]], SitesList_Not4Tdp) #hessian issues
-Seas.NH4.df <- seasPlotFun.Unique(12, Seas.NH4, "NH4")
-
-Seas.NO3 <- SeasDatFun.Unique(MarsSeasSiteState[[4]], SitesList_Not4Tdp)
+Seas.NO3 <- SeasDatFun.Unique(MarsSeasSiteState[[3]], SitesList_NO3) #hessian issues
 Seas.NO3.df <- seasPlotFun.Unique(12, Seas.NO3, "NO3")
 
-Seas.TDP <- SeasDatFun.Unique(MarsSeasSiteState[[5]], SitesList_4Tdp) #hessian issues
-Seas.TDP.df <- seasPlotFun.Unique(12, Seas.TDP, "TDP") 
-
-Seas.SO4 <- SeasDatFun.Unique(MarsSeasSiteState[[6]], SitesList_Not4Tdp) #hessian issues
+Seas.SO4 <- SeasDatFun.Unique(MarsSeasSiteState[[4]], SitesList_SO4)
 Seas.SO4.df <- seasPlotFun.Unique(12, Seas.SO4, "SO4")
+
+Seas.NH4 <- SeasDatFun.Unique(MarsSeasSiteState[[5]], SitesList_NH4) #hessian issues
+Seas.NH4.df <- seasPlotFun.Unique(12, Seas.NH4, "NH4") 
+
+Seas.TDP <- SeasDatFun.Unique(MarsSeasSiteState[[6]], SitesList_TDP) #hessian issues
+Seas.TDP.df <- seasPlotFun.Unique(12, Seas.TDP, "TDP")
 
 # join site and catchment DF
     Seas.So4.Both.df <- Seas.SO4.Unique.df %>% 
@@ -508,7 +530,7 @@ ggplot(df, aes(y = log(FWATDPmgL), x = doy, color = Yf)) +
 dev.off()
 
 save.image("07_JMHplots_Rdat")
-load("07_JMHplots_Rdat")
+load("Analysis/07_JMHplots_Rdat")
 
 
 df %>% 
