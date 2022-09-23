@@ -111,17 +111,6 @@ states <- states0.s %>%
           full_join(BlankTS, by = "TimeNum") %>% 
           mutate(Date = as.POSIXct(Date, format = "%Y-%m-%d"))
 
-# site = fct_relevel(site, c("HJA", "ELA", "MEF", "TLW", "DOR", "HBEF", "BBWM")),
-# , 
-# watershed = fct_relevel(watershed,
-#                         c("GSWS08", "GSWS09",
-#                           "EIF", "NEIF", "NWIF",
-#                           "S2", "S5",
-#                           "C32", "C35", "C38",
-#                           "HP3", "HP3A", "HP4", "HP5", "HP6", "HP6A",
-#                           "WS6", "WS7", "WS8", "WS9",
-#                           "EB"))
-
 SiteList <- states %>% select(site, watershed) %>% distinct()
 
 states %>% select(site, watershed, states, solute) %>% filter(is.na(states)) %>% distinct()
@@ -129,12 +118,6 @@ states %>% select(site, watershed, states, solute) %>% filter(is.na(states)) %>%
 
 # Make plot
 SoluteList <- unique(states$solute)
-# SoluteYaxis <- list(expression(paste(NO[3]^{"-"},"-N state (± 1 SE)")),
-#                     expression(paste(NH[4]^{"+1"},"-N state (± 1 SE)")),
-#                     expression(paste(NO[3]^{"-2"},"-N state (± 1 SE)")),
-#                     expression(paste(NH[4]^{"+3"},"-N state (± 1 SE)")),
-#                     expression(paste(NO[3]^{"-4"},"-N state (± 1 SE)")),
-#                     expression(paste(NH[4]^{"+5"},"-N state (± 1 SE)")))
 
 pdf(file = file.path(here::here("plots"), "MARSS_StatePlots_20220922.pdf"), paper = "letter")
 for(i in 1:length(SoluteList)){
@@ -195,7 +178,10 @@ tbl_fit_seas_bs <- tbl_fit_bootstrap %>%
                     mutate_at("region", str_remove, "X.") %>%
                     mutate_at("seas", str_remove, "[)]") %>% 
                     mutate_at("region", str_remove, "[())]") %>% 
-                    rename("coef" = "bias")
+                    rename("coef" = "bias") %>% 
+                      mutate(Sig = ifelse((loCI > 0 & upCI > 0) | (loCI <0 & upCI < 0),
+                                          "Sig", "NS"),
+                             Sig = fct_relevel(Sig, "Sig", "NS"))
 
 # cleans up bias df
 tbl_fit_bias_bs <- tbl_fit_bootstrap %>% 
@@ -240,7 +226,7 @@ ggplot() +
                   aes(y = U_perChange_y_upCI + 10, x = watershed, label = "*"), size = 8, fontface = "bold")
 # dev.off()
 
-
+# only significant bias fits
 ggplot() +
         geom_hline(yintercept = 0) +
         geom_pointrange(data = tbl_fit_bias_bs %>% 
@@ -263,93 +249,113 @@ ggplot() +
 # https://stackoverflow.com/questions/24384179/how-to-determine-whether-two-variables-have-the-same-sign-in-r/24384436
 SigFun <- function(a,b) {ifelse(a == 0 | b == 0,"FALSE",!xor(sign(a)+1,sign(b)+1))}
 
-# for the models with site states
-SeasDatFun.Site <- function(MarsMod, SitesList){
-  # for testing
-  # MarsMod <- MarsSeasSiteState[[1]]
-  
-  Modpar <- MARSSparamCIs(MarsMod, method = "hessian", alpha = 0.05, nboot = 1000)
-  ModCcoefs <- data.frame(coefs = as.factor(as.character(row.names(Modpar$par$U))),
-                          C = Modpar$par$U,
-                          Lci = Modpar$par.lowCI$U,
-                          Uci = Modpar$par.upCI$U) %>% 
-    filter(str_detect(coefs, "seas")) %>% 
-    mutate(coefs = str_replace_all(coefs, "[(]",""),
-           coefs = str_replace_all(coefs, "[)]",""),
-           coefs = str_replace_all(coefs, "C.","")) %>% 
-    separate(coefs, into = c("sites", "seas"), sep = ",") %>% 
-    mutate(sites = fct_relevel(sites, SitesList)) %>% 
-    mutate(Sig = SigFun(Lci, Uci)) %>% 
-    pivot_wider(id_cols = sites, names_from = seas, values_from = C:Sig) %>% 
-    mutate(Sig = paste0(Sig_seas_1, "_", Sig_seas_2),
-           Sig2 = ifelse(Sig == "FALSE_FALSE", "no", 
-                         ifelse(Sig == "TRUE_FALSE" | Sig == "FALSE_TRUE", "one",
-                                ifelse(Sig == "TRUE_TRUE", "both", "blah"))))
-}
+# # for the models with site states
+# SeasDatFun.Site <- function(MarsMod, SitesList){
+#   # for testing
+#   # MarsMod <- MarsSeasSiteState[[1]]
+#   
+#   Modpar <- MARSSparamCIs(MarsMod, method = "hessian", alpha = 0.05, nboot = 1000)
+#   ModCcoefs <- data.frame(coefs = as.factor(as.character(row.names(Modpar$par$U))),
+#                           C = Modpar$par$U,
+#                           Lci = Modpar$par.lowCI$U,
+#                           Uci = Modpar$par.upCI$U) %>% 
+#     filter(str_detect(coefs, "seas")) %>% 
+#     mutate(coefs = str_replace_all(coefs, "[(]",""),
+#            coefs = str_replace_all(coefs, "[)]",""),
+#            coefs = str_replace_all(coefs, "C.","")) %>% 
+#     separate(coefs, into = c("sites", "seas"), sep = ",") %>% 
+#     mutate(sites = fct_relevel(sites, SitesList)) %>% 
+#     mutate(Sig = SigFun(Lci, Uci)) %>% 
+#     pivot_wider(id_cols = sites, names_from = seas, values_from = C:Sig) %>% 
+#     mutate(Sig = paste0(Sig_seas_1, "_", Sig_seas_2),
+#            Sig2 = ifelse(Sig == "FALSE_FALSE", "no", 
+#                          ifelse(Sig == "TRUE_FALSE" | Sig == "FALSE_TRUE", "one",
+#                                 ifelse(Sig == "TRUE_TRUE", "both", "blah"))))
+# }
+# 
+# # for models with catchment (unique) states
+# SeasDatFun.Unique <- function(MarsMod, SitesList){
+#   # for testing
+#   # MarsMod <- MarsSeasSiteState[[6]]
+#   # SitesList <- as.vector(SitesList_TDP)
+#   
+#   Modpar <- MARSSparamCIs(MarsMod, method = "hessian", alpha = 0.05, nboot = 1000)
+#   ModCcoefs <- data.frame(coefs = as.factor(as.character(row.names(Modpar$par$U))),
+#                           C = Modpar$par$U,
+#                           Lci = Modpar$par.lowCI$U,
+#                           Uci = Modpar$par.upCI$U) %>% 
+#     filter(str_detect(coefs, "seas")) %>% 
+#     mutate(coefs = str_replace_all(coefs, "[(]",""),
+#            coefs = str_replace_all(coefs, "[)]",""),
+#            coefs = str_replace_all(coefs, "X.","")) %>% 
+#     separate(coefs, into = c("sites", "seas"), sep = ",") %>% 
+#     separate(sites, into = c("region", "sites", "catchment"), sep = "_") %>% 
+#     mutate(sites = fct_relevel(sites, SitesList)) %>% 
+#     mutate(Sig = SigFun(Lci, Uci)) %>% 
+#     pivot_wider(id_cols = region:catchment, names_from = seas, values_from = C:Sig) %>% 
+#     mutate(Sig = paste0(Sig_seas_1, "_", Sig_seas_2),
+#            Sig2 = ifelse(Sig == "FALSE_FALSE", "no", 
+#                          ifelse(Sig == "TRUE_FALSE" | Sig == "FALSE_TRUE", "one",
+#                                 ifelse(Sig == "TRUE_TRUE", "both", "blah"))))
+# }
 
-# for models with catchment (unique) states
-SeasDatFun.Unique <- function(MarsMod, SitesList){
-  # for testing
-  # MarsMod <- MarsSeasSiteState[[6]]
-  # SitesList <- as.vector(SitesList_TDP)
-  
-  Modpar <- MARSSparamCIs(MarsMod, method = "hessian", alpha = 0.05, nboot = 1000)
-  ModCcoefs <- data.frame(coefs = as.factor(as.character(row.names(Modpar$par$U))),
-                          C = Modpar$par$U,
-                          Lci = Modpar$par.lowCI$U,
-                          Uci = Modpar$par.upCI$U) %>% 
-    filter(str_detect(coefs, "seas")) %>% 
-    mutate(coefs = str_replace_all(coefs, "[(]",""),
-           coefs = str_replace_all(coefs, "[)]",""),
-           coefs = str_replace_all(coefs, "X.","")) %>% 
-    separate(coefs, into = c("sites", "seas"), sep = ",") %>% 
-    separate(sites, into = c("region", "sites", "catchment"), sep = "_") %>% 
-    mutate(sites = fct_relevel(sites, SitesList)) %>% 
-    mutate(Sig = SigFun(Lci, Uci)) %>% 
-    pivot_wider(id_cols = region:catchment, names_from = seas, values_from = C:Sig) %>% 
-    mutate(Sig = paste0(Sig_seas_1, "_", Sig_seas_2),
-           Sig2 = ifelse(Sig == "FALSE_FALSE", "no", 
-                         ifelse(Sig == "TRUE_FALSE" | Sig == "FALSE_TRUE", "one",
-                                ifelse(Sig == "TRUE_TRUE", "both", "blah"))))
-}
+# 
+# # FUNCTIONS TO GENERATE TIME SERIES FOR PLOTING
+# # for sites
+# seasPlotFun.Site <- function(periodS, MarsDF, solute){
+#   # set up sin and cos matrix
+#   # periodS <- 12# TEST
+#   PeriodStart <- 1
+#   PeriodEnd <- periodS
+#   monthNum <- seq(PeriodStart, PeriodEnd, by = 1)
+#   #seas_1 is sin; seas_2 is cos
+#   cos.t <- cos(2 * pi * monthNum/periodS)
+#   sin.t <- sin(2 * pi * monthNum/periodS)
+#   #sin is seas_1, cos is seas_2
+#   c.Four <- rbind(sin.t, cos.t) # if these get switched in C output they have to be switched
+#   # MarsDF <- Seas.Ca # TEST
+#   coefs <- as.matrix(MarsDF[,c("C_seas_1", "C_seas_2")])
+#   
+#   # calculate seasonality
+#   seas.F <- coefs %*% c.Four
+#   seas.F.df <- as.data.frame(t(seas.F))
+#   colnames(seas.F.df) <- MarsDF$sites
+#   seas.F.df$month <- monthNum
+# 
+#   # Prepare and export data frame
+#   seas.F.df2 <- seas.F.df %>% 
+#     pivot_longer(cols = -month, names_to = "sites", values_to = "seas") %>% 
+#     left_join(MarsDF %>% 
+#                 select(sites,Sig2), by = c("sites")) %>% 
+#     mutate(solute = solute)
+#   
+#   seas.F.df2
+# }
 
 
-# FUNCTIONS TO GENERATE TIME SERIES FOR PLOTING
-# for sites
-seasPlotFun.Site <- function(periodS, MarsDF, solute){
-  # set up sin and cos matrix
-  # periodS <- 12# TEST
-  PeriodStart <- 1
-  PeriodEnd <- periodS
-  monthNum <- seq(PeriodStart, PeriodEnd, by = 1)
-  #seas_1 is sin; seas_2 is cos
-  cos.t <- cos(2 * pi * monthNum/periodS)
-  sin.t <- sin(2 * pi * monthNum/periodS)
-  #sin is seas_1, cos is seas_2
-  c.Four <- rbind(sin.t, cos.t) # if these get switched in C output they have to be switched
-  # MarsDF <- Seas.Ca # TEST
-  coefs <- as.matrix(MarsDF[,c("C_seas_1", "C_seas_2")])
-  
-  # calculate seasonality
-  seas.F <- coefs %*% c.Four
-  seas.F.df <- as.data.frame(t(seas.F))
-  colnames(seas.F.df) <- MarsDF$sites
-  seas.F.df$month <- monthNum
 
-  # Prepare and export data frame
-  seas.F.df2 <- seas.F.df %>% 
-    pivot_longer(cols = -month, names_to = "sites", values_to = "seas") %>% 
-    left_join(MarsDF %>% 
-                select(sites,Sig2), by = c("sites")) %>% 
-    mutate(solute = solute)
-  
-  seas.F.df2
-}
+
+
+
+
+
+
+# STOPPED PLAYING AROUND HERE
+
+
+
+
 
 # For catchments
 seasPlotFun.Unique <- function(periodS, MarsDF, solute){
   # set up sin and cos matrix
-  # periodS <- 12# TEST
+  periodS <- 12# TEST
+  MarsDF <- tbl_fit_seas_bs %>% 
+    filter(solute == "Ca") %>% 
+    pivot_wider(id_cols = solute:watershed, names_from = seas, values_from = coef:Sig)
+  solute  <-  "Ca"
+  
+  
   PeriodStart <- 1
   PeriodEnd <- periodS
   monthNum <- seq(PeriodStart, PeriodEnd, by = 1)
@@ -359,19 +365,19 @@ seasPlotFun.Unique <- function(periodS, MarsDF, solute){
   #sin is seas_1, cos is seas_2
   c.Four <- rbind(sin.t, cos.t) # if these get switched in C output they have to be switched
   # MarsDF <- Seas.SO4.Unique # TEST
-  coefs <- as.matrix(MarsDF[,c("C_seas_1", "C_seas_2")])
+  coefs <- as.matrix(MarsDF[,c("coef_seas_1", "coef_seas_2")])
   
   # calculate seasonality
   seas.F <- coefs %*% c.Four
   seas.F.df <- as.data.frame(t(seas.F))
-  colnames(seas.F.df) <- MarsDF$catchment
+  colnames(seas.F.df) <- MarsDF$watershed
   seas.F.df$month <- monthNum
   
   # Prepare and export data frame
   seas.F.df2 <- seas.F.df %>% 
-    pivot_longer(cols = -month, names_to = "catchment", values_to = "seas") %>% 
+    pivot_longer(cols = -month, names_to = "watershed", values_to = "seas") %>% 
     left_join(MarsDF %>% 
-                select(catchment, sites,Sig2), by = c("catchment")) %>% 
+                select(solute:Sig_seas_2), by = c("watershed")) %>% 
     mutate(solute = solute)
   
   seas.F.df2
@@ -396,8 +402,9 @@ SitesList_TDP <- as.vector(unique(states[states$solute == "TDP" & !is.na(states$
 # Order of models in MARSS model list
 # "Ca"  "DOC" "NO3" "SO4" "NH4" "TDP"
 
-Seas.Ca <- SeasDatFun.Unique(MarsSeasSiteState[[1]], SitesList_Ca)
-Seas.Ca.df <- seasPlotFun.Unique(12, Seas.Ca, "Ca")
+# Seas.Ca <- SeasDatFun.Unique(MarsSeasSiteState[[1]], SitesList_Ca)
+Seas.Ca.df <- seasPlotFun.Unique(12, tbl_fit_seas_bs %>% 
+                                   filter(solute == "Ca"), "Ca")
 
 Seas.Doc <- SeasDatFun.Unique(MarsSeasSiteState[[2]], SitesList_DOC)
 Seas.Doc.df <- seasPlotFun.Unique(12, Seas.Doc, "DOC")
