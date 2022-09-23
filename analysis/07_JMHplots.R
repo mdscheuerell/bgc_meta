@@ -15,13 +15,13 @@ names(BlankTS) <- c("TimeNum", "Date")
 # original dataframe ----
 df <- readr::read_csv(here::here("data", "tbl_solutes_unmanaged_mon_v2.csv"))
 
-# GET BEST MODELS ----
+# GET MARSS MODELS ----
 # THE ORDER OF THE MODELS IS: "Ca"  "DOC" "NO3" "SO4" "NH4" "TDP"
-# this is the "best" model for all solutes
+# this is unique states model with seasonality and bias
 MarsSeasSiteState <- readRDS(file = file.path(here::here("analysis"), "fitted_seas_unique_states_RW_b.rds"))
 
 # Bias bootstraps
-biasBS <- readr::read_csv(here::here("analysis", "bias_bootstrapped_values.csv"))
+biasBS <- readRDS(here::here("Unity", "mod_set_site_RW_b_BiasTerms.rds"))
 
 
 ## Calcium ----
@@ -136,7 +136,7 @@ SoluteList <- unique(states$solute)
 #                     expression(paste(NO[3]^{"-4"},"-N state (± 1 SE)")),
 #                     expression(paste(NH[4]^{"+5"},"-N state (± 1 SE)")))
 
-pdf(file = file.path(here::here("plots"), "MARSS_StatePlots_20220914.pdf"), paper = "letter")
+pdf(file = file.path(here::here("plots"), "MARSS_StatePlots_20220922.pdf"), paper = "letter")
 for(i in 1:length(SoluteList)){
   SoluteList_i <- SoluteList[i]
   # SoluteList_i <- SoluteList[6]
@@ -168,94 +168,89 @@ dev.off()
 
 
 # Bias plot ----
-# load the MARS data
-MARSS_BiasCoefs <- as.data.frame(matrix(nrow = 1, ncol = 5))
-names(MARSS_BiasCoefs) <- c("U", "U_lowCI", "U_upCI", "site", "solute")
 
-# THIS TAKES A LONG TIME
+# create table of bias estimates (+/- CI) ----
+tmp <- list()
+for(i in 1:length(SoluteList)) {
+  bias_ID <- rownames(biasBS[[i]]$par$U)
+  tmp$solute <- rep(SoluteList[i], length(bias_ID))
+  tmp$site <- bias_ID
+  tmp$bias <- biasBS[[i]]$par$U
+  tmp$loCI <- biasBS[[i]]$par.lowCI$U
+  tmp$upCI <- biasBS[[i]]$par.upCI$U
+  if(i == 1) {
+    tbl_fit_bootstrap <- data.frame(tmp)
+  } else {
+    tbl_fit_bootstrap <- rbind(tbl_fit_bootstrap, data.frame(tmp))
+  }
+}
+tbl_fit_bootstrap[, -c(1:2)] <- signif(tbl_fit_bootstrap[, -c(1:2)], 3)
+rownames(tbl_fit_bootstrap) <- NULL
 
-# ERRORS
-# 1: In MARSShessian(MLEobj, method = hessian.fun) :
-#   MARSShessian: Hessian could not be inverted to compute the parameter var-cov matrix. parSigma set to NULL.  See MARSSinfo("HessianNA").
-# 
-# 2: In MARSSparamCIs(MarsSeasSiteState[[i]], method = "hessian", alpha = 0.05,  :
-#  MARSSparamCIs: No parSigma element returned by Hessian function.  See marssMLE object errors (MLEobj$errors)
-# 3: In MARSShessian(MLEobj, method = hessian.fun) :
-#    MARSShessian: Hessian could not be inverted to compute the parameter var-cov matrix. parSigma set to NULL.  See MARSSinfo("HessianNA").
-#                     
-#4: In MARSSparamCIs(MarsSeasSiteState[[i]], method = "hessian", alpha = 0.05,  :
-#    MARSSparamCIs: No parSigma element returned by Hessian function.  See marssMLE object errors (MLEobj$errors)
-# 5: In MARSShessian(MLEobj, method = hessian.fun) :
-#    MARSShessian: Hessian could not be inverted to compute the parameter var-cov matrix. parSigma set to NULL.  See MARSSinfo("HessianNA").
-#                                         
-#6: In MARSSparamCIs(MarsSeasSiteState[[i]], method = "hessian", alpha = 0.05,  :
-#    MARSSparamCIs: No parSigma element returned by Hessian function.  See marssMLE object errors (MLEobj$errors)
+# cleans up seas coefs df
+tbl_fit_seas_bs <- tbl_fit_bootstrap %>% 
+                    filter(grepl("seas", site)) %>% 
+                    separate(site, sep = ",", into = c("site", "seas")) %>% 
+                    separate(site, sep = "_", into = c("region", "site", "watershed")) %>% 
+                    mutate_at("region", str_remove, "X.") %>%
+                    mutate_at("seas", str_remove, "[)]") %>% 
+                    mutate_at("region", str_remove, "[())]") %>% 
+                    rename("coef" = "bias")
+
+# cleans up bias df
+tbl_fit_bias_bs <- tbl_fit_bootstrap %>% 
+                    filter(!grepl("seas", site)) %>% 
+                    separate(site, sep = "_", into = c("region", "site", "watershed")) %>% 
+                    mutate_at("region", str_remove, "X.") %>%
+                    #units percent decline/mo to percent decline/yr
+                    mutate(
+                      #still not sure this is right
+                      U_perChange_y = (exp(bias)-1)*12*100, 
+                      U_perChange_y_lowCI = (exp(loCI)-1)*12*100,
+                      U_perChange_y_upCI = (exp(upCI)-1)*12*100) %>% 
+                    mutate_at(c("region", "site", "watershed"), factor)  %>%
+                    mutate(site = fct_relevel(site, c("HJA", "ELA", "MEF", "TLW", "DOR", "HBEF", "BBWM", "SLP")),
+                         watershed = fct_relevel(watershed,
+                                                 c("GSWS08", "GSWS09",
+                                                   "EIF", "NEIF", "NWIF",
+                                                   "S2", "S5",
+                                                   "C32", "C35", "C38",
+                                                   "HP3", "HP3A", "HP4", "HP5", "HP6", "HP6A",
+                                                   "WS6", "WS7", "WS8", "WS9",
+                                                   "EB",
+                                                   "W9"))) %>% 
+                      mutate(Sig = ifelse((loCI > 0 & upCI > 0) | (loCI <0 & upCI < 0),
+                                          "Sig", "NS"),
+                             Sig = fct_relevel(Sig, "Sig", "NS"))
 
 
-# currently do not need this because I'm using Mark's bootstrapped data
-# for(i in 1:length(SoluteList)){
-#   # i = 1
-#   solute_i <- SoluteList[i]
-#   # For i = 3, 5, 6: Hessian could not be inverted to compute the parameter var-cov matrix
-#   # do I need the nboot for the hessian?
-#   MARSmodCoefs.i <- MARSSparamCIs(MarsSeasSiteState[[i]], method = "hessian", alpha = 0.05, nboot = 1000)
-# 
-#   MARScoef.df <- as.data.frame(cbind(MARSmodCoefs.i$par$U, 
-#                                      MARSmodCoefs.i$par.lowCI$U,
-#                                      MARSmodCoefs.i$par.upCI$U)) #coefs and par return the same values
-#   names(MARScoef.df) <- c("U", "U_lowCI", "U_upCI")
-#   MARScoef.df$site <- rownames(MARScoef.df)
-#   MARScoef.df2 <- MARScoef.df %>% 
-#     filter(!str_detect(site, "seas")) %>% 
-#     mutate(solute = solute_i)
-#   MARSS_BiasCoefs <- rbind(MARSS_BiasCoefs, MARScoef.df2)
-# }
 
-
-biasBS
-
-names(CaCoef) <- "Bias"
-CaCoef$site <- rownames(CaCoef)
-
-MARSS_BiasCoefs2 <- MARSS_BiasCoefs[-1,] %>%
-  mutate(
-         #still not sure this is right
-          U_perChange_y = (exp(U)-1)*12*100, #units percent decline/mo to percent decline/yr
-          U_perChange_y_lowCI = (exp(U_lowCI)-1)*12*100,
-          U_perChange_y_upCI = (exp(U_upCI)-1)*12*100) %>%
-  separate(site, sep = "_", into= c("region", "site", "watershed")) %>%
-  mutate_at("region", str_replace, "X.", "") %>%
-  mutate_at(c("region", "site", "watershed"), factor)  %>%
-  mutate(site = fct_relevel(site, c("HJA", "ELA", "MEF", "TLW", "DOR", "HBEF", "BBWM")),
-         watershed = fct_relevel(watershed,
-                                 c("GSWS08", "GSWS09",
-                                   "EIF", "NEIF", "NWIF",
-                                   "S2", "S5",
-                                   "C32", "C35", "C38",
-                                   "HP3", "HP3A", "HP4", "HP5", "HP6", "HP6A",
-                                   "WS6", "WS7", "WS8", "WS9",
-                                   "EB"))) %>%
-  mutate(Sig = ifelse(is.na(U_perChange_y_lowCI),
-                      "Hessian issues",
-                      0 >= U_lowCI & 0 >= U_upCI),
-         Sig2 = ifelse(Sig == "TRUE", "Significant",
-                       ifelse(Sig == "FALSE", "Not significant", Sig)))
-
-# biasBS2 <- 
-  
-  ggplot(biasBS, aes(y = bias, x = site, color = solute)) +geom_point()
-
-png(file = file.path(here::here("plots"), "MARSS_BiasPlots.png"), units="in", width= 8, height=6, res=300)
+# png(file = file.path(here::here("plots"), "MARSS_BiasPlots.png"), units="in", width= 8, height=6, res=300)
 ggplot() +
-  geom_hline(yintercept = 0) +
-  geom_pointrange(data = MARSS_BiasCoefs2, aes(y = U_perChange_y, x = watershed, color = site,
-                                               ymin = U_perChange_y_lowCI,
-                                               ymax = U_perChange_y_upCI,
-                                               shape = Sig2)) +
-  facet_grid(solute ~., scales = "free_y") +
-  theme(axis.text.x = element_text(angle = 90)) +
-  ylab(expression(paste("Bias ± 95% CI (% change ", y^-1,")"))) 
-dev.off()
+        geom_hline(yintercept = 0) +
+        geom_pointrange(data = tbl_fit_bias_bs, aes(y = U_perChange_y, x = watershed, fill = site,
+                                                     ymin = U_perChange_y_lowCI,
+                                                     ymax = U_perChange_y_upCI),
+                                                    shape = 21) +
+        # scale_shape_manual(values = c(21, 23)) +
+        facet_grid(solute ~., scales = "free_y") +
+        theme(axis.text.x = element_text(angle = 90)) +
+        ylab(expression(paste("Bias ± 95% CI (% change ", y^-1,")"))) +
+        geom_text(data = tbl_fit_bias_bs[tbl_fit_bias_bs$Sig == "Sig",], 
+                  aes(y = U_perChange_y_upCI + 10, x = watershed, label = "*"), size = 8, fontface = "bold")
+# dev.off()
+
+
+ggplot() +
+        geom_hline(yintercept = 0) +
+        geom_pointrange(data = tbl_fit_bias_bs %>% 
+                                filter(Sig == "Sig") %>% 
+                                mutate(S_WS = paste0(site," ", watershed)), 
+                                aes(y = U_perChange_y, x = solute, fill = site,
+                                                    ymin = U_perChange_y_lowCI,
+                                                    ymax = U_perChange_y_upCI),
+                        shape = 21, position = "jitter") +
+        ylab(expression(paste("Bias ± 95% CI (% change ", y^-1,")"))) 
 
 
 
