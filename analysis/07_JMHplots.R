@@ -1,9 +1,12 @@
+# plot results of MARSS models
+# JMH Sept. 22
+
+# libraries ----
 library(tidyverse)
 library(here)
 library(MARSS)
 library(ggpubr)
-
-
+library(lubridate)
 
 # Timeseries plots ----
 TimeSeriesLength <- 408
@@ -119,7 +122,7 @@ states %>% select(site, watershed, states, solute) %>% filter(is.na(states)) %>%
 # Make plot
 SoluteList <- unique(states$solute)
 
-# pdf(file = file.path(here::here("plots"), "MARSS_StatePlots_20220922.pdf"), paper = "letter")
+pdf(file = file.path(here::here("plots"), "MARSS_StatePlots_20220926.pdf"), paper = "letter")
 for(i in 1:length(SoluteList)){
   SoluteList_i <- SoluteList[i]
   # SoluteList_i <- SoluteList[6]
@@ -147,7 +150,7 @@ for(i in 1:length(SoluteList)){
   print(TestPlot_i)
   
 }
-# dev.off()
+dev.off()
 
 
 # Bias plot ----
@@ -200,7 +203,7 @@ tbl_fit_bias_bs <- tbl_fit_bootstrap %>%
 
 ## Bias plots ----
 # All watersheds/solutes
-png(file = file.path(here::here("plots"), "MARSS_BiasPlots_All.png"), units="in", width= 8, height=6, res=300)
+png(file = file.path(here::here("plots"), "MARSS_BiasPlots_All_20200926.png"), units="in", width= 8, height=6, res=300)
 ggplot() +
         geom_hline(yintercept = 0) +
         geom_pointrange(data = tbl_fit_bias_bs, aes(y = U_perChange_y, x = watershed, fill = site,
@@ -208,7 +211,7 @@ ggplot() +
                                                      ymax = U_perChange_y_upCI),
                                                     shape = 21) +
         # scale_shape_manual(values = c(21, 23)) +
-        facet_grid(solute ~., scales = "free_y") +
+        facet_grid(solute ~ ., scales = "free_y") +
         theme(axis.text.x = element_text(angle = 90)) +
         ylab(expression(paste("Bias ± 95% CI (% change ", y^-1,")"))) +
         geom_text(data = tbl_fit_bias_bs[tbl_fit_bias_bs$Sig == "Sig",], 
@@ -216,7 +219,7 @@ ggplot() +
 dev.off()
 
 # only significant bias fits
-png(file = file.path(here::here("plots"), "MARSS_BiasPlots_OnlySig.png"), units="in", width= 8, height=6, res=300)
+png(file = file.path(here::here("plots"), "MARSS_BiasPlots_OnlySig_20200926.png"), units="in", width= 8, height=6, res=300)
 ggplot() +
         geom_hline(yintercept = 0) +
         geom_pointrange(data = tbl_fit_bias_bs %>% 
@@ -339,7 +342,7 @@ SeasDat <- rbind(Seas.Ca.df, Seas.Doc.df, Seas.NH4.df, Seas.NO3.df, Seas.TDP.df,
     
   
   
-pdf(file = file.path(here::here("plots"), "07p_SeasBySolute.pdf"), height = 8, width = 10)
+pdf(file = file.path(here::here("plots"), "MARSS_SeasBySolute_20200926.pdf"), height = 8, width = 10)
   ggplot(SeasDat, 
          aes(y = seas, x = DateIsh, color = watershed, linetype = Sig2)) +
     geom_line(size = 1.25) +
@@ -356,7 +359,7 @@ pdf(file = file.path(here::here("plots"), "07p_SeasBySolute.pdf"), height = 8, w
       panel.grid.minor = element_blank())
 dev.off()
 
-pdf(file = file.path(here::here("plots"), "07p_Seas_SoluteBySite.pdf"), height = 8, width = 10)  
+pdf(file = file.path(here::here("plots"), "MARSS_Seas_SoluteBySite_20200926.pdf"), height = 8, width = 10)  
   ggplot(SeasDat, 
          aes(y = seas, x = DateIsh, color = watershed, linetype = Sig2)) +
     geom_line(size = 1.25) +
@@ -377,9 +380,9 @@ dev.off()
 save.image("analysis/07_JMHplots_Rdat")
 
 
-# RAW TIMESERIES DATA
+# Examine raw data ----
 # Let's check one or two of these
-library(lubridate)
+
 df2 <- df %>% 
   # this is not correct because date is water not calender year, but probably within a couple months
   mutate(dec_water_yr2 = format(date_decimal(dec_water_yr), "%d-%m-%Y"),
@@ -397,16 +400,48 @@ SoluteList2 <- c("Ca", "DOC", "NO3", "SO4", "NH4", "TDP")
 
 
 #THIS DOESN'T WORK
-pdf(file = file.path(here::here("plots"), "07q_Seas_RawDat.pdf"))
+pdf(file = file.path(here::here("plots"), "MARSS_Seas_RawDat_20220926.pdf"))
 for(i in 1:length(SoluteList2)){
-  solute_i = SoluteList2[1]
-  ggplot(df2, aes(y = solute_i, x = doy)) +
+  solute_i = SoluteList2[i]
+  SeasRawPlot <- ggplot(df2, aes_string(y = solute_i, x = "doy")) +
     geom_point(size = 0.5, alpha = 0.5) +
-    facet_wrap(vars(site,catchment), scales = "free_y") +
+    facet_wrap(vars(site, catchment), scales = "free_y") +
     stat_smooth(se = FALSE, size = 0.5)
-  
+  print(SeasRawPlot)
 }
 dev.off()
+
+
+
+#STILL TRYING TO GET THIS TO WORK
+SeasDat2 <- SeasDat %>% 
+  select(month, watershed, seas, solute, site) %>% 
+  mutate(Date = as.POSIXct(paste0("2020-", month, "-15"), format = "%Y-%m-%d"),
+         doy = as.numeric(strftime(Date, format = "%j")),
+         seas = 0.01 + seas/100) %>% 
+  select(site, watershed, doy, solute, seas) %>% 
+  pivot_wider(id_cols = site:doy, names_from = solute, values_from = seas) %>% 
+  select(site, catchment = watershed, doy, Ca, DOC, NO3 = NO3N, SO4, NH4 = NH4N, TDP)
+
+df3 <- df2 %>% 
+  select(site, catchment, Ca:TDP, doy, Y) %>% 
+  pivot_longer(cols = Ca:TDP, names_to = "solute", values_to = "FWMC") %>% 
+  full_join(SeasDat2 %>% 
+              pivot_longer(cols = Ca:TDP, names_to = "solute", values_to = "seas"), by = c("site", "catchment", "doy", "solute")) %>% 
+  group_by(site, catchment, solute) %>% 
+  mutate(seas2 = seas*median(FWMC)) %>% 
+  pivot_wider(id_cols = site:Y, names_from = solute, values_from = c(FWMC, seas, seas2))
+
+ggplot()+
+  geom_point(data = df3, aes(y = FWMC_Ca, x = doy)) +
+  geom_line(data = df3, aes(y = seas2_Ca, x = doy), color = "blue")+
+  facet_wrap(vars(site, catchment), scales = "free_y")
+
+ggplot() +
+  geom_point(data = df2, aes_string(y = solute_i, x = "doy"),size = 0.5, alpha = 0.5) +
+  facet_wrap(vars(site, catchment), scales = "free_y") +
+  stat_smooth(se = FALSE, size = 0.5) +
+  geom_line(data = SeasDat2, aes_string(y = solute_i, x = "doy"), color = "red")
 
   
 # dev.off()
