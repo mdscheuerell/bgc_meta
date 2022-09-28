@@ -1,0 +1,56 @@
+WARNING: ignoring environment value of R_HOME
+
+R version 3.5.1 (2018-07-02) -- "Feather Spray"
+Copyright (C) 2018 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+> # library(tidyverse, lib.loc = "/home/hood.211/R_libs")
+> #KFASurl and MARSurl were uncommented during last run
+> # KFASurl <- "https://cran.r-project.org/src/contrib/Archive/KFAS/KFAS_1.3.6.tar.gz"
+> # install.packages(KFASurl, repos = NULL, type = "source")
+> # MARSurl <- "https://cran.r-project.org/src/contrib/Archive/MARSS/MARSS_3.10.12.tar.gz"
+> # install.packages(MARSurl, repos = NULL, type = "source")
+> # mvtnormURL <- "https://cran.r-project.org/src/contrib/Archive/mvtnorm/mvtnorm_0.1-8.tar.gz"
+> # install.packages(mvtnormURL, repos = NULL, type = "source")
+> 
+> library(mvtnorm)
+> library(KFAS)
+> library(MARSS)
+> # library(doParallel, lib.loc = "/home/hood.211/R_libs")
+> library(doParallel)
+Loading required package: foreach
+Loading required package: iterators
+Loading required package: parallel
+> 
+> #/tmp/RtmpEsRhTh/downloaded_packages
+> #‘/tmp/Rtmp0Y9pwz/downloaded_packages’ 14 Sept 22
+> 
+> # load MARSS model
+> mod_set_RW_b <- readRDS("fitted_seas_unique_states_RW_b.rds")
+> 
+> 
+> 
+> ## bootstrap biased RW models by site
+> # startTime <- 
+> Sys.time()
+[1] "2022-09-16 11:01:33 EDT"
+> # 2 nboot took 1.298418 hours on iMAc; 40.12 mins on MacS 
+> # Meaning the whole thing will take 27 days or 14 days
+> 
+> bias_bootstrap <- mclapply(mod_set_RW_b, MARSSparamCIs, method = "parametric", nboot = 2, mc.cores = 6)
+slurmstepd: error: *** JOB 4289553 ON u022 CANCELLED AT 2022-09-16T11:13:06 ***
