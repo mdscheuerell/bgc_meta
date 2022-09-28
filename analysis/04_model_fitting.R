@@ -255,8 +255,12 @@ for(i in 1:length(solutes)) {
 
 tbl_mod_aic
 
+
+# mod_set_RW_b <- readRDS(file = here::here("analysis", "fitted_seas_unique_states_RW_b.rds"))
+
 ## bootstrap biased RW models by site
-bias_bootstrap <- lapply(mod_set_site_RW_b, MARSSparamCIs, method = "parametric", nboot = 200)
+bias_bootstrap <- lapply(mod_set_RW_b, MARSSparamCIs, method = "parametric", nboot = 200)
+
 
 ## create table of bias estimates (+/- CI) 
 tmp <- list()
