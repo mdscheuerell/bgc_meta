@@ -343,40 +343,74 @@ Seas.SO4.df <- seasPlotFun.Unique(12, tbl_fit_seas_bs, "SO4")
 Seas.NH4.df <- seasPlotFun.Unique(12, tbl_fit_seas_bs, "NH4N") 
 Seas.TDP.df <- seasPlotFun.Unique(12, tbl_fit_seas_bs, "TDP")
 
-# Combine all site seas fits
+# STILL HAVEN'T FIGURED THIS OUT. NEED TO SEE HOW MARK WAS STRUCTURING DATA.
 
+# THIS DOESN'T MAKE SENSE TO ME
+# When I use month 1-12 from above the trend is consistant with the data
+# However, when I adjust that from water year to calendar year the pattern doesn't make sense.
 SeasDat <- rbind(Seas.Ca.df, Seas.Doc.df, Seas.NH4.df, Seas.NO3.df, Seas.TDP.df, Seas.SO4.df) %>% 
-            mutate(site = fct_relevel(site, c("HJA", "ELA", "MEF", "TLW", "DOR", "HBEF", "BBWM", "SLP")),
-                   Sig2 = ifelse(Sig_seas_1 == "Sig" & Sig_seas_2 == "Sig", "TwoSig",
-                            ifelse((Sig_seas_1 == "Sig" & Sig_seas_2 != "Sig") |
-                                     (Sig_seas_1 != "Sig" & Sig_seas_2 == "Sig"),"OneSig", "NS")),
-                   Sig2 = fct_relevel(Sig2, c("TwoSig", "OneSig", "NS")),
-                   solute = fct_relevel(solute, c("Ca", "DOC", "NH4N", "NO3N", "TDP", "SO4")), 
-                   #corrected for water year
-                   month2 = ifelse(month == "1", "10",
-                              ifelse(month == "2", "11",
-                                ifelse(month == "3", "12",
-                                  ifelse(month == "4", "1",
-                                    ifelse(month == "5", "2",
-                                      ifelse(month == "6", "3",
-                                        ifelse(month == "7", "4",
-                                          ifelse(month == "8", "5",
-                                            ifelse(month == "9", "6", 
-                                              ifelse(month == "10", "7",
-                                                ifelse(month == "11", "8",
-                                                  ifelse(month == "12", "9", "blah")))))))))))),
-                   month3 = as.numeric(month2),
-                   # ugh don't know a better way to do this
-                   DateIsh = as.POSIXct(paste0("01-",month3,"-2020"), format = "%d-%m-%Y"),
-                   doy = as.POSIXct(paste0("01-",month3,"-2020"), format = "%j"),
-                   monthName = strftime(paste0("01-",month3,"-2020"), format = "%b"),
-                   solute2 = fct_recode(solute, "Calcium" = "Ca", "Dissolved organic C" = "DOC",
-                                       "Ammonium" = "NH4N", "Nitrate" = "NO3N", "Total dissolved P" = "TDP",
-                                       "Sulfate" = "SO4")) 
-    
+  mutate(site = fct_relevel(site, c("HJA", "ELA", "MEF", "TLW", "DOR", "HBEF", "BBWM", "SLP")),
+         Sig2 = ifelse(Sig_seas_1 == "Sig" & Sig_seas_2 == "Sig", "TwoSig",
+                       ifelse((Sig_seas_1 == "Sig" & Sig_seas_2 != "Sig") |
+                                (Sig_seas_1 != "Sig" & Sig_seas_2 == "Sig"),"OneSig", "NS")),
+         Sig2 = fct_relevel(Sig2, c("TwoSig", "OneSig", "NS")),
+         solute = fct_relevel(solute, c("Ca", "DOC", "NH4N", "NO3N", "TDP", "SO4")), 
+         # convert from water year to calendar year
+         monthCal = as.numeric(ifelse(month <= 3, month + 9, 
+                                      ifelse(month > 3, month-3,"NA"))),
+         solute2 = fct_recode(solute, "Calcium" = "Ca", "Dissolved organic C" = "DOC",
+                              "Ammonium" = "NH4N", "Nitrate" = "NO3N", "Total dissolved P" = "TDP",
+                              "Sulfate" = "SO4")) 
+
+# this has the same patterns as raw data
+df2 <- df %>%
+  mutate(dec_water_yrC = as.character(dec_water_yr)) %>%
+  separate(dec_water_yrC, into = c("Y","dec")) %>% 
+  # convert from decimal month (which is a water year) to calendar year month
+  mutate(month = case_when(dec == "08333333333" ~ 11,
+                           dec == "16666666667" ~ 12,
+                           dec == "25" ~ 1,
+                           dec == "33333333333" ~ 2,
+                           dec == "41666666667" ~ 3,
+                           dec == "5" ~ 4,
+                           dec == "58333333333" ~ 5,
+                           dec == "66666666667" ~ 6,
+                           dec == "75" ~ 7,
+                           dec == "83333333333" ~ 8,
+                           dec == "91666666667" ~ 9,
+                           is.na(dec) ~ 10)) %>% 
+  # log data
+  mutate(across(Ca:TDP,log)) %>%
+  # need to center each timeseries individually
+  group_by(catchment) %>%
+  # center
+  mutate(across(Ca:TDP, scale, scale = FALSE)) %>%
+  rename(NO3N = NO3, NH4N = NH4, watershed = catchment) %>%
+  pivot_longer(cols = Ca:TDP, names_to = "solute", values_to = "FWMC_log_scaled") 
+
+
+pdf(file = file.path(here::here("plots"), "MARSS_Seas_SoluteBySite_20221028.pdf"), height = 40, width = 10)  
+ggplot() +
+  geom_line(data = SeasDat ,
+            aes(y = seas, x = month, color = watershed, linetype = Sig2), size = 1.25) +
+  geom_point(data =  df2,
+             aes(y = FWMC_log_scaled, x = month, color = watershed), shape = 1, size = 0.5, alpha = 0.5) +
+  scale_linetype_manual(values = c("solid", "dashed", "dotted"), name = "Significant coef") +
+  # facet_grid(watershed ~ solute, scale = "free_y") +
+  facet_wrap(vars(watershed, solute), scale = "free_y") +
+  xlab(NULL) +
+  ylab("Seasonality") +
+  theme_bw() +
+  theme(
+    axis.text = element_text(size = 12),
+    axis.title.y = element_text(size = 18),
+    panel.grid.minor = element_blank())
+dev.off()
+
+
   
   
-pdf(file = file.path(here::here("plots"), "MARSS_SeasBySolute_2020102822.pdf"), height = 8, width = 10)
+pdf(file = file.path(here::here("plots"), "MARSS_SeasBySolute_20221028.pdf"), height = 8, width = 10)
   ggplot(SeasDat, 
          aes(y = seas, x = DateIsh, color = watershed, linetype = Sig2)) +
     geom_line(size = 1.25) +
@@ -399,23 +433,23 @@ dev.off()
 # STOPPED HERE. DATA NOT MATCHED UP WITH SEASONALITY PATTERNS
 
 
-pdf(file = file.path(here::here("plots"), "MARSS_Seas_SoluteBySite_20201028.pdf"), height = 40, width = 10)  
+pdf(file = file.path(here::here("plots"), "MARSS_Seas_SoluteBySite_20201028B.pdf"), height = 40, width = 10)  
 ggplot() +
   geom_line(data = SeasDat,
             aes(y = seas, x = month3, color = watershed, linetype = Sig2), size = 1.25) +
-  geom_point(data = df %>%
-               mutate(pdt = lubridate::date_decimal(dec_water_yr),
-                      pdt = as.POSIXct(pdt, format = "%Y-%m-%d")) %>%
-               # log data
-               mutate(across(Ca:TDP,log)) %>%
-               # need to center each timeseries individually
-               group_by(catchment) %>%
-               # center
-               mutate(across(Ca:TDP, scale, scale = FALSE)) %>%
-               rename(NO3N = NO3, NH4N = NH4, watershed = catchment) %>%
-               mutate(M = as.numeric(strftime(pdt, format = "%m"))) %>%
-               pivot_longer(cols = Ca:TDP, names_to = "solute", values_to = "FWMC_log_scaled"),
-             aes(y = FWMC_log_scaled, x = M, color = watershed), shape = 1, size = 0.5, alpha = 0.5) +
+  # geom_point(data = df %>%
+  #              mutate(pdt = lubridate::date_decimal(dec_water_yr),
+  #                     pdt = as.POSIXct(pdt, format = "%Y-%m-%d") - (92*24*60*60)) %>%
+  #              # log data
+  #              mutate(across(Ca:TDP,log)) %>%
+  #              # need to center each timeseries individually
+  #              group_by(catchment) %>%
+  #              # center
+  #              mutate(across(Ca:TDP, scale, scale = FALSE)) %>%
+  #              rename(NO3N = NO3, NH4N = NH4, watershed = catchment) %>%
+  #              mutate(M = as.numeric(strftime(pdt, format = "%m"))) %>%
+  #              pivot_longer(cols = Ca:TDP, names_to = "solute", values_to = "FWMC_log_scaled"),
+  #            aes(y = FWMC_log_scaled, x = M, color = watershed), shape = 1, size = 0.5, alpha = 0.5) +
   scale_linetype_manual(values = c("solid", "dashed", "dotted"), name = "Significant coef") +
   facet_grid(watershed ~ solute, scale = "free_y") +
   xlab(NULL) +
@@ -434,7 +468,7 @@ dev.off()
 
 df2 <- df %>% 
   # this is not correct because date is water not calender year, but probably within a couple months
-  mutate(dec_water_yr2 = format(date_decimal(dec_water_yr), "%d-%m-%Y"),
+  mutate(dec_water_yr2 = format(lubridate::date_decimal(dec_water_yr), "%d-%m-%Y"),
          # Water year starts on 1 Oct.
          dec_water_yr3 = as.POSIXct(dec_water_yr2, format = "%d-%m-%Y") - (92*24*60*60),
          Y = as.numeric(strftime(dec_water_yr3, format = "%Y")),
@@ -477,7 +511,8 @@ df3Sum <- df3 %>%
 df4 <- df3 %>% 
   full_join(df3Sum, by = c("site", "catchment", "solute")) %>% 
   # scaling seasonality to make it similar to FWMC
-  mutate(seas2 = seas*meanFWMC + meanFWMC) %>% 
+  # mutate(seas2 = seas*meanFWMC + meanFWMC) %>% 
+  
   full_join(SeasDat2sig, by = c("site", "catchment", "solute"))
 
 pdf(file = file.path(here::here("plots"), "MARSS_Seas_RawDat_20220930.pdf"))
