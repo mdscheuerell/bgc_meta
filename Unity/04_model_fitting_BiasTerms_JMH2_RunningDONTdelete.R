@@ -1,11 +1,12 @@
 # JMH Sept 16 22
-# started 25 Sept.
+# started 25 Sept. (not date last run started)
+# finished 19 October
 
 library(MARSS)
 library(doParallel)
 
 # load MARSS model
-mod_set_RW_b <- readRDS("fitted_seas_unique_states_RW_b.rds")
+mod_set_RW_b <- readRDS("Unity/fitted_seas_unique_states_RW_b.rds")
 
 
 
@@ -34,6 +35,6 @@ EndTime - startTime
 EndTime <- Sys.time()
 EndTime - startTime
 # Save
-saveRDS(bias_bootstrap, file = "mod_set_site_RW_b_BiasTerms.rds")
-save.image("04_model_fitting_BiasTerms_JMH2_250steps_RDat")
+saveRDS(bias_bootstrap, file = "Unity/mod_set_site_RW_b_BiasTerms.rds")
+save.image("Unity/04_model_fitting_BiasTerms_JMH2_250steps_RDat")
 
