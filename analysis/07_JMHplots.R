@@ -18,16 +18,17 @@ names(BlankTS) <- c("TimeNum", "Date")
 # original dataframe ----
 df <- readr::read_csv(here::here("data", "tbl_solutes_unmanaged_mon_v2.csv"))
 
-# GET MARSS MODELS ----
+# Get MARSS models ----
 # THE ORDER OF THE MODELS IS: "Ca"  "DOC" "NO3" "SO4" "NH4" "TDP"
 # this is unique states model with seasonality and bias
 MarsSeasSiteState <- readRDS(file = file.path(here::here("analysis"), "fitted_seas_unique_states_RW_b.rds"))
 
-# Bias bootstraps
+# Model coefs ----
+# run in 04_model_fitting_BiasTerms_1000bootstraps.R
 biasBS <- readRDS(file = file.path(here::here("analysis"), "mod_set_site_RW_b_BiasTerms_1000.rds"))
   
 
-
+# Assemble states ----
 ## Calcium ----
 Ca <- as.data.frame(t(MarsSeasSiteState[[1]]$states)) %>% 
     # this is the # of rows in all of these files CAREFUL to change if needed
@@ -121,12 +122,12 @@ SiteList <- states %>% select(site, watershed) %>% distinct()
 states %>% select(site, watershed, states, solute) %>% filter(is.na(states)) %>% distinct()
 
 
-# Make plot
+# States plot ----
 # prepare raw data for comparison
 
 SoluteList <- unique(states$solute)
 
-pdf(file = file.path(here::here("plots"), "MARSS_StatePlots_20221028.pdf"), paper = "letter")
+pdf(file = file.path(here::here("plots"), "MARSS_StatePlots_20221101.pdf"), paper = "letter")
 for(i in 1:length(SoluteList)){
   SoluteList_i <- SoluteList[i]
   # SoluteList_i <- SoluteList[6]
@@ -167,8 +168,8 @@ for(i in 1:length(SoluteList)){
 }
 dev.off()
 
-# Notes
-# for NH4, model is generating state for TLW catchment C35 even though there is not data for that.
+## Notes on states plots ----
+# for NH4, model is generating state for TLW catchment C35 even though there is no data for that.
 # this is giving huge uncertainty.
 # I should have removed these complete NA catchments from the dataset before modeling
 # see 04_model_fiting_JMH_R, row 82
@@ -231,8 +232,8 @@ tbl_fit_bias_bs <- tbl_fit_bootstrap %>%
 
 
 ## Bias plots ----
-# All watersheds/solutes
-png(file = file.path(here::here("plots"), "MARSS_BiasPlots_All_20201028.png"), units="in", width= 8, height=6, res=300)
+### All watersheds/solutes ----
+png(file = file.path(here::here("plots"), "MARSS_BiasPlots_All_20201101.png"), units="in", width= 8, height=6, res=300)
 ggplot() +
         geom_hline(yintercept = 0) +
         geom_pointrange(data = tbl_fit_bias_bs, aes(y = U_perChange_y, x = watershed, fill = site,
@@ -247,8 +248,9 @@ ggplot() +
                   aes(y = U_perChange_y_upCI + 10, x = watershed, label = "*"), size = 8, fontface = "bold")
 dev.off()
 
-# only significant bias fits
-png(file = file.path(here::here("plots"), "MARSS_BiasPlots_OnlySig_20201028.png"), units="in", width= 8, height=6, res=300)
+
+### Only sig fits ----
+png(file = file.path(here::here("plots"), "MARSS_BiasPlots_OnlySig_20201101.png"), units="in", width= 8, height=6, res=300)
 ggplot() +
         geom_hline(yintercept = 0) +
         geom_pointrange(data = tbl_fit_bias_bs %>% 
@@ -264,7 +266,7 @@ dev.off()
 
 
 
-# Seasonality Plots ----
+# Seasonality ----
 ## cleans up seas coefs df ----
 tbl_fit_seas_bs <- tbl_fit_bootstrap %>% 
   filter(grepl("seas", site)) %>% 
@@ -285,7 +287,7 @@ SigFun <- function(a,b) {ifelse(a == 0 | b == 0,"FALSE",!xor(sign(a)+1,sign(b)+1
 
 ## For catchments ----
 seasPlotFun.Unique <- function(periodS, MarsDF, solute_i){
-  # set up sin and cos matrix
+  # For testing function only
   # periodS <- 12 # TEST
   # solute_i  <-  "Ca" # TEST
   
@@ -304,7 +306,7 @@ seasPlotFun.Unique <- function(periodS, MarsDF, solute_i){
   sin.t <- sin(2 * pi * monthNum/periodS)
   
   #sin is seas_1, cos is seas_2
-    c.Four <- rbind(sin.t, cos.t) # if these get switched in C output they have to be switched
+    c.Four <- rbind(sin.t, cos.t) # if these get switched in C output they have to be switched here
   
   
   # MarsDF <- Seas.SO4.Unique # For TEST
@@ -327,7 +329,7 @@ seasPlotFun.Unique <- function(periodS, MarsDF, solute_i){
 }
 
 
-# Prepare df ----
+## Prepare df ----
 SitesList_Ca <- as.vector(unique(states[states$solute == "Ca" & !is.na(states$states),]$site))
 SitesList_DOC <- as.vector(unique(states[states$solute == "DOC" & !is.na(states$states),]$site))
 SitesList_NH4 <- as.vector(unique(states[states$solute == "NH4N" & !is.na(states$states),]$site))
@@ -343,10 +345,10 @@ Seas.SO4.df <- seasPlotFun.Unique(12, tbl_fit_seas_bs, "SO4")
 Seas.NH4.df <- seasPlotFun.Unique(12, tbl_fit_seas_bs, "NH4N") 
 Seas.TDP.df <- seasPlotFun.Unique(12, tbl_fit_seas_bs, "TDP")
 
-# STILL HAVEN'T FIGURED THIS OUT. NEED TO SEE HOW MARK WAS STRUCTURING DATA.
+
 
 # THIS DOESN'T MAKE SENSE TO ME
-# When I use month 1-12 from above the trend is consistant with the data
+# When I use month 1-12 from above the trend is consistent with the data
 # However, when I adjust that from water year to calendar year the pattern doesn't make sense.
 SeasDat <- rbind(Seas.Ca.df, Seas.Doc.df, Seas.NH4.df, Seas.NO3.df, Seas.TDP.df, Seas.SO4.df) %>% 
   mutate(site = fct_relevel(site, c("HJA", "ELA", "MEF", "TLW", "DOR", "HBEF", "BBWM", "SLP")),
@@ -365,8 +367,10 @@ SeasDat <- rbind(Seas.Ca.df, Seas.Doc.df, Seas.NH4.df, Seas.NO3.df, Seas.TDP.df,
 # this has the same patterns as raw data
 df2 <- df %>%
   mutate(dec_water_yrC = as.character(dec_water_yr)) %>%
+  # errors generated here, but don't cause issues
   separate(dec_water_yrC, into = c("Y","dec")) %>% 
   # convert from decimal month (which is a water year) to calendar year month
+  # lubridate func don't work because this is a water year
   mutate(month = case_when(dec == "08333333333" ~ 11,
                            dec == "16666666667" ~ 12,
                            dec == "25" ~ 1,
@@ -389,10 +393,10 @@ df2 <- df %>%
   pivot_longer(cols = Ca:TDP, names_to = "solute", values_to = "FWMC_log_scaled") 
 
 
-pdf(file = file.path(here::here("plots"), "MARSS_Seas_SoluteBySite_20221028.pdf"), height = 40, width = 10)  
+pdf(file = file.path(here::here("plots"), "MARSS_Seas_SoluteBySite_20221101.pdf"), height = 40, width = 30)  
 ggplot() +
   geom_line(data = SeasDat ,
-            aes(y = seas, x = month, color = watershed, linetype = Sig2), size = 1.25) +
+            aes(y = seas, x = month, color = watershed, linetype = Sig2), size = 1.5) +
   geom_point(data =  df2,
              aes(y = FWMC_log_scaled, x = month, color = watershed), shape = 1, size = 0.5, alpha = 0.5) +
   scale_linetype_manual(values = c("solid", "dashed", "dotted"), name = "Significant coef") +
@@ -410,13 +414,13 @@ dev.off()
 
   
   
-pdf(file = file.path(here::here("plots"), "MARSS_SeasBySolute_20221028.pdf"), height = 8, width = 10)
+pdf(file = file.path(here::here("plots"), "MARSS_SeasBySolute_20221101.pdf"), height = 8, width = 10)
   ggplot(SeasDat, 
-         aes(y = seas, x = DateIsh, color = watershed, linetype = Sig2)) +
+         aes(y = seas, x = month, color = watershed, linetype = Sig2)) +
     geom_line(size = 1.25) +
     # scale_color_brewer(palette = "Set2", name = "Sites")+
     scale_linetype_manual(values = c("solid", "dashed", "dotted"), name = "Significant coef") +
-    scale_x_datetime(date_labels = "%b") +
+    # scale_x_datetime(date_labels = "%b") +
     facet_wrap(vars(solute2), nrow = 3, ncol = 3) +
     xlab(NULL) +
     ylab("Seasonality") +
@@ -427,106 +431,6 @@ pdf(file = file.path(here::here("plots"), "MARSS_SeasBySolute_20221028.pdf"), he
       panel.grid.minor = element_blank())
 dev.off()
 
-
-
-
-# STOPPED HERE. DATA NOT MATCHED UP WITH SEASONALITY PATTERNS
-
-
-pdf(file = file.path(here::here("plots"), "MARSS_Seas_SoluteBySite_20201028B.pdf"), height = 40, width = 10)  
-ggplot() +
-  geom_line(data = SeasDat,
-            aes(y = seas, x = month3, color = watershed, linetype = Sig2), size = 1.25) +
-  # geom_point(data = df %>%
-  #              mutate(pdt = lubridate::date_decimal(dec_water_yr),
-  #                     pdt = as.POSIXct(pdt, format = "%Y-%m-%d") - (92*24*60*60)) %>%
-  #              # log data
-  #              mutate(across(Ca:TDP,log)) %>%
-  #              # need to center each timeseries individually
-  #              group_by(catchment) %>%
-  #              # center
-  #              mutate(across(Ca:TDP, scale, scale = FALSE)) %>%
-  #              rename(NO3N = NO3, NH4N = NH4, watershed = catchment) %>%
-  #              mutate(M = as.numeric(strftime(pdt, format = "%m"))) %>%
-  #              pivot_longer(cols = Ca:TDP, names_to = "solute", values_to = "FWMC_log_scaled"),
-  #            aes(y = FWMC_log_scaled, x = M, color = watershed), shape = 1, size = 0.5, alpha = 0.5) +
-  scale_linetype_manual(values = c("solid", "dashed", "dotted"), name = "Significant coef") +
-  facet_grid(watershed ~ solute, scale = "free_y") +
-  xlab(NULL) +
-  ylab("Seasonality") +
-  theme_bw() +
-  theme(
-    axis.text = element_text(size = 12),
-    axis.title.y = element_text(size = 18),
-    panel.grid.minor = element_blank())
-dev.off()
-
-
-
-# Examine raw data ----
-# Let's check one or two of these
-
-df2 <- df %>% 
-  # this is not correct because date is water not calender year, but probably within a couple months
-  mutate(dec_water_yr2 = format(lubridate::date_decimal(dec_water_yr), "%d-%m-%Y"),
-         # Water year starts on 1 Oct.
-         dec_water_yr3 = as.POSIXct(dec_water_yr2, format = "%d-%m-%Y") - (92*24*60*60),
-         Y = as.numeric(strftime(dec_water_yr3, format = "%Y")),
-         Yf = as.factor(as.character(Y)),
-         M = strftime(dec_water_yr3, format = "%m"),
-         doy = as.numeric(strftime(dec_water_yr3, format = "%j"))) 
-
-SoluteList2 <- c("Ca", "DOC", "NO3", "SO4", "NH4", "TDP")
-
-SeasDat2 <- SeasDat %>% 
-  select(month, watershed, seas, solute, site) %>% 
-  mutate(Date = as.POSIXct(paste0("2020-", month, "-15"), format = "%Y-%m-%d"),
-         doy = as.numeric(strftime(Date, format = "%j"))) %>% 
-  select(site, watershed, doy, solute, seas) %>% 
-  pivot_wider(id_cols = site:doy, names_from = solute, values_from = seas) %>% 
-  select(site, catchment = watershed, doy, Ca, DOC, NO3 = NO3N, SO4, NH4 = NH4N, TDP) %>% 
-  pivot_longer(cols = Ca:TDP, names_to = "solute", values_to = "seas") %>% 
-  # add a year column
-  mutate(Y = as.numeric("NA"))
-
-
-# get sig data
-SeasDat2sig <- SeasDat %>% 
-  select(catchment = watershed, solute, site, Sig2) %>% 
-  mutate(solute = fct_recode(solute, "NO3" = "NO3N", "NH4" = "NH4N")) %>% 
-  distinct()
-
-df3 <- df2 %>% 
-  select(site, catchment, Ca:TDP, doy, Y) %>% 
-  pivot_longer(cols = Ca:TDP, names_to = "solute", values_to = "FWMC") %>% 
-  # just adds this to the end
-  full_join(SeasDat2, by = c("site", "catchment", "Y", "doy", "solute"))  
-
-# get the mean to scale seasonality
-df3Sum <- df3 %>% 
-  ungroup() %>% 
-  group_by(site, catchment, solute) %>% 
-  summarize(meanFWMC = mean(FWMC, na.rm = T))
-
-df4 <- df3 %>% 
-  full_join(df3Sum, by = c("site", "catchment", "solute")) %>% 
-  # scaling seasonality to make it similar to FWMC
-  # mutate(seas2 = seas*meanFWMC + meanFWMC) %>% 
-  
-  full_join(SeasDat2sig, by = c("site", "catchment", "solute"))
-
-pdf(file = file.path(here::here("plots"), "MARSS_Seas_RawDat_20220930.pdf"))
-for(i in 1:length(SoluteList2)){
-  SoluteList2_i = SoluteList2[i]
-  SeasRawDat <- ggplot(data = df4 %>% 
-                         filter(solute == SoluteList2_i))+
-    geom_point(aes(y = FWMC, x = doy, color = Y), size = 2)  +
-    geom_point(aes(y = seas2, x = doy, shape = Sig2), color = "red") +
-    facet_wrap(vars(site, catchment), scales = "free_y") +
-    ggtitle(SoluteList2_i)
-  print(SeasRawDat)
-}
-dev.off()
 
 
 # Save image ----
