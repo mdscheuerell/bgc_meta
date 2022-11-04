@@ -274,6 +274,8 @@ for(i in 1:length(solutes)) {
 }
 
 tbl_mod_aic
+write.csv(tbl_mod_aic, "04_MARSSmodel_AICtable.csv")
+
 
 ## bootstrap biased RW models by site
 bias_bootstrap <- lapply(mod_set_RW_b, MARSSparamCIs, method = "parametric", nboot = 1000)
@@ -299,4 +301,4 @@ tbl_bias_bootstrap
 
 
 # save.image("Analysis/04_model_fitting_JMH_Rdata")
-# load("Analysis/04_model_fitting_JMH_Rdata")
+load("Analysis/04_model_fitting_JMH_Rdata")
