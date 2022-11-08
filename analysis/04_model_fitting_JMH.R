@@ -274,7 +274,7 @@ for(i in 1:length(solutes)) {
 }
 
 tbl_mod_aic
-write.csv(tbl_mod_aic, "04_MARSSmodel_AICtable.csv")
+write.csv(tbl_mod_aic, "Tables/04_MARSSmodel_AICtable.csv")
 
 
 # save.image("Analysis/04_model_fitting_JMH_Rdata")

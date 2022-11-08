@@ -141,4 +141,14 @@ for(i in 1:length(SoluteList)){
 }
 dev.off()
 
-save.image("08_MKandSensSlope_Rdat")
+## export table ----
+MARSSmkTab_2 <- MARSSmkTab %>% 
+  pivot_wider(id_cols = c("solute", "watershed"), names_from = analysis, values_from = Bias:Sig) %>% 
+  select(solute, watershed, Bias_MARSS, Bias_L95_MARSS, Bias_U95_MARSS, Sig_MARSS,
+         Bias_MKandSens, Bias_L95_MKandSens, Bias_U95_MKandSens, pval_MKandSens, Sig_MKandSens) %>% 
+  arrange(solute, watershed)
+
+write.csv(MARSSmkTab_2, "Tables/08_MARSS_SensSlops_BiasTable.csv")
+
+# save.image("analysis/08_MKandSensSlope_Rdat")
+# load("analysis/08_MKandSensSlope_Rdat")
