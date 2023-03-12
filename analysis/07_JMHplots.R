@@ -7,6 +7,7 @@ library(here)
 library(MARSS)
 library(ggpubr)
 library(lubridate)
+library(viridis)
 
 # Timeseries plots ----
 TimeSeriesLength <- 408
@@ -263,7 +264,37 @@ ggplot() +
         ylab(expression(paste("Bias ± 95% CI (% change ", y^-1,")"))) 
 dev.off()
 
+## Sig bias: presentation fig ##
+bias.pl <- ggplot() +
+              geom_hline(yintercept = 0) +
+              geom_pointrange(data = tbl_fit_bias_bs %>% 
+                    filter(Sig == "Sig") %>% 
+                    mutate(S_WS = paste0(site," ", watershed)), 
+                      aes(y = U_perChange_y, x = solute, fill = site,
+                          ymin = U_perChange_y_lowCI,
+                          ymax = U_perChange_y_upCI),
+                      shape = 21, size = 1.5, position = position_jitter(w = 0.2)) +
+              scale_fill_manual(values = c("orange red", viridis::viridis(6))) +
+              scale_x_discrete(labels = c(expression(Ca^{"2+"}),
+                                          "DOC", 
+                                          expression(NH[4]^{"+"}), 
+                                          expression(NO[3]^{"-"}),
+                                          expression(SO[4]^{"2-"}))) +
+              ylab(expression(paste("Bias ± 95% CI (% change ", y^-1,")"))) +
+              theme_bw() +
+              theme(legend.position = "right",
+                legend.background = element_rect(fill = NA, color = NA),
+                legend.text = element_text(size = 28),
+                legend.title = element_text(size = 28),
+                panel.grid = element_blank(),
+                panel.border = element_rect(color = "black", linewidth = 2),
+                plot.margin = unit(c(t = 0.5, r = 0.5, b = 0.5, l = 0.5), "cm"),
+                axis.text = element_text(size = 30),
+                axis.title.y = element_text(size = 30),
+                axis.text.x = element_text(vjust = 0.5),
+                axis.title.x = element_blank())
 
+ggsave(bias.pl, path = "plots", file = "bias.sig.pdf", width = 10, height = 8, units = "in")
 
 
 # Seasonality ----
@@ -431,6 +462,68 @@ pdf(file = file.path(here::here("plots"), "MARSS_SeasBySolute_20221101.pdf"), he
       panel.grid.minor = element_blank())
 dev.off()
 
+## Seasonality by solute: presentation fig ##
+#### TKH note: need to add in NA rows for catchments missing colute to align colors....?
+cols1 <- c("#f51505", "#f0079a", "#f095ce", # red-TL
+  "#fde725", # yellow-BB
+  "#7f039e", # purple-ELA
+  "orange red", "#f5965f", # orange-AND
+  "#05d5f5", "#6eb5db", "#aad6f0", "#0367a1", "#0505f7", "#084ec7", # blue-DOR
+  "#8507fa", "#7b54a1", # purple-ELA
+  "#35528b", "#c392f0", # lavender-MAR
+  "#21918c", # teal-SLP
+  "#5ec962", "#1e5920", "#029e07", "#07f0b2" # green-HBR
+  )
+
+## Nitrate only  
+seas.NO3.pl <- SeasDat %>% filter(solute2 == "Nitrate") %>%
+                           ggplot(aes(y = seas, x = month, color = watershed, linetype = Sig2)) +
+                              geom_line(linewidth = 1.25) +
+                              scale_linetype_manual(values = c("solid", "dashed", "dotted"), name = "Significant coef") +
+                              scale_color_manual(values = cols1) +
+                              xlab("month") +
+                              ylab(expression("seasonality of"~NO[3]^{"-"})) +
+                              scale_x_continuous(limits = c(1, 12), expand = c(0, 0)) +
+                              guides(linetype = "none") +
+                              theme_bw() +
+                              theme(legend.position = "right",
+                                legend.background = element_rect(fill = NA, color = NA),
+                                legend.text = element_text(size = 28),
+                                legend.title = element_text(size = 30),
+                                panel.grid = element_blank(),
+                                panel.border = element_rect(color = "black", linewidth = 2),
+                                plot.margin = unit(c(t = 0.5, r = 0.5, b = 0.5, l = 0.5), "cm"),
+                                axis.text = element_text(size = 30),
+                                axis.title.x = element_text(size = 30),
+                                axis.title.y = element_text(size = 30))
+
+ggsave(seas.NO3.pl, path = "plots", file = "seas.NO3.sig.pdf", width = 11, height = 8, units = "in")
+
+## All solutes
+seas.sol.pl <- ggplot(SeasDat, aes(y = seas, x = month, color = watershed, linetype = Sig2)) +
+                  geom_line(linewidth = 1.25) +
+                  scale_linetype_manual(values = c("solid", "dashed", "dotted"), name = "Significant coef") +
+  # scale_x_datetime(date_labels = "%b") +
+                  scale_color_manual(values = cols1) +
+                  facet_wrap(vars(solute2), nrow = 3, ncol = 3) +
+                  xlab("month") +
+                  ylab("seasonality") +
+                  scale_x_continuous(limits = c(1, 12), expand = c(0, 0)) +
+                  theme_bw() +
+                  theme(legend.position = "none",
+                    #legend.background = element_rect(fill = NA, color = NA),
+                    #legend.text = element_text(size = 20),
+                    #legend.title = element_text(size = 28),
+                    panel.grid = element_blank(),
+                    panel.border = element_rect(color = "black", linewidth = 2),
+                    plot.margin = unit(c(t = 0.5, r = 1.5, b = 0.5, l = 0.5), "cm"),
+                    axis.text = element_text(size = 30),
+                    axis.title.y = element_text(size = 30),
+                    axis.title.x = element_text(size = 30),
+                    strip.background = element_blank(),
+                    strip.text = element_text(size = 30))
+
+ggsave(seas.sol.pl, path = "plots", file = "seas.sig.pdf", width = 14, height = 10, units = "in")
 
 
 # Save image ----
