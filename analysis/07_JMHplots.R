@@ -1,5 +1,7 @@
 # plot results of MARSS models
 # JMH Oct 22
+# TK Jun 23
+# JMH Jun 23
 
 # libraries ----
 library(tidyverse)
@@ -115,20 +117,86 @@ states <- states0.s %>%
           mutate_at("region", str_replace, "X.", "") %>% 
           mutate_at(c("region", "site", "watershed"), factor)  %>% 
           full_join(BlankTS, by = "TimeNum") %>% 
-          mutate(Date = as.POSIXct(Date, format = "%Y-%m-%d"))
+          mutate(Date = as.POSIXct(Date, format = "%Y-%m-%d"),
+                 watershed = fct_relevel(watershed,
+                                         # BBWM
+                                         "EB", 
+                                         # DOR
+                                         "HP3",    "HP3A",   "HP4",    "HP5",    "HP6",    "HP6A",
+                                         # ELA
+                                         "EIF",    "NEIF",   "NWIF",
+                                         # HBEF
+                                         "WS6",    "WS7",    "WS8",    "WS9",
+                                         # MEF
+                                         "S2",     "S5",     
+                                         # SLP
+                                         "W9",
+                                         # TLW
+                                         "C32",    "C35",    "C38",
+                                         # HJA
+                                         "GSWS08", "GSWS09"))
 
 SiteList <- states %>% select(site, watershed) %>% distinct()
 
 # List of sites with no state data
-states %>% select(site, watershed, states, solute) %>% filter(is.na(states)) %>% distinct()
+SitesSol_Deleted <- states %>% 
+  select(site, watershed, states, solute) %>% 
+  filter(is.na(states)) %>% 
+  distinct() %>% 
+  mutate(SiteCatchSol = paste0(site, "_", watershed, "_", solute)) %>% 
+  select(SiteCatchSol)
 
+# remove catchments-solutes with no data
+states2 <- states %>% 
+            mutate(SiteCatchSol = paste0(site, "_", watershed, "_", solute)) %>% 
+            filter(!(SiteCatchSol %in% SitesSol_Deleted$SiteCatchSol))
 
+# NOTE-this doesn't change the number of rows, because it doesn't delete any catchments, only Na's things in solute columns            
+df2 <- df %>% 
+        pivot_longer(cols = Ca:TDP, names_to = "solute", values_to = "FWMC") %>% 
+        mutate(SiteCatchSol = paste0(site, "_", catchment, "_", solute)) %>% 
+        # filter((SiteCatchSol %in% SitesSol_Deleted$SiteCatchSol))
+        filter(!(SiteCatchSol %in% SitesSol_Deleted$SiteCatchSol)) %>% 
+        pivot_wider(id_cols = region:dec_water_yr, names_from = solute, values_from = FWMC)
 # States plot ----
 # prepare raw data for comparison
 
+
+
+
+# NEXT STEPS!!!!!!! ----
+# check figures
+# clean up figures
+
+
+
+
+
+
+
+
+
+blah <- states %>% select(site, watershed) %>% distinct()
+
 SoluteList <- unique(states$solute)
 
-pdf(file = file.path(here::here("plots"), "MARSS_StatePlots_20221101.pdf"), paper = "letter")
+#### TKH note: need to add in NA rows for catchments missing solute to align colors....?
+cols1 <- c(
+  "#fde725", # yellow-BBWM
+  "#05d5f5", "#6eb5db", "#aad6f0", "#0367a1", "#0505f7", "#084ec7", # blue-DOR
+  "#7f039e", "#8507fa", "#7b54a1",   # purple-ELA
+  "#5ec962", "#1e5920", "#029e07", "#07f0b2", # green-HBEF
+  "#35528b", "#c392f0", # lavender-MEF
+  "#21918c", # teal-SLP
+  "#f51505", "#f0079a", "#f095ce", # red-TLW
+  "orange red", "#f5965f" # orange-HJA         
+)
+
+
+
+
+SoluteList <- unique(states$solute)
+
 for(i in 1:length(SoluteList)){
   SoluteList_i <- SoluteList[i]
   # SoluteList_i <- SoluteList[6]
@@ -143,14 +211,16 @@ for(i in 1:length(SoluteList)){
                  # center
                  mutate(across(Ca:TDP, scale, scale = FALSE)) %>% 
                  rename(NO3N = NO3, NH4N = NH4, watershed = catchment), 
-                        aes(y = .data[[SoluteList_i]], x = pdt), color = "grey", shape = 1) +
+               aes(y = .data[[SoluteList_i]], x = pdt), color = "grey", shape = 1) +
     geom_line( data = states %>%
                  filter(solute == SoluteList_i), aes(y = states, x = Date, color = watershed)) +
     geom_ribbon(data = states %>%
                   filter(solute == SoluteList_i), aes(ymin = states - states.se,
-                                             ymax = states + states.se,
-                                             x = Date, fill= watershed),
+                                                      ymax = states + states.se,
+                                                      x = Date, fill= watershed),
                 alpha = 0.25, color = "transparent") +
+    scale_color_manual(values = cols1) +
+    scale_fill_manual(values = cols1) +
     facet_grid(site ~., scales = "free_y") +
     theme_bw() +
     ylab(SoluteList_i) +
@@ -163,11 +233,8 @@ for(i in 1:length(SoluteList)){
           panel.grid.minor = element_blank(),
           panel.spacing = unit(1,"lines"))
   
-  
-  print(TestPlot_i)
-  
+  ggsave(TestPlot_i, path = "plots", file = paste0("MARSSStatePlots_",SoluteList_i,".png"), width = 11, height = 8, units = "in")
 }
-dev.off()
 
 ## Notes on states plots ----
 # for NH4, model is generating state for TLW catchment C35 even though there is no data for that.
@@ -234,7 +301,7 @@ tbl_fit_bias_bs <- tbl_fit_bootstrap %>%
 
 ## Bias plots ----
 ### All watersheds/solutes ----
-png(file = file.path(here::here("plots"), "MARSS_BiasPlots_All_20201101.png"), units="in", width= 8, height=6, res=300)
+png(file = file.path(here::here("plots"), "MARSS_BiasPlots_All_20230613.png"), units="in", width= 8, height=6, res=300)
 ggplot() +
         geom_hline(yintercept = 0) +
         geom_pointrange(data = tbl_fit_bias_bs, aes(y = U_perChange_y, x = watershed, fill = site,
@@ -251,7 +318,7 @@ dev.off()
 
 
 ### Only sig fits ----
-png(file = file.path(here::here("plots"), "MARSS_BiasPlots_OnlySig_20201101.png"), units="in", width= 8, height=6, res=300)
+png(file = file.path(here::here("plots"), "MARSS_BiasPlots_OnlySig_20230613.png"), units="in", width= 8, height=6, res=300)
 ggplot() +
         geom_hline(yintercept = 0) +
         geom_pointrange(data = tbl_fit_bias_bs %>% 
@@ -424,7 +491,7 @@ df2 <- df %>%
   pivot_longer(cols = Ca:TDP, names_to = "solute", values_to = "FWMC_log_scaled") 
 
 
-pdf(file = file.path(here::here("plots"), "MARSS_Seas_SoluteBySite_20221101.pdf"), height = 40, width = 30)  
+pdf(file = file.path(here::here("plots"), "MARSS_Seas_SoluteBySite_20230613.pdf"), height = 40, width = 30)  
 ggplot() +
   geom_line(data = SeasDat ,
             aes(y = seas, x = month, color = watershed, linetype = Sig2), size = 1.5) +
@@ -445,7 +512,7 @@ dev.off()
 
   
   
-pdf(file = file.path(here::here("plots"), "MARSS_SeasBySolute_20221101.pdf"), height = 8, width = 10)
+pdf(file = file.path(here::here("plots"), "MARSS_SeasBySolute_20230613.pdf"), height = 8, width = 10)
   ggplot(SeasDat, 
          aes(y = seas, x = month, color = watershed, linetype = Sig2)) +
     geom_line(size = 1.25) +
@@ -463,7 +530,7 @@ pdf(file = file.path(here::here("plots"), "MARSS_SeasBySolute_20221101.pdf"), he
 dev.off()
 
 ## Seasonality by solute: presentation fig ##
-#### TKH note: need to add in NA rows for catchments missing colute to align colors....?
+#### TKH note: need to add in NA rows for catchments missing solute to align colors....?
 cols1 <- c("#f51505", "#f0079a", "#f095ce", # red-TL
   "#fde725", # yellow-BB
   "#7f039e", # purple-ELA
