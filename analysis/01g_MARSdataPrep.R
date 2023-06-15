@@ -68,13 +68,13 @@ MARSdf2 <- MARSdf2 %>%
 
 ## Plot MARS data ----
 pdf(file.path(here::here("plots"),
-              "MARSdataAllSites20220324.pdf"), width = 25, height = 10)
+              "MARSdataAllSites20230615.pdf"), width = 25, height = 10)
 ggplot(MARSdf2 %>% 
-         pivot_longer(cols = Ca:TDP, names_to = "Solute", values_to = "FWMC_mgL"), aes(y =  FWMC_mgL, x = Date, color = WS)) +
+         pivot_longer(cols = Ca:TDP, names_to = "Solute", values_to = "FWMC_mgL"), aes(y =  FWMC_mgL, x = dec_water_yr, color = catchment)) +
   geom_point()+
   geom_line()+
   scale_y_log10() +
-  facet_grid(Solute ~ Site, scales = "free_y") +
+  facet_grid(Solute ~ site, scales = "free_y") +
   ylab("Flow-weighted mean conc (mg element/L)")
 dev.off()
 
@@ -95,7 +95,7 @@ dev.off()
 
 ## df of missing data ----
 MARSmissingDataByWS <- MARSdf2 %>% 
-  group_by(Site, WS) %>% 
+  group_by(site, catchment) %>% 
   # turn on to check number of rows in each WS
   # summarise(across(Date, ~n()))
   # Calcs the % missing rows for each solute
@@ -103,8 +103,8 @@ MARSmissingDataByWS <- MARSdf2 %>%
 
 # export/save ----
 # write.csv(MARSmissingDataByWS, file.path(here::here("data/JMHnewMungedDat"), "01g_NumberOfNAsInMARSdf.csv"))
-write.csv(MARSdf2, here::here("data", "tbl_solutes_unmanaged_mon_v2.csv"),
-          row.names = FALSE)
+# write.csv(MARSdf2, here::here("data", "tbl_solutes_unmanaged_mon_v2.csv"),
+#           row.names = FALSE)
 
 
 # save.image(file.path(here::here("analysis"), "01gg_MARSdataPrep_Rdat"))

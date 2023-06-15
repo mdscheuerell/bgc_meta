@@ -19,7 +19,10 @@ BlankTS <- cbind(BlankTS.01, BlankTS.0)
 names(BlankTS) <- c("TimeNum", "Date")
 
 # original dataframe ----
-df <- readr::read_csv(here::here("data", "tbl_solutes_unmanaged_mon_v2.csv"))
+yr_first <- 1987 #state estimates start on 11 Oct. 2026
+yr_last <- 2020
+df <- readr::read_csv(here::here("data", "tbl_solutes_unmanaged_mon_v2.csv")) %>%
+  filter(dec_water_yr >= yr_first & dec_water_yr <= yr_last)
 
 # Get MARSS models ----
 # THE ORDER OF THE MODELS IS: "Ca"  "DOC" "NO3" "SO4" "NH4" "TDP"
@@ -134,22 +137,32 @@ states <- states0.s %>%
                                          # TLW
                                          "C32",    "C35",    "C38",
                                          # HJA
-                                         "GSWS08", "GSWS09"))
+                                         "GSWS08", "GSWS09"),
+                 site = fct_relevel(site, "BBWM", "DOR",  "ELA",  "HBEF", "MEF",  "SLP",  "TLW", "HJA")) %>% 
+          # making catchment/watershed consistent across df's
+          rename(catchment = "watershed")
 
-SiteList <- states %>% select(site, watershed) %>% distinct()
+SiteList <- states %>% select(site, catchment) %>% distinct()
 
 # List of sites with no state data
 SitesSol_Deleted <- states %>% 
-  select(site, watershed, states, solute) %>% 
+  select(site, catchment, states, solute) %>% 
   filter(is.na(states)) %>% 
   distinct() %>% 
-  mutate(SiteCatchSol = paste0(site, "_", watershed, "_", solute)) %>% 
+  mutate(SiteCatchSol = paste0(site, "_", catchment, "_", solute)) %>% 
   select(SiteCatchSol)
+
+# these have state predictions, but there was no data
+StatePredNoDat <- as.data.frame(c("TLW_C32_NH4N", "TLW_C35_NH4N", "HBEF_WS6_NH4N", "HBEF_WS6_NO3N"))
+names(StatePredNoDat) <- c("SiteCatchSol")
+SitesSol_Deleted <- rbind(SitesSol_Deleted,StatePredNoDat)
 
 # remove catchments-solutes with no data
 states2 <- states %>% 
-            mutate(SiteCatchSol = paste0(site, "_", watershed, "_", solute)) %>% 
-            filter(!(SiteCatchSol %in% SitesSol_Deleted$SiteCatchSol))
+            mutate(SiteCatchSol = paste0(site, "_", catchment, "_", solute)) %>% 
+            filter(!(SiteCatchSol %in% SitesSol_Deleted$SiteCatchSol)) %>% 
+            # clip last year of predictions
+            filter(Date < as.POSIXct("2019-10-01 00:00:00", format = "%Y-%m-%d %H:%M:%S"))
 
 # NOTE-this doesn't change the number of rows, because it doesn't delete any catchments, only Na's things in solute columns            
 df2 <- df %>% 
@@ -157,7 +170,28 @@ df2 <- df %>%
         mutate(SiteCatchSol = paste0(site, "_", catchment, "_", solute)) %>% 
         # filter((SiteCatchSol %in% SitesSol_Deleted$SiteCatchSol))
         filter(!(SiteCatchSol %in% SitesSol_Deleted$SiteCatchSol)) %>% 
-        pivot_wider(id_cols = region:dec_water_yr, names_from = solute, values_from = FWMC)
+        pivot_wider(id_cols = region:dec_water_yr, names_from = solute, values_from = FWMC)%>% 
+        # convert to posix.ct then adjust from water years (start oct) to normal years
+        mutate(pdt = lubridate::date_decimal(dec_water_yr)-91*24*60*60) %>% 
+  mutate(watershed = fct_relevel(catchment,
+                                 # BBWM
+                                 "EB", 
+                                 # DOR
+                                 "HP3",    "HP3A",   "HP4",    "HP5",    "HP6",    "HP6A",
+                                 # ELA
+                                 "EIF",    "NEIF",   "NWIF",
+                                 # HBEF
+                                 "WS6",    "WS7",    "WS8",    "WS9",
+                                 # MEF
+                                 "S2",     "S5",     
+                                 # SLP
+                                 "W9",
+                                 # TLW
+                                 "C32",    "C35",    "C38",
+                                 # HJA
+                                 "GSWS08", "GSWS09"),
+         site = fct_relevel(site, "BBWM", "DOR",  "ELA",  "HBEF", "MEF",  "SLP",  "TLW", "HJA")) 
+
 # States plot ----
 # prepare raw data for comparison
 
@@ -175,17 +209,18 @@ df2 <- df %>%
 
 
 
+# table of distinct catchments and sites
+DistinctCatchments <- states %>% select(site, catchment) %>% distinct()
 
-blah <- states %>% select(site, watershed) %>% distinct()
-
+# list of solutes
 SoluteList <- unique(states$solute)
 
-#### TKH note: need to add in NA rows for catchments missing solute to align colors....?
+# Global color palette for figs
 cols1 <- c(
   "#fde725", # yellow-BBWM
   "#05d5f5", "#6eb5db", "#aad6f0", "#0367a1", "#0505f7", "#084ec7", # blue-DOR
   "#7f039e", "#8507fa", "#7b54a1",   # purple-ELA
-  "#5ec962", "#1e5920", "#029e07", "#07f0b2", # green-HBEF
+  "#1e5920", "#5ec962", "#029e07", "#07f0b2", # green-HBEF
   "#35528b", "#c392f0", # lavender-MEF
   "#21918c", # teal-SLP
   "#f51505", "#f0079a", "#f095ce", # red-TLW
@@ -193,39 +228,47 @@ cols1 <- c(
 )
 
 
-
-
-SoluteList <- unique(states$solute)
+State_fancyYaxisLabels <- c(expression(paste("Scaled volume-weighted calcium concentration (mg Ca ",L^-1,")" )),
+                           expression(paste("Scaled volume-weighted DOC concentration (mg DOC ",L^-1,")" )),
+                           expression(paste("Scaled volume-weighted nitrate-N concentration (mg ", NO[3]^'-', "-N ",L^-1,")" )),
+                           expression(paste("Scaled volume-weighted sulfate concentration (mg ",SO[4]^'2-', " ",L^-1,")" )),
+                           expression(paste("Scaled volume-weighted ammonium-N concentration (mg ",NH[4]^'+', "-N ",L^-1,")" )),
+                           expression(paste("Scaled volume-weighted TDP concentration (mg TDP ",L^-1,")" )))
 
 for(i in 1:length(SoluteList)){
   SoluteList_i <- SoluteList[i]
-  # SoluteList_i <- SoluteList[6]
+# SoluteList_i <- SoluteList[6]
+State_fancyYaxisLabels_i <- State_fancyYaxisLabels[i]
   
   TestPlot_i <- ggplot() +
-    geom_point(data = df %>% 
-                 mutate(pdt = lubridate::date_decimal(dec_water_yr)) %>% 
+    geom_point(data = df2 %>% 
                  # log data
                  mutate(across(Ca:TDP,log)) %>%
                  # need to center each timeseries individually
                  group_by(catchment) %>% 
                  # center
                  mutate(across(Ca:TDP, scale, scale = FALSE)) %>% 
-                 rename(NO3N = NO3, NH4N = NH4, watershed = catchment), 
+                 rename(NO3N = NO3, NH4N = NH4), 
                aes(y = .data[[SoluteList_i]], x = pdt), color = "grey", shape = 1) +
-    geom_line( data = states %>%
-                 filter(solute == SoluteList_i), aes(y = states, x = Date, color = watershed)) +
-    geom_ribbon(data = states %>%
+    geom_line( data = states2 %>%
+                 filter(solute == SoluteList_i), aes(y = states, x = Date, color = catchment)) +
+    geom_ribbon(data = states2 %>%
                   filter(solute == SoluteList_i), aes(ymin = states - states.se,
                                                       ymax = states + states.se,
-                                                      x = Date, fill= watershed),
+                                                      x = Date, fill= catchment),
                 alpha = 0.25, color = "transparent") +
-    scale_color_manual(values = cols1) +
-    scale_fill_manual(values = cols1) +
+    scale_color_manual(values = cols1, name = "Catchment") +
+    # , guides(color = guide_legend("Catchment"),
+    #          fill = guide_legend("Catchment"))
+    scale_fill_manual(values = cols1, name = "Catchment") +
     facet_grid(site ~., scales = "free_y") +
     theme_bw() +
-    ylab(SoluteList_i) +
-    xlab("Time") +
-    scale_x_datetime(date_labels = "%Y", date_breaks = "5 years") +
+    # this needs to be fixed once stack exchange comes online
+    ylab(State_fancyYaxisLabels_i) +
+    # ylab(expression(paste("Volume-weighted ", !!SoluteList_i," concentration (mg ",L^-1,")"))) +
+    # ylab(paste("Volume-weighted ", SoluteList_i," concentration (mg/L)")) +
+    xlab(NULL) +
+    scale_x_datetime(date_labels = "%Y", date_breaks = "5 years") + #, limits = c(1985,2020)
     # scale_y_continuous(breaks = c(-7.5, 0, 7.5), limits = c(-7.5,7.5)) +
     theme(axis.title = element_text(size = 20),
           axis.text = element_text(size = 12),
@@ -233,19 +276,9 @@ for(i in 1:length(SoluteList)){
           panel.grid.minor = element_blank(),
           panel.spacing = unit(1,"lines"))
   
-  ggsave(TestPlot_i, path = "plots", file = paste0("MARSSStatePlots_",SoluteList_i,".png"), width = 11, height = 8, units = "in")
+  ggsave(TestPlot_i, path = "plots", file = paste0("MARSSStatePlots_",SoluteList_i,".png"), width = 11, height = 9, units = "in")
 }
 
-## Notes on states plots ----
-# for NH4, model is generating state for TLW catchment C35 even though there is no data for that.
-# this is giving huge uncertainty.
-# I should have removed these complete NA catchments from the dataset before modeling
-# see 04_model_fiting_JMH_R, row 82
-df %>% 
-  filter(site == "TLW") %>% 
-  filter(catchment == "C35")
-
-# for DOC, why does SLP have high uncertainty at start with no data but MEF, HJA, HBEF sites do not??
 
 
 # Bias plot ----
@@ -283,16 +316,24 @@ tbl_fit_bias_bs <- tbl_fit_bootstrap %>%
                       U_perChange_y_lowCI = (exp(loCI)-1)*12*100,
                       U_perChange_y_upCI = (exp(upCI)-1)*12*100) %>% 
                     mutate_at(c("region", "site", "watershed"), factor)  %>%
-                    mutate(site = fct_relevel(site, c("HJA", "ELA", "MEF", "TLW", "DOR", "HBEF", "BBWM", "SLP")),
-                         watershed = fct_relevel(watershed,
-                                                 c("GSWS08", "GSWS09",
-                                                   "EIF", "NEIF", "NWIF",
-                                                   "S2", "S5",
-                                                   "C32", "C35", "C38",
-                                                   "HP3", "HP3A", "HP4", "HP5", "HP6", "HP6A",
-                                                   "WS6", "WS7", "WS8", "WS9",
-                                                   "EB",
-                                                   "W9"))) %>% 
+                    mutate(site = fct_relevel(site, c("BBWM", "DOR",  "ELA",  "HBEF", "MEF",  "SLP",  "TLW", "HJA")),
+                           watershed = fct_relevel(watershed,
+                                                   # BBWM
+                                                   "EB", 
+                                                   # DOR
+                                                   "HP3",    "HP3A",   "HP4",    "HP5",    "HP6",    "HP6A",
+                                                   # ELA
+                                                   "EIF",    "NEIF",   "NWIF",
+                                                   # HBEF
+                                                   "WS6",    "WS7",    "WS8",    "WS9",
+                                                   # MEF
+                                                   "S2",     "S5",     
+                                                   # SLP
+                                                   "W9",
+                                                   # TLW
+                                                   "C32",    "C35",    "C38",
+                                                   # HJA
+                                                   "GSWS08", "GSWS09")) %>% 
                       # Label sig if CI's don't overlap zero
                       mutate(Sig = ifelse((loCI > 0 & upCI > 0) | (loCI <0 & upCI < 0),
                                           "Sig", "NS"),
@@ -331,7 +372,27 @@ ggplot() +
         ylab(expression(paste("Bias ± 95% CI (% change ", y^-1,")"))) 
 dev.off()
 
-## Sig bias: presentation fig ##
+### Sig bias: presentation fig ----
+# Taking colors most representative of Tamara's color scheme for catchment.
+bialsPlotColors <- c(# BBWM
+                      "#fde725",
+                      # DOR
+                      "#0505f7",
+                      # ELA
+                      "#7f039e",
+                      # HBEF
+                      "#029e07",
+                      # MEF
+                      "#c392f0",
+                      # SLP
+                      "#21918c",
+                      # TLW
+                      "#f51505",
+                      # HJA
+                      "orange red")
+
+
+
 bias.pl <- ggplot() +
               geom_hline(yintercept = 0) +
               geom_pointrange(data = tbl_fit_bias_bs %>% 
@@ -341,7 +402,8 @@ bias.pl <- ggplot() +
                           ymin = U_perChange_y_lowCI,
                           ymax = U_perChange_y_upCI),
                       shape = 21, size = 1.5, position = position_jitter(w = 0.2)) +
-              scale_fill_manual(values = c("orange red", viridis::viridis(6))) +
+              # scale_fill_manual(values = c("orange red", viridis::viridis(6)), name = "Site") +
+               scale_fill_manual(values = bialsPlotColors, name = "Site") +
               scale_x_discrete(labels = c(expression(Ca^{"2+"}),
                                           "DOC", 
                                           expression(NH[4]^{"+"}), 
@@ -463,43 +525,45 @@ SeasDat <- rbind(Seas.Ca.df, Seas.Doc.df, Seas.NH4.df, Seas.NO3.df, Seas.TDP.df,
                               "Sulfate" = "SO4")) 
 
 # this has the same patterns as raw data
-df2 <- df %>%
+df2_seas <- df2 %>%
   mutate(dec_water_yrC = as.character(dec_water_yr)) %>%
   # errors generated here, but don't cause issues
   separate(dec_water_yrC, into = c("Y","dec")) %>% 
   # convert from decimal month (which is a water year) to calendar year month
   # lubridate func don't work because this is a water year
-  mutate(month = case_when(dec == "08333333333" ~ 11,
-                           dec == "16666666667" ~ 12,
-                           dec == "25" ~ 1,
-                           dec == "33333333333" ~ 2,
-                           dec == "41666666667" ~ 3,
-                           dec == "5" ~ 4,
-                           dec == "58333333333" ~ 5,
-                           dec == "66666666667" ~ 6,
-                           dec == "75" ~ 7,
-                           dec == "83333333333" ~ 8,
-                           dec == "91666666667" ~ 9,
-                           is.na(dec) ~ 10)) %>% 
+  # mutate(month = case_when(dec == "08333333333" ~ 11,
+  #                          dec == "16666666667" ~ 12,
+  #                          dec == "25" ~ 1,
+  #                          dec == "33333333333" ~ 2,
+  #                          dec == "41666666667" ~ 3,
+  #                          dec == "5" ~ 4,
+  #                          dec == "58333333333" ~ 5,
+  #                          dec == "66666666667" ~ 6,
+  #                          dec == "75" ~ 7,
+  #                          dec == "83333333333" ~ 8,
+  #                          dec == "91666666667" ~ 9,
+  #                          is.na(dec) ~ 10)) %>% 
   # log data
+  mutate(month = as.numeric(strftime(pdt, format = "%m"))) %>% 
   mutate(across(Ca:TDP,log)) %>%
   # need to center each timeseries individually
   group_by(catchment) %>%
   # center
   mutate(across(Ca:TDP, scale, scale = FALSE)) %>%
-  rename(NO3N = NO3, NH4N = NH4, watershed = catchment) %>%
+  rename(NO3N = NO3, NH4N = NH4) %>%
   pivot_longer(cols = Ca:TDP, names_to = "solute", values_to = "FWMC_log_scaled") 
 
 
-pdf(file = file.path(here::here("plots"), "MARSS_Seas_SoluteBySite_20230613.pdf"), height = 40, width = 30)  
+pdf(file = file.path(here::here("plots"), "MARSS_Seas_SoluteBySite_20230613.pdf"), height = 40, width = 30)
 ggplot() +
-  geom_line(data = SeasDat ,
-            aes(y = seas, x = month, color = watershed, linetype = Sig2), size = 1.5) +
-  geom_point(data =  df2,
+  geom_line(data = SeasDat %>% 
+              rename(catchment = "watershed"),
+            aes(y = seas, x = month, color = catchment, linetype = Sig2), size = 1.5) +
+  geom_point(data =  df2_seas,
              aes(y = FWMC_log_scaled, x = month, color = watershed), shape = 1, size = 0.5, alpha = 0.5) +
   scale_linetype_manual(values = c("solid", "dashed", "dotted"), name = "Significant coef") +
   # facet_grid(watershed ~ solute, scale = "free_y") +
-  facet_wrap(vars(watershed, solute), scale = "free_y") +
+  facet_wrap(vars(catchment, solute), scale = "free_y") +
   xlab(NULL) +
   ylab("Seasonality") +
   theme_bw() +
@@ -513,8 +577,9 @@ dev.off()
   
   
 pdf(file = file.path(here::here("plots"), "MARSS_SeasBySolute_20230613.pdf"), height = 8, width = 10)
-  ggplot(SeasDat, 
-         aes(y = seas, x = month, color = watershed, linetype = Sig2)) +
+  ggplot(SeasDat %>% 
+           rename(catchment = "watershed"), 
+         aes(y = seas, x = month, color = catchment, linetype = Sig2)) +
     geom_line(size = 1.25) +
     # scale_color_brewer(palette = "Set2", name = "Sites")+
     scale_linetype_manual(values = c("solid", "dashed", "dotted"), name = "Significant coef") +
@@ -529,25 +594,43 @@ pdf(file = file.path(here::here("plots"), "MARSS_SeasBySolute_20230613.pdf"), he
       panel.grid.minor = element_blank())
 dev.off()
 
-## Seasonality by solute: presentation fig ##
-#### TKH note: need to add in NA rows for catchments missing solute to align colors....?
-cols1 <- c("#f51505", "#f0079a", "#f095ce", # red-TL
-  "#fde725", # yellow-BB
-  "#7f039e", # purple-ELA
-  "orange red", "#f5965f", # orange-AND
+## Seasonality by solute: presentation fig ----
+colsseasNO3 <- c(
+  "#fde725", # yellow-BBWM
   "#05d5f5", "#6eb5db", "#aad6f0", "#0367a1", "#0505f7", "#084ec7", # blue-DOR
-  "#8507fa", "#7b54a1", # purple-ELA
-  "#35528b", "#c392f0", # lavender-MAR
+  "#7f039e", "#8507fa", "#7b54a1",   # purple-ELA
+  "#1e5920", "#5ec962", "#029e07", "#07f0b2", # green-HBEF
+  # "#35528b", "#c392f0", # lavender-MEF
   "#21918c", # teal-SLP
-  "#5ec962", "#1e5920", "#029e07", "#07f0b2" # green-HBR
-  )
+  "#f51505", "#f0079a", "#f095ce", # red-TLW
+  "orange red", "#f5965f" # orange-HJA         
+)
 
 ## Nitrate only  
-seas.NO3.pl <- SeasDat %>% filter(solute2 == "Nitrate") %>%
-                           ggplot(aes(y = seas, x = month, color = watershed, linetype = Sig2)) +
+seas.NO3.pl <- SeasDat %>% 
+                rename(catchment = "watershed") %>% 
+                filter(solute2 == "Nitrate") %>%
+                mutate(catchment = fct_relevel(catchment,
+                                               # BBWM
+                                               "EB", 
+                                               # DOR
+                                               "HP3",    "HP3A",   "HP4",    "HP5",    "HP6",    "HP6A",
+                                               # ELA
+                                               "EIF",    "NEIF",   "NWIF",
+                                               # HBEF
+                                               "WS6",    "WS7",    "WS8",    "WS9",
+                                               # MEF - NO NO3 DATA FOR MEF
+                                               # "S2",     "S5",
+                                               # SLP
+                                               "W9",
+                                               # TLW
+                                               "C32",    "C35",    "C38",
+                                               # HJA
+                                               "GSWS08", "GSWS09")) %>% 
+                           ggplot(aes(y = seas, x = month, color = catchment, linetype = Sig2)) +
                               geom_line(linewidth = 1.25) +
                               scale_linetype_manual(values = c("solid", "dashed", "dotted"), name = "Significant coef") +
-                              scale_color_manual(values = cols1) +
+                              scale_color_manual(values = colsseasNO3) +
                               xlab("month") +
                               ylab(expression("seasonality of"~NO[3]^{"-"})) +
                               scale_x_continuous(limits = c(1, 12), expand = c(0, 0)) +
@@ -567,7 +650,26 @@ seas.NO3.pl <- SeasDat %>% filter(solute2 == "Nitrate") %>%
 ggsave(seas.NO3.pl, path = "plots", file = "seas.NO3.sig.pdf", width = 11, height = 8, units = "in")
 
 ## All solutes
-seas.sol.pl <- ggplot(SeasDat, aes(y = seas, x = month, color = watershed, linetype = Sig2)) +
+seas.sol.pl <- SeasDat %>% 
+              rename(catchment = "watershed") %>% 
+              mutate(catchment = fct_relevel(catchment,
+                                             # BBWM
+                                             "EB", 
+                                             # DOR
+                                             "HP3",    "HP3A",   "HP4",    "HP5",    "HP6",    "HP6A",
+                                             # ELA
+                                             "EIF",    "NEIF",   "NWIF",
+                                             # HBEF
+                                             "WS6",    "WS7",    "WS8",    "WS9",
+                                             # MEF - NO NO3 DATA FOR MEF
+                                             "S2",     "S5",
+                                             # SLP
+                                             "W9",
+                                             # TLW
+                                             "C32",    "C35",    "C38",
+                                             # HJA
+                                             "GSWS08", "GSWS09")) %>% 
+                ggplot(aes(y = seas, x = month, color = catchment, linetype = Sig2)) +
                   geom_line(linewidth = 1.25) +
                   scale_linetype_manual(values = c("solid", "dashed", "dotted"), name = "Significant coef") +
   # scale_x_datetime(date_labels = "%b") +
@@ -577,7 +679,7 @@ seas.sol.pl <- ggplot(SeasDat, aes(y = seas, x = month, color = watershed, linet
                   ylab("seasonality") +
                   scale_x_continuous(limits = c(1, 12), expand = c(0, 0)) +
                   theme_bw() +
-                  theme(legend.position = "none",
+                  theme(legend.position = "right",
                     #legend.background = element_rect(fill = NA, color = NA),
                     #legend.text = element_text(size = 20),
                     #legend.title = element_text(size = 28),
