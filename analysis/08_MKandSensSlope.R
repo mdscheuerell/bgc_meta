@@ -1,5 +1,6 @@
 # mann kendal and sens slopes
 # JMH Nov 2022
+# JMH JUN 2023
 
 # libraries
 library(tidyverse)
@@ -16,7 +17,7 @@ df <- readr::read_csv(here::here("data", "tbl_solutes_unmanaged_mon_v2.csv")) %>
                FWMC = scale(FWMC, scale = FALSE))
 
 # Mann-Kendall & sens slope
-# tested a few to make sure the code below was workign
+# tested a few to make sure the code below was working
 # mk.test(df[df$catchment == "EB" & df$solute == "Ca",]$FWMC)
 
 df_mk <- df %>% 
@@ -123,23 +124,65 @@ ggplot(MARSSmkTab %>%
   facet_wrap(vars(analysis), scales = "free_y")
         # geom_pointrange(aes(ymin = Bias_L95, ymax = Bias_U95)) 
 
-pdf(file = file.path(here::here("plots"), "MARSS_Sens_BiasPlots_All.pdf"))
-for(i in 1:length(SoluteList)){
-  Solute_i = SoluteList[i]
-  BiasPlot_i <- ggplot(MARSSmkTab %>%
-           filter(solute == Solute_i) %>% 
-           ungroup() %>% 
-           mutate(watershed = as.factor(watershed),
-                  watershed = fct_reorder(watershed, Bias)), aes(y = Bias, x = watershed, shape = analysis, color = Sig)) +
-            geom_point()+
-            # geom_pointrange(aes(ymin = Bias_L95, ymax = Bias_U95)) +
-            theme(axis.text.x = element_text(angle = 90)) +
-            scale_color_manual(values = c("black", "blue")) +
-            # theme_bw() +
-            ggtitle(Solute_i)
-  print(BiasPlot_i)
-}
-dev.off()
+## FIG 7 ----
+MARSSmkTab %>%
+  ungroup() %>% 
+  mutate(watershed = as.factor(watershed),
+         watershed = fct_reorder(watershed, Bias)) %>% 
+  mutate(watershed = fct_relevel(watershed,
+                                 # BBWM
+                                 "EB", 
+                                 # DOR
+                                 "HP3",    "HP3A",   "HP4",    "HP5",    "HP6",    "HP6A",
+                                 # ELA
+                                 "EIF",    "NEIF",   "NWIF",
+                                 # HBEF
+                                 "WS6",    "WS7",    "WS8",    "WS9",
+                                 # MEF - NO NO3 DATA FOR MEF
+                                 "S2",     "S5",
+                                 # SLP
+                                 "W9",
+                                 # TLW
+                                 "C32",    "C35",    "C38",
+                                 # HJA
+                                 "GSWS08", "GSWS09")) %>% 
+  mutate(Sig = case_when(Sig == "Sig" ~ "Yes",
+                         Sig == "NS" ~ "No"),
+         analysis = case_when(analysis == "MARSS" ~ "MARSS",
+                              analysis == "MKandSens" ~ "Sens slope"),
+         solute2 = fct_recode(solute, "Calcium" = "Ca", "DOC" = "DOC",
+                              "Ammonium" = "NH4N", "Nitrate" = "NO3N", "TDP" = "TDP",
+                              "Sulfate" = "SO4")) %>% 
+  # fig
+  ggplot() +
+  geom_hline(yintercept = 0, color = "grey") +
+  geom_pointrange(aes(y = Bias, x = watershed, ymin = Bias_L95, ymax = Bias_U95, 
+                      fill = Sig, shape = analysis), 
+                  position = position_jitter(w = 0.3), 
+                  size = 1.25) +
+  scale_fill_manual(values = c("grey90", "steelblue"), name = "P < 0.05") +
+  scale_shape_manual(values = c(21,22), name = "Analysis") +
+  facet_wrap(vars(solute2),
+             nrow = 3,
+             ncol = 2) +
+  ylim(-30,20) +
+  ylab(expression(paste("Bias ± 95% CI (% change ", y^-1,")"))) +
+  theme_bw() +
+  guides(fill=guide_legend(override.aes=list(shape=21))) +
+  theme(legend.position = "top",
+        legend.background = element_rect(fill = NA, color = NA),
+        legend.text = element_text(size = 26),
+        legend.title = element_text(size = 28, face = "bold"),
+        panel.grid = element_blank(),
+        panel.border = element_rect(color = "black", linewidth = 2),
+        plot.margin = unit(c(t = 0.5, r = 0.5, b = 0.5, l = 0.5), "cm"),
+        axis.text.y = element_text(size = 20),
+        axis.title.y = element_text(size = 30),
+        axis.text.x = element_text(size = 20, vjust = 0.5, hjust = 1, angle = 90),
+        axis.title.x = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 34)) +
+  ggsave(path = "plots", file = "MARSS_SensSlopeComp.pdf", width = 16, height = 10, units = "in")
 
 ## export table ----
 MARSSmkTab_2 <- MARSSmkTab %>% 

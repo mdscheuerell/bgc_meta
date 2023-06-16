@@ -83,9 +83,12 @@ dev.off()
 
 ## Notes on stuff that was removed ----
 # REMOVED FOR DL ISSUES
-# NH4 = WStoDropNH4 <-  c("BBWM_EB", "HBEF_WS6", "HJA_GSWS08", "HJA_GSWS09", "TLW_C32", "TLW_C35")
-# NO3 = WStoDropNO3 <- "HBEF_WS6"
-# TDP = WStoDropTDP <- c("HBEF_WS6", "HBEF_WS7", "HBEF_WS8", "HBEF_WS9", "SLP_W9")
+# NH4 = 
+WStoDropNH4 <-  c("BBWM_EB", "HBEF_WS6", "HJA_GSWS08", "HJA_GSWS09", "TLW_C32", "TLW_C35")
+# NO3 = 
+WStoDropNO3 <- "HBEF_WS6"
+# TDP = 
+WStoDropTDP <- c("HBEF_WS6", "HBEF_WS7", "HBEF_WS8", "HBEF_WS9", "SLP_W9")
 
 # REMOVED FOR OTHER REASONS
 # very limited SRP data in SLP - remove
@@ -99,10 +102,23 @@ MARSmissingDataByWS <- MARSdf2 %>%
   # turn on to check number of rows in each WS
   # summarise(across(Date, ~n()))
   # Calcs the % missing rows for each solute
-  summarise(across(Ca:TDP, ~round(sum(is.na(.))/408*100,0)))   #there should be 408 rows for each WS
+  summarise(across(Ca:TDP, ~round(sum(is.na(.))/408*100,0))) %>%     #there should be 408 rows for each WS
+  # NA-out catchment * solute combos that were removed
+  mutate(SiteCatch = paste0(site,"_", catchment),
+         NH4 = ifelse(SiteCatch %in% WStoDropNH4, as.numeric("NA"), NH4),
+         NO3 = ifelse(SiteCatch %in% WStoDropNO3, as.numeric("NA"), NO3),
+         TDP = ifelse(SiteCatch %in% WStoDropTDP, as.numeric("NA"), TDP),
+         TDP = ifelse(site == "SLP", as.numeric("NA"), TDP),
+         NH4 = ifelse(site == "SLP", as.numeric("NA"), NH4),
+         NH4 = ifelse(site == "MEF", as.numeric("NA"), NH4),
+         NO3 = ifelse(site == "MEF", as.numeric("NA"), NO3),
+         TDP = ifelse(site == "BBWM", as.numeric("NA"), TDP),
+         TDP = ifelse(site == "MEF", as.numeric("NA"), TDP)) %>% 
+  select(-SiteCatch)
+
 
 # export/save ----
-# write.csv(MARSmissingDataByWS, file.path(here::here("data/JMHnewMungedDat"), "01g_NumberOfNAsInMARSdf.csv"))
+write.csv(MARSmissingDataByWS, file.path(here::here("data/JMHnewMungedDat"), "01g_PercentNAsInMARSdf.csv"))
 # write.csv(MARSdf2, here::here("data", "tbl_solutes_unmanaged_mon_v2.csv"),
 #           row.names = FALSE)
 

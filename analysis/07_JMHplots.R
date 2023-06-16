@@ -152,7 +152,7 @@ SitesSol_Deleted <- states %>%
   mutate(SiteCatchSol = paste0(site, "_", catchment, "_", solute)) %>% 
   select(SiteCatchSol)
 
-# these have state predictions, but there was no data
+# these have state predictions, but there was no data - remove
 StatePredNoDat <- as.data.frame(c("TLW_C32_NH4N", "TLW_C35_NH4N", "HBEF_WS6_NH4N", "HBEF_WS6_NO3N"))
 names(StatePredNoDat) <- c("SiteCatchSol")
 SitesSol_Deleted <- rbind(SitesSol_Deleted,StatePredNoDat)
@@ -195,20 +195,6 @@ df2 <- df %>%
 # States plot ----
 # prepare raw data for comparison
 
-
-
-
-# NEXT STEPS!!!!!!! ----
-# check figures
-# clean up figures
-
-
-
-
-
-
-
-
 # table of distinct catchments and sites
 DistinctCatchments <- states %>% select(site, catchment) %>% distinct()
 
@@ -227,14 +213,23 @@ cols1 <- c(
   "orange red", "#f5965f" # orange-HJA         
 )
 
+# Fancy labels with units
+State_fancyYaxisLabels <- c(expression(paste("Scaled volume-weighted Ca concentration")),
+                           expression(paste("Scaled volume-weighted DOC concentration")),
+                           expression(paste("Scaled volume-weighted ", NO[3]^'-', "-N", " concentration")),
+                           expression(paste("Scaled volume-weighted ",SO[4]^'2-', " concentration")),
+                           expression(paste("Scaled volume-weighted ",NH[4]^'+', "-N concentration")),
+                           expression(paste("Scaled volume-weighted TDP concentration")))
 
-State_fancyYaxisLabels <- c(expression(paste("Scaled volume-weighted calcium concentration (mg Ca ",L^-1,")" )),
-                           expression(paste("Scaled volume-weighted DOC concentration (mg DOC ",L^-1,")" )),
-                           expression(paste("Scaled volume-weighted nitrate-N concentration (mg ", NO[3]^'-', "-N ",L^-1,")" )),
-                           expression(paste("Scaled volume-weighted sulfate concentration (mg ",SO[4]^'2-', " ",L^-1,")" )),
-                           expression(paste("Scaled volume-weighted ammonium-N concentration (mg ",NH[4]^'+', "-N ",L^-1,")" )),
-                           expression(paste("Scaled volume-weighted TDP concentration (mg TDP ",L^-1,")" )))
+# Fancy labels with units
+# State_fancyYaxisLabels <- c(expression(paste("Scaled volume-weighted calcium concentration (mg Ca ",L^-1,")" )),
+#                             expression(paste("Scaled volume-weighted DOC concentration (mg DOC ",L^-1,")" )),
+#                             expression(paste("Scaled volume-weighted nitrate-N concentration (mg ", NO[3]^'-', "-N ",L^-1,")" )),
+#                             expression(paste("Scaled volume-weighted sulfate concentration (mg ",SO[4]^'2-', " ",L^-1,")" )),
+#                             expression(paste("Scaled volume-weighted ammonium-N concentration (mg ",NH[4]^'+', "-N ",L^-1,")" )),
+#                             expression(paste("Scaled volume-weighted TDP concentration (mg TDP ",L^-1,")" )))
 
+## FIG 4 States timeseries ----
 for(i in 1:length(SoluteList)){
   SoluteList_i <- SoluteList[i]
 # SoluteList_i <- SoluteList[6]
@@ -248,12 +243,22 @@ State_fancyYaxisLabels_i <- State_fancyYaxisLabels[i]
                  group_by(catchment) %>% 
                  # center
                  mutate(across(Ca:TDP, scale, scale = FALSE)) %>% 
-                 rename(NO3N = NO3, NH4N = NH4), 
+                 rename(NO3N = NO3, NH4N = NH4) %>% 
+                 select(site, catchment, pdt, !!SoluteList_i) %>% 
+                 # drop the sites with no data for this solute, in conj w state2 filters
+                 filter(!is.na(.data[[SoluteList_i]])) %>% 
+                 droplevels(), 
                aes(y = .data[[SoluteList_i]], x = pdt), color = "grey", shape = 1) +
     geom_line( data = states2 %>%
-                 filter(solute == SoluteList_i), aes(y = states, x = Date, color = catchment)) +
+                 filter(solute == SoluteList_i) %>% 
+                 # drop the sites with no data for this solute, in conj w df2 filters
+                 filter(!is.na(!!SoluteList_i)) %>% 
+                 droplevels(), aes(y = states, x = Date, color = catchment)) +
     geom_ribbon(data = states2 %>%
-                  filter(solute == SoluteList_i), aes(ymin = states - states.se,
+                  filter(solute == SoluteList_i) %>% 
+                  # drop the sites with no data for this solute, in conj w df2 filters
+                  filter(!is.na(!!SoluteList_i)) %>% 
+                  droplevels(), aes(ymin = states - states.se,
                                                       ymax = states + states.se,
                                                       x = Date, fill= catchment),
                 alpha = 0.25, color = "transparent") +
@@ -372,7 +377,7 @@ ggplot() +
         ylab(expression(paste("Bias ± 95% CI (% change ", y^-1,")"))) 
 dev.off()
 
-### Sig bias: presentation fig ----
+### FIG 6 - sig bias est ----
 # Taking colors most representative of Tamara's color scheme for catchment.
 bialsPlotColors <- c(# BBWM
                       "#fde725",
@@ -391,6 +396,11 @@ bialsPlotColors <- c(# BBWM
                       # HJA
                       "orange red")
 
+# number of ts for each solute, entered into x-axis title in fig below
+tbl_fit_bias_bs %>% 
+  select(watershed, solute, bias) %>% 
+  pivot_wider(id_cols = c(watershed), names_from = "solute", values_from = "bias") %>% 
+  summarise(across(Ca:TDP, ~sum(!is.na(.))))
 
 
 bias.pl <- ggplot() +
@@ -404,11 +414,11 @@ bias.pl <- ggplot() +
                       shape = 21, size = 1.5, position = position_jitter(w = 0.2)) +
               # scale_fill_manual(values = c("orange red", viridis::viridis(6)), name = "Site") +
                scale_fill_manual(values = bialsPlotColors, name = "Site") +
-              scale_x_discrete(labels = c(expression(Ca^{"2+"}),
-                                          "DOC", 
-                                          expression(NH[4]^{"+"}), 
-                                          expression(NO[3]^{"-"}),
-                                          expression(SO[4]^{"2-"}))) +
+              scale_x_discrete(labels = c(expression(atop(Ca^{"2+"}," (22)")),
+                                          expression(atop("DOC", "(22)")), 
+                                          expression(atop(NH[4]^{"+"}," (16)")), 
+                                          expression(atop(NO[3]^{"-"}," (20)")),
+                                          expression(atop(SO[4]^{"2-"}," (22)")))) +
               ylab(expression(paste("Bias ± 95% CI (% change ", y^-1,")"))) +
               theme_bw() +
               theme(legend.position = "right",
@@ -423,7 +433,7 @@ bias.pl <- ggplot() +
                 axis.text.x = element_text(vjust = 0.5),
                 axis.title.x = element_blank())
 
-ggsave(bias.pl, path = "plots", file = "bias.sig.pdf", width = 10, height = 8, units = "in")
+ggsave(bias.pl, path = "plots", file = "bias.sig.pdf", width = 11, height = 8, units = "in")
 
 
 # Seasonality ----
@@ -520,8 +530,8 @@ SeasDat <- rbind(Seas.Ca.df, Seas.Doc.df, Seas.NH4.df, Seas.NO3.df, Seas.TDP.df,
          # convert from water year to calendar year
          monthCal = as.numeric(ifelse(month <= 3, month + 9, 
                                       ifelse(month > 3, month-3,"NA"))),
-         solute2 = fct_recode(solute, "Calcium" = "Ca", "Dissolved organic C" = "DOC",
-                              "Ammonium" = "NH4N", "Nitrate" = "NO3N", "Total dissolved P" = "TDP",
+         solute2 = fct_recode(solute, "Calcium" = "Ca", "DOC" = "DOC",
+                              "Ammonium" = "NH4N", "Nitrate" = "NO3N", "TDP" = "TDP",
                               "Sulfate" = "SO4")) 
 
 # this has the same patterns as raw data
@@ -675,9 +685,10 @@ seas.sol.pl <- SeasDat %>%
   # scale_x_datetime(date_labels = "%b") +
                   scale_color_manual(values = cols1) +
                   facet_wrap(vars(solute2), nrow = 3, ncol = 3) +
-                  xlab("month") +
-                  ylab("seasonality") +
-                  scale_x_continuous(limits = c(1, 12), expand = c(0, 0)) +
+                  xlab("Month") +
+                  ylab("Seasonality") +
+                  scale_x_continuous(limits = c(1, 12), expand = c(0, 0),
+                                     breaks = c(1,4,8, 12)) +
                   theme_bw() +
                   theme(legend.position = "right",
                     #legend.background = element_rect(fill = NA, color = NA),
@@ -690,7 +701,8 @@ seas.sol.pl <- SeasDat %>%
                     axis.title.y = element_text(size = 30),
                     axis.title.x = element_text(size = 30),
                     strip.background = element_blank(),
-                    strip.text = element_text(size = 30))
+                    strip.text = element_text(size = 34),
+                    panel.spacing.x = unit(30,"pt"))
 
 ggsave(seas.sol.pl, path = "plots", file = "seas.sig.pdf", width = 14, height = 10, units = "in")
 
