@@ -105,27 +105,27 @@ par(mfrow = c(1,4), mai = c(0.4, 0.4, 0.1, 0.1), omi = c(0, 0, 0.2, 0))
 
 matplot(y1, las = 1, col = clr, type = "l", lty = "solid",
         xaxt = "n", yaxt = "n", ylab = "", xlab = "")
-mtext("A) Catchment", 3, line = 0.5, adj = 0, cex = 0.8)
-mtext(expression(italic(y)), 2, line = 1)
-mtext("Time", 1, line = 1)
+mtext("A) Catchment", 3, line = 0.5, adj = 0, cex = 1.2)
+mtext(expression(italic(y)), 2, line = 1, cex = 1.2)
+mtext("Time", 1, line = 1, cex = 1.2)
 
 matplot(y2, las = 1, col = clr, type = "l", lty = "solid",
         xaxt = "n", yaxt = "n", ylab = "", xlab = "")
-mtext("B) Site", 3, line = 0.5, adj = 0, cex = 0.8)
-mtext(expression(italic(y)), 2, line = 1)
-mtext("Time", 1, line = 1)
+mtext("B) Site", 3, line = 0.5, adj = 0, cex = 1.2)
+mtext(expression(italic(y)), 2, line = 1, cex = 1.2)
+mtext("Time", 1, line = 1, cex = 1.2)
 
 matplot(y3, las = 1, col = clr, type = "l", lty = "solid",
         xaxt = "n", yaxt = "n", ylab = "", xlab = "")
-mtext("C) Region", 3, line = 0.5, adj = 0, cex = 0.8)
-mtext(expression(italic(y)), 2, line = 1)
-mtext("Time", 1, line = 1)
+mtext("C) Region", 3, line = 0.5, adj = 0, cex = 1.2)
+mtext(expression(italic(y)), 2, line = 1, cex = 1.2)
+mtext("Time", 1, line = 1, cex = 1.2)
 
 matplot(y4, las = 1, col = clr, type = "l", lty = "solid",
         xaxt = "n", yaxt = "n", ylab = "", xlab = "")
-mtext("D) N America", 3, line = 0.5, adj = 0, cex = 0.8)
-mtext(expression(italic(y)), 2, line = 1)
-mtext("Time", 1, line = 1)
+mtext("D) N America", 3, line = 0.5, adj = 0, cex = 1.2)
+mtext(expression(italic(y)), 2, line = 1, cex = 1.2)
+mtext("Time", 1, line = 1, cex = 1.2)
 
 dev.off()
 
