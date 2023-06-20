@@ -78,55 +78,67 @@ sen_resid <- yb - y_hat
 ww_hat <- residuals(fit_brw, type = "tT")
 ww_hat <- subset(ww_hat, name=="model")$.resids
 
+
 ## plots of fits, residuals, and ACF
 pdf("biased_rw_ex.pdf", width = 7, height = 5)
 
 par(mfrow = c(2,3), mai = c(0.7, 0.7, 0.1, 0.1), omi = c(0, 0, 0.2, 0))
 
 ## BRW fit
-plot.ts(yb, pch = 16, type = "o", cex = 1.2, las = 1,
-        ylim = range(cbind(y_hat, yb)), ylab = expression(italic(y)))
-text(x = 0, y = 12.5, expression(paste(hat(b), " = 0.36 (0.10, 0.62)")), pos = 4, cex = 0.8)
+plot(seq(nn), yb, pch = 16, type = "o", cex = 1.2, las = 1,
+     cex.axis = 1.3, cex.lab = 1.3,
+     ylim = range(cbind(y_hat, yb)), ylab = expression(italic(y)),
+     xlab = "Time",
+     yaxt = "n",
+     xaxt = "n")
+axis(1, at = c(0, 10, 20, 30), cex.axis = 1.3)
+axis(2, at = c(0, 4, 8, 12), las = 1, cex.axis = 1.3)
+text(x = -1, y = 12, expression(paste(hat(italic(b)), "" %~~% "0.36 (0.10, 0.62)")),
+     pos = 4, cex = 1.0)
 lines(t(fit_brw$states), col = "dodgerblue", lwd = 2)
-mtext("A", 3, line = 0.5, adj = 0, cex = 0.8)
+mtext("A", 3, line = 0.5, adj = 0, cex = 1.0)
 ## BRW residuals
-plot.ts(ww_hat, lwd = 2, las = 1, col = "dodgerblue",
-        ylim = range(sen_resid), ylab = "Residuals")
-mtext("B", 3, line = 0.5, adj = 0, cex = 0.8)
+plot(seq(nn), ww_hat, type = "l", las = 1,
+     cex.axis = 1.3, cex.lab = 1.3, lwd = 2,
+     col = "dodgerblue",
+     ylim = range(sen_resid), ylab = "Residuals",
+     xlab = "Time",
+     xaxt = "n")
+axis(1, at = c(0, 10, 20, 30), cex.axis = 1.3)
+mtext("B", 3, line = 0.5, adj = 0, cex = 1.0)
 ## BRW ACF
 acf(ww_hat, las = 1, lag.max = 10,
+    cex.axis = 1.3, cex.lab = 1.3,
     xlim = c(1,10), ylim = c(-0.6, 0.6))
-mtext("C", 3, line = 0.5, adj = 0, cex = 0.8)
+mtext("C", 3, line = 0.5, adj = 0, cex = 1.0)
 
 ## Sen's slope
-plot.ts(yb, pch = 16, type = "o", cex = 1.2, las = 1,
-        ylim = range(cbind(y_hat, yb)), ylab = expression(italic(y)))
-text(x = 0, y = 12.5, expression(paste(hat(b), " = 0.44 (0.39, 0.50)")), pos = 4, cex = 0.8)
+plot(seq(nn), yb, pch = 16, type = "o", cex = 1.2, las = 1,
+     cex.axis = 1.3, cex.lab = 1.3,
+     ylim = range(cbind(y_hat, yb)), ylab = expression(italic(y)),
+     xlab = "Time",
+     yaxt = "n",
+     xaxt = "n")
+axis(1, at = c(0, 10, 20, 30), cex.axis = 1.3)
+axis(2, at = c(0, 4, 8, 12), las = 1, cex.axis = 1.3)
+text(x = -1, y = 12, expression(paste(hat(italic(b)), "" %~~% "0.44 (0.39, 0.50)")), pos = 4, cex = 1.0)
 lines(y_hat, col = "indianred", lwd = 2)
-mtext("D", 3, line = 0.5, adj = 0, cex = 0.8)
+mtext("D", 3, line = 0.5, adj = 0, cex = 1.0)
 ## Sen's residuals
-plot.ts(sen_resid, lwd = 2, las = 1, col = "indianred",
-        ylim = range(sen_resid), ylab = "Residuals")
-mtext("E", 3, line = 0.5, adj = 0, cex = 0.8)
+plot(seq(nn), sen_resid, type = "l", las = 1,
+     cex.axis = 1.3, cex.lab = 1.3, lwd = 2,
+     col = "indianred",
+     ylim = range(sen_resid), ylab = "Residuals",
+     xlab = "Time",
+     xaxt = "n")
+axis(1, at = c(0, 10, 20, 30), cex.axis = 1.3)
+
+mtext("E", 3, line = 0.5, adj = 0, cex = 1.0)
 ## Sen's ACF
 acf(sen_resid, las = 1, lag.max = 10,
+    cex.axis = 1.3, cex.lab = 1.3,
     xlim = c(1,10), ylim = c(-0.6, 0.6))
-mtext("F", 3, line = 0.5, adj = 0, cex = 0.8)
-
-# ## lm fit
-# plot.ts(yb, pch = 16, type = "o", cex = 1.2, las = 1,
-#         ylim = range(cbind(y_hat, yb)), ylab = expression(italic(y)))
-# text(x = 0, y = 12, expression(paste(hat(b), " = 0.43 (0.38, 0.48)")), pos = 4, cex = 0.8)
-# lines(y_hat, col = "indianred", lwd = 2)
-# mtext("D", 3, line = 0.5, adj = 0, cex = 0.8)
-# ## lm residuals
-# plot.ts(residuals(fit_lm), lwd = 2, las = 1, col = "indianred",
-#         ylim = range(residuals(fit_lm)), ylab = "Residuals")
-# mtext("E", 3, line = 0.5, adj = 0, cex = 0.8)
-# ## lm ACF
-# acf(residuals(fit_lm), las = 1, lag.max = 10,
-#     xlim = c(1,10), ylim = c(-0.6, 0.6))
-# mtext("F", 3, line = 0.5, adj = 0, cex = 0.8)
+mtext("F", 3, line = 0.5, adj = 0, cex = 1.0)
 
 dev.off()
 
