@@ -191,7 +191,78 @@ MARSSmkTab_2 <- MARSSmkTab %>%
          Bias_MKandSens, Bias_L95_MKandSens, Bias_U95_MKandSens, pval_MKandSens, Sig_MKandSens) %>% 
   arrange(solute, watershed)
 
-write.csv(MARSSmkTab_2, "Tables/08_MARSS_SensSlops_BiasTable.csv")
+write.csv(MARSSmkTab_2, "Tables/08_MARSS_SensSlops_BiasTable.csv", row.names = FALSE)
+
+## TKH recreate bias & Sen plot
+MARSSmkTab_2 <- read.csv("Tables/08_MARSS_SensSlops_BiasTable.csv")
+
+Sens <- MARSSmkTab_2 %>% select(solute, watershed, ends_with("Sens"))
+mars <- MARSSmkTab_2 %>% select(solute, watershed, ends_with("MARSS"))
+
+names(Sens) <- c("solute", "watershed", "Bias", "Bias_L95", "Bias_U95", "pval", "Sig")
+names(mars) <- c("solute", "watershed", "Bias", "Bias_L95", "Bias_U95", "Sig")
+
+Sens <- Sens %>% mutate(analysis = "MKandSens")
+mars <- mars %>% mutate(analysis = "MARSS") %>%
+                 mutate(Sig = ifelse((Bias_L95 > 0 & Bias_U95 > 0) | (Bias_L95 < 0 & Bias_U95 < 0), "Sig", "NS"),
+                 Sig = fct_relevel(Sig, "Sig", "NS"))
+
+marMK <- bind_rows(Sens, mars)
+
+marMK <- marMK %>% mutate(solute2 = fct_recode(solute, "Calcium" = "Ca", 
+                                                       "DOC" = "DOC",
+                                                       "Ammonium" = "NH4N", 
+                                                       "Nitrate" = "NO3N", 
+                                                       "TDP" = "TDP",
+                                                       "Sulfate" = "SO4")) %>%
+                   mutate(watershed = fct_relevel(watershed,
+                                 # BBWM
+                                 "EB", 
+                                 # DOR
+                                 "HP3",    "HP3A",   "HP4",    "HP5",    "HP6",    "HP6A",
+                                 # ELA
+                                 "EIF",    "NEIF",   "NWIF",
+                                 # HBEF
+                                 "WS6",    "WS7",    "WS8",    "WS9",
+                                 # MEF - NO NO3 DATA FOR MEF
+                                 "S2",     "S5",
+                                 # SLP
+                                 "W9",
+                                 # TLW
+                                 "C32",    "C35",    "C38",
+                                 # HJA
+                                 "GSWS08", "GSWS09")) %>%
+                   mutate(Sig = case_when(Sig == "Sig" ~ "Yes", Sig == "NS" ~ "No"))
+
+biasSen.pl <- marMK %>% filter(!is.na(Sig)) %>%
+                        ggplot(x = watershed, y = Bias) +
+                               geom_hline(yintercept = 0, color = "grey") +
+                               geom_pointrange(aes(y = Bias, x = watershed, ymin = Bias_L95, ymax = Bias_U95, 
+                                                   fill = Sig, shape = analysis), 
+                                                   position = position_jitter(w = 0.3), 
+                                                   size = 1.25) +
+                               scale_fill_manual(values = c("grey90", "steelblue"), name = "P < 0.05") +
+                               scale_shape_manual(values = c(21,22), name = "Analysis") +
+                               facet_wrap(vars(solute2), nrow = 3, ncol = 2) +
+                               ylim(-25,25) +
+                               ylab(expression(paste("Bias ± 95% CI (% change ", y^-1,")"))) +
+                               theme_bw() +
+                               guides(fill = guide_legend(override.aes=list(shape=21))) +
+                               theme(legend.position = "bottom",
+                                  legend.background = element_rect(fill = NA, color = NA),
+                                  legend.text = element_text(size = 24),
+                                  legend.title = element_text(size = 24, face = "bold"),
+                                  panel.grid = element_blank(),
+                                  panel.border = element_rect(color = "black", linewidth = 2),
+                                  plot.margin = unit(c(t = 0.5, r = 0.5, b = 0.5, l = 0.5), "cm"),
+                                  axis.text.y = element_text(size = 20),
+                                  axis.title.y = element_text(size = 24),
+                                  axis.text.x = element_text(size = 20, vjust = 0.5, hjust = 1, angle = 90),
+                                  axis.title.x = element_blank(),
+                                  strip.background = element_blank(),
+                                  strip.text = element_text(size = 24))
+
+ggsave(biasSen.pl, path = here("plots"), file = "Fig7_MARSS_Sen.pdf", width = 12, height = 14, units = "in")
 
 # save.image("analysis/08_MKandSensSlope_Rdat")
 # load("analysis/08_MKandSensSlope_Rdat")

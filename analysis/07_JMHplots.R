@@ -214,7 +214,7 @@ cols1 <- c(
 )
 
 # Fancy labels with units
-State_fancyYaxisLabels <- c(expression(paste("Scaled volume-weighted Ca concentration")),
+State_fancyYaxisLabels <- c(expression(paste("Scaled volume-weighted ", Ca^'2+', " concentration")),
                            expression(paste("Scaled volume-weighted DOC concentration")),
                            expression(paste("Scaled volume-weighted ", NO[3]^'-', "-N", " concentration")),
                            expression(paste("Scaled volume-weighted ",SO[4]^'2-', " concentration")),
@@ -586,7 +586,7 @@ dev.off()
 
   
   
-pdf(file = file.path(here::here("plots"), "MARSS_SeasBySolute_20230613.pdf"), height = 8, width = 10)
+pdf(file = file.path(here::here("plots"), "MARSS_SeasBySolute_20230613.pdf"), height = 8, width = 12)
   ggplot(SeasDat %>% 
            rename(catchment = "watershed"), 
          aes(y = seas, x = month, color = catchment, linetype = Sig2)) +
@@ -692,8 +692,8 @@ seas.sol.pl <- SeasDat %>%
                   theme_bw() +
                   theme(legend.position = "right",
                     #legend.background = element_rect(fill = NA, color = NA),
-                    #legend.text = element_text(size = 20),
-                    #legend.title = element_text(size = 28),
+                    legend.text = element_text(size = 24),
+                    legend.title = element_text(size = 24),
                     panel.grid = element_blank(),
                     panel.border = element_rect(color = "black", linewidth = 2),
                     plot.margin = unit(c(t = 0.5, r = 1.5, b = 0.5, l = 0.5), "cm"),
@@ -704,7 +704,7 @@ seas.sol.pl <- SeasDat %>%
                     strip.text = element_text(size = 34),
                     panel.spacing.x = unit(30,"pt"))
 
-ggsave(seas.sol.pl, path = "plots", file = "seas.sig.pdf", width = 14, height = 10, units = "in")
+ggsave(seas.sol.pl, path = "plots", file = "seas.sig.pdf", width = 17, height = 10, units = "in")
 
 
 # Save image ----
