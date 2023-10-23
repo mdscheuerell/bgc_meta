@@ -5,6 +5,9 @@
 # libraries
 library(tidyverse)
 library(trend)
+library(EnvStats)
+library(here)
+library(broom)
 
 # Data used in MARSS models
 df <- readr::read_csv(here::here("data", "tbl_solutes_unmanaged_mon_v2.csv")) %>% 
@@ -266,3 +269,201 @@ ggsave(biasSen.pl, path = here("plots"), file = "Fig7_MARSS_Sen.pdf", width = 12
 
 # save.image("analysis/08_MKandSensSlope_Rdat")
 # load("analysis/08_MKandSensSlope_Rdat")
+
+#########################
+### Seasonal MK & Sen ###
+#########################
+
+### Import data used in MARSS models
+df.seas <- readr::read_csv(here::here("data", "tbl_solutes_unmanaged_mon_v2.csv")) 
+  
+## Make regular time series for compatibility with Mann-Kendall function
+## Log & center FWMC 
+df.seas <- df.seas %>% mutate(date = as.Date(round_date(date_decimal(dec_water_yr), "month"), format = "%Y-%m")) %>%
+                       group_by(site, catchment) %>%
+                       complete(date = seq.Date(from = as.Date("1986-01-01"), to = as.Date("2020-12-01"), by = "month")) %>%
+                       mutate(year = as.numeric(format(date, "%Y"))) %>%
+                       mutate(month = as.numeric(format(date, "%m"))) %>%
+                       pivot_longer(cols = Ca:TDP, names_to = "solute", values_to = "FWMC") %>% 
+                       ungroup() %>%
+                       # log and center on mean...check whether MARSS demeaned by catchment or across all data
+                       group_by(solute) %>%
+                       mutate(FWMC = c(scale(log(FWMC), scale = FALSE)))
+                  
+### Test seasonal MK for single site
+# Independent.obs = FALSE requires contiguous data 
+kseas <- df.seas %>% filter(catchment == "EB" & solute == "Ca") %>%
+                     kendallSeasonalTrendTest(FWMC ~ month + year, 
+                                               data = .,
+                                               alternative = "two.sided",
+                                               ci.slope = TRUE,
+                                               conf.level = 0.95, 
+                                               independent.obs = FALSE)
+
+kseas$p.value[2] # p-value for trend
+kseas$parameter # df
+kseas$statistic # test statistics for heterogeneity and trend
+kseas$interval["limits"][[1]]
+kseas$interval$limits[[1]]
+kseas$estimate["slope"] # sen's slope
+
+### Seasonal MK all catchments and solutes                                       
+
+## Remove sites*solutes lacking data
+df.seas <- df.seas %>% filter(!(solute == "TDP" & site %in% c("BBWM", "HJA", "MEF", "SLP"))) %>%
+                       filter(!(solute == "NH4" & site %in% c("BBWM", "HJA", "MEF", "SLP"))) %>%
+                       filter(!(solute == "NO3" & site %in% c("MEF"))) %>%
+                       filter(!(solute == "NH4" & catchment %in% c("C32", "C35", "WS6"))) %>%
+                       filter(!(solute == "NO3" & catchment %in% c("WS6"))) %>%
+                       filter(!(solute == "TDP" & catchment %in% c("WS6", "WS7", "WS8", "WS9"))) 
+  
+## Shouldn't need to rerun models for each stat. h.test object doesn't play with tidy.
+df_seasmk <- df.seas %>% 
+  group_by(catchment, solute) %>% 
+  nest() %>% 
+  mutate(mk_hetstat = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
+                                                           data = .,
+                                                           alternative = "two.sided",
+                                                           ci.slope = TRUE,
+                                                           conf.level = 0.95)$statistic[1])) %>%
+  mutate(mk_trendzstat = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
+                                                           data = .,
+                                                           alternative = "two.sided",
+                                                           ci.slope = TRUE,
+                                                           conf.level = 0.95)$statistic[2])) %>%
+  mutate(mk_het_pval = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
+                                                              data = .,
+                                                              alternative = "two.sided",
+                                                              ci.slope = TRUE,
+                                                              conf.level = 0.95)$p.value[1])) %>%
+  mutate(mk_pval = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
+                                                            data = .,
+                                                            alternative = "two.sided",
+                                                            ci.slope = TRUE,
+                                                            conf.level = 0.95)$p.value[2])) %>%
+  mutate(mk_df = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
+                                                        data = .,
+                                                        alternative = "two.sided",
+                                                        ci.slope = TRUE,
+                                                        conf.level = 0.95)$parameter)) %>%
+  mutate(sen_sl = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
+                                                      data = .,
+                                                      alternative = "two.sided",
+                                                      ci.slope = TRUE,
+                                                      conf.level = 0.95)$estimate[["slope"]])) %>%
+  mutate(sen_L95 = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
+                                                      data = .,
+                                                      alternative = "two.sided",
+                                                      ci.slope = TRUE,
+                                                      conf.level = 0.95)$interval$limits[[1]])) %>%
+  mutate(sen_U95 = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
+                                                        data = .,
+                                                        alternative = "two.sided",
+                                                        ci.slope = TRUE,
+                                                        conf.level = 0.95)$interval$limits[[2]])) %>%
+         
+  unnest(c(mk_hetstat, mk_trendzstat, mk_het_pval, mk_pval, mk_df, sen_sl, sen_L95, sen_U95)) %>% 
+  select(-data)
+
+# combine
+df_seasmk_c <- df_seasmk %>% mutate(Sig = ifelse(mk_pval < 0.05, "Sig", "NS"),
+                                    s_slope = sen_sl*100,
+                                    s_L95 = sen_L95*100,
+                                    s_U95 = sen_U95*100) %>% 
+                             select(solute, watershed = catchment, Bias = s_slope, Bias_L95 = s_L95, Bias_U95 = s_U95, pval = mk_pval, Sig) %>% 
+                             mutate(analysis = "MKandSens",
+                                    solute = ifelse(solute == "NH4","NH4N",
+                                    ifelse(solute == "NO3", "NO3N", solute)))
+
+tbl_fit_bias_bs_c <- tbl_fit_bias_bs %>% 
+  mutate(pval = as.numeric("NA"),
+         analysis = "MARSS") %>% 
+  select(solute, watershed, Bias = U_perChange_y, Bias_L95 = U_perChange_y_lowCI, 
+         Bias_U95 = U_perChange_y_upCI, pval, Sig, analysis)
+
+
+MARSSseasmkTab <- rbind(df_seasmk_c, tbl_fit_bias_bs_c)
+
+ggplot(MARSSseasmkTab, aes(y = Bias, x = analysis, color = Sig)) +
+  geom_pointrange(aes(ymin = Bias_L95, ymax = Bias_U95)) +
+  facet_grid(solute ~ watershed, scales = "free_y") +
+  theme(axis.text.x = element_text(angle = 90))
+
+ggplot(MARSSseasmkTab %>% 
+         ungroup() %>% 
+         group_by(analysis) %>% 
+         mutate(ID = as.factor(paste0(solute,"_", watershed)),
+                ID = fct_reorder(ID, Bias)), aes(y = Bias, x = ID, shape = analysis, color = Sig)) +
+  geom_point()+
+  theme(axis.text.x = element_text(angle = 90)) +
+  facet_wrap(vars(analysis))
+# geom_pointrange(aes(ymin = Bias_L95, ymax = Bias_U95)) 
+
+## FIG 7 ----
+Fig7 <- MARSSseasmkTab %>%
+                            ungroup() %>% 
+                            mutate(watershed = as.factor(watershed),
+                                   watershed = fct_reorder(watershed, Bias)) %>% 
+                            mutate(watershed = fct_relevel(watershed,
+                                 # BBWM
+                                 "EB", 
+                                 # DOR
+                                 "HP3",    "HP3A",   "HP4",    "HP5",    "HP6",    "HP6A",
+                                 # ELA
+                                 "EIF",    "NEIF",   "NWIF",
+                                 # HBEF
+                                 "WS6",    "WS7",    "WS8",    "WS9",
+                                 # MEF - NO NO3 DATA FOR MEF
+                                 "S2",     "S5",
+                                 # SLP
+                                 "W9",
+                                 # TLW
+                                 "C32",    "C35",    "C38",
+                                 # HJA
+                                 "GSWS08", "GSWS09")) %>% 
+                            mutate(Sig = case_when(Sig == "Sig" ~ "Yes", Sig == "NS" ~ "No"),
+                                   analysis = case_when(analysis == "MARSS" ~ "MARSS",
+                                   analysis == "MKandSens" ~ "Sens slope"),
+                                   solute2 = fct_recode(solute, "Calcium" = "Ca", "DOC" = "DOC",
+                              "Ammonium" = "NH4N", "Nitrate" = "NO3N", "TDP" = "TDP",
+                              "Sulfate" = "SO4")) %>% 
+  # fig
+  ggplot() +
+  geom_hline(yintercept = 0, color = "grey") +
+  geom_pointrange(aes(y = Bias, x = watershed, ymin = Bias_L95, ymax = Bias_U95, 
+                      fill = Sig, shape = analysis), 
+                  position = position_jitter(w = 0.3), 
+                  size = 1.25) +
+  scale_fill_manual(values = c("grey90", "steelblue"), name = "P < 0.05") +
+  scale_shape_manual(values = c(21,22), name = "Analysis") +
+  facet_wrap(vars(solute2),
+             nrow = 3,
+             ncol = 2) +
+  ylim(-25,25) +
+  ylab(expression(paste("Bias ± 95% CI (% change ", y^-1,")"))) +
+  theme_bw() +
+  guides(fill=guide_legend(override.aes=list(shape=21))) +
+  theme(legend.position = "bottom",
+        legend.background = element_rect(fill = NA, color = NA),
+        legend.text = element_text(size = 26),
+        legend.title = element_text(size = 28, face = "bold"),
+        panel.grid = element_blank(),
+        panel.border = element_rect(color = "black", linewidth = 2),
+        plot.margin = unit(c(t = 0.5, r = 0.5, b = 0.5, l = 0.5), "cm"),
+        axis.text.y = element_text(size = 20),
+        axis.title.y = element_text(size = 30),
+        axis.text.x = element_text(size = 20, vjust = 0.5, hjust = 1, angle = 90),
+        axis.title.x = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_text(size = 34))
+  
+  ggsave(path = "plots", file = "Fig7_MARSS_seasSensSlopeComp.pdf", width = 12, height = 16, units = "in")
+
+## export table ----
+MARSSseasmkTab_2 <- MARSSseasmkTab %>% 
+  pivot_wider(id_cols = c("solute", "watershed"), names_from = analysis, values_from = Bias:Sig) %>% 
+  select(solute, watershed, Bias_MARSS, Bias_L95_MARSS, Bias_U95_MARSS, Sig_MARSS,
+         Bias_MKandSens, Bias_L95_MKandSens, Bias_U95_MKandSens, pval_MKandSens, Sig_MKandSens) %>% 
+  arrange(solute, watershed)
+
+write.csv(MARSSseasmkTab_2, "Tables/08_MARSS_seasSensSlops_BiasTable.csv", row.names = FALSE)
