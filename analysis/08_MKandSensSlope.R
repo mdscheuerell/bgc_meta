@@ -432,8 +432,9 @@ Fig7 <- MARSSseasmkTab %>%
   geom_hline(yintercept = 0, color = "grey") +
   geom_pointrange(aes(y = Bias, x = watershed, ymin = Bias_L95, ymax = Bias_U95, 
                       fill = Sig, shape = analysis), 
-                  position = position_jitter(w = 0.3), 
-                  size = 1.25) +
+                  position = position_jitter(w = 0.5), 
+                  size = 1.5) +
+  expand_limits(x= c(-0.1, length(unique(MARSSseasmkTab$watershed)) + 1.1)) +
   scale_fill_manual(values = c("grey90", "steelblue"), name = "P < 0.05") +
   scale_shape_manual(values = c(21,22), name = "Analysis") +
   facet_wrap(vars(solute2),
@@ -450,14 +451,14 @@ Fig7 <- MARSSseasmkTab %>%
         panel.grid = element_blank(),
         panel.border = element_rect(color = "black", linewidth = 2),
         plot.margin = unit(c(t = 0.5, r = 0.5, b = 0.5, l = 0.5), "cm"),
-        axis.text.y = element_text(size = 20),
+        axis.text.y = element_text(size = 24),
         axis.title.y = element_text(size = 30),
-        axis.text.x = element_text(size = 20, vjust = 0.5, hjust = 1, angle = 90),
+        axis.text.x = element_text(size = 24, vjust = 0.5, hjust = 1, angle = 90),
         axis.title.x = element_blank(),
         strip.background = element_blank(),
-        strip.text = element_text(size = 34))
+        strip.text = element_text(size = 30))
   
-  ggsave(path = "plots", file = "Fig7_MARSS_seasSensSlopeComp.pdf", width = 12, height = 16, units = "in")
+  ggsave(path = "plots", file = "Fig7_MARSS_seasSensSlopeComp.png", width = 16, height = 18, units = "in")
 
 ## export table ----
 MARSSseasmkTab_2 <- MARSSseasmkTab %>% 
