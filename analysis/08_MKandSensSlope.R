@@ -1,6 +1,7 @@
 # mann kendal and sens slopes
 # JMH Nov 2022
 # JMH JUN 2023
+# JMH Nov 2023
 
 # libraries
 library(tidyverse)
@@ -9,7 +10,7 @@ library(EnvStats)
 library(here)
 library(broom)
 
-# Data used in MARSS models
+# Data used in MARSS models ----
 df <- readr::read_csv(here::here("data", "tbl_solutes_unmanaged_mon_v2.csv")) %>% 
         pivot_longer(cols = Ca:TDP, names_to = "solute", values_to = "FWMC") %>% 
         # have to remove NAs
@@ -19,7 +20,11 @@ df <- readr::read_csv(here::here("data", "tbl_solutes_unmanaged_mon_v2.csv")) %>
         mutate(FWMC = log(FWMC),
                FWMC = scale(FWMC, scale = FALSE))
 
-# Mann-Kendall & sens slope
+# MARSS Model coefs ----
+# run in 04_model_fitting_BiasTerms_1000bootstraps.R
+biasBS <- readRDS(file = file.path(here::here("analysis"), "mod_set_site_RW_b_BiasTerms_1000.rds"))
+
+# Normal MK & Sens ----
 # tested a few to make sure the code below was working
 # mk.test(df[df$catchment == "EB" & df$solute == "Ca",]$FWMC)
 
@@ -35,13 +40,11 @@ df_mk <- df %>%
           unnest(c(mk_pval, mk_n, mk_stat, s_slope, s_L95, s_U95)) %>% 
           select(-data)
 
-# Model coefs ----
-# run in 04_model_fitting_BiasTerms_1000bootstraps.R
-biasBS <- readRDS(file = file.path(here::here("analysis"), "mod_set_site_RW_b_BiasTerms_1000.rds"))
 
-# Bias plot ----
 
-## create table of bias estimates (+/- CI) ----
+## Bias plot ----
+
+### create table of bias estimates (+/- CI) ----
 
 SoluteList <- c("Ca", "DOC", "NO3N", "SO4", "NH4N", "TDP")
 
@@ -63,7 +66,7 @@ tbl_fit_bootstrap[, -c(1:2)] <- signif(tbl_fit_bootstrap[, -c(1:2)], 3)
 rownames(tbl_fit_bootstrap) <- NULL
 
 
-## cleans up df ----
+### cleans up df ----
 tbl_fit_bias_bs <- tbl_fit_bootstrap %>% 
   # remove seasonality coefs
   filter(!grepl("seas", site)) %>% 
@@ -127,7 +130,7 @@ ggplot(MARSSmkTab %>%
   facet_wrap(vars(solute), scales = "free_y")
         # geom_pointrange(aes(ymin = Bias_L95, ymax = Bias_U95)) 
 
-## FIG 7 ----
+### FIG 7 ----
 MARSSmkTab %>%
   ungroup() %>% 
   mutate(watershed = as.factor(watershed),
@@ -187,7 +190,7 @@ MARSSmkTab %>%
         strip.text = element_text(size = 34)) +
   ggsave(path = "plots", file = "MARSS_SensSlopeComp.pdf", width = 16, height = 10, units = "in")
 
-## export table ----
+### export table ----
 MARSSmkTab_2 <- MARSSmkTab %>% 
   pivot_wider(id_cols = c("solute", "watershed"), names_from = analysis, values_from = Bias:Sig) %>% 
   select(solute, watershed, Bias_MARSS, Bias_L95_MARSS, Bias_U95_MARSS, Sig_MARSS,
@@ -197,7 +200,7 @@ MARSSmkTab_2 <- MARSSmkTab %>%
 write.csv(MARSSmkTab_2, "Tables/08_MARSS_SensSlops_BiasTable.csv", row.names = FALSE)
 
 
-## TKH recreate bias & Sen plot
+### TKH bias & Sen plot ----
 MARSSmkTab_2 <- read.csv("Tables/08_MARSS_SensSlops_BiasTable.csv")
 
 Sens <- MARSSmkTab_2 %>% select(solute, watershed, ends_with("Sens"))
@@ -268,14 +271,8 @@ biasSen.pl <- marMK %>% filter(!is.na(Sig)) %>%
 
 ggsave(biasSen.pl, path = here("plots"), file = "Fig7_MARSS_Sen.pdf", width = 12, height = 14, units = "in")
 
-# save.image("analysis/08_MKandSensSlope_Rdat")
-# load("analysis/08_MKandSensSlope_Rdat")
-
-#########################
-### Seasonal MK & Sen ###
-#########################
-
-### Import data used in MARSS models
+# Seasonal MK & Sen ----
+## Import data used in MARSS models 
 df.seas <- readr::read_csv(here::here("data", "tbl_solutes_unmanaged_mon_v2.csv")) 
   
 ## Make regular time series for compatibility with Mann-Kendall function
@@ -291,7 +288,8 @@ df.seas <- df.seas %>% mutate(date = as.Date(round_date(date_decimal(dec_water_y
                        group_by(solute, catchment) %>%
                        mutate(FWMC = c(scale(log(FWMC), scale = FALSE)))
                   
-### Test seasonal MK for single site
+## Test ----
+# seasonal MK for single site
 # Independent.obs = FALSE requires contiguous data 
 kseas <- df.seas %>% filter(catchment == "EIF" & solute == "NO3") %>%
                      filter(!(month %in% c(3,4,5))) %>% 
@@ -309,7 +307,7 @@ kseas$interval["limits"][[1]]
 kseas$interval$limits[[1]]
 kseas$estimate["slope"] # sen's slope
 
-### Seasonal MK all catchments and solutes                                       
+## Seasonal MK all ----                                       
 
 ## Remove sites*solutes lacking data
 df.seas <- df.seas %>% filter(!(solute == "TDP" & site %in% c("BBWM", "HJA", "MEF", "SLP"))) %>%
@@ -327,6 +325,7 @@ df.seas <- df.seas %>% filter(!(solute == "TDP" & site %in% c("BBWM", "HJA", "ME
                       filter(!(catchment == "S5" & solute %in% c("Ca", "DOC", "NH4", "NO3", "SO4", "TDP") & month %in% c(5,6))) 
   
 ## Shouldn't need to rerun models for each stat. h.test object doesn't play with tidy.
+# by default this uses the continuity correction: correct = TRUE
 df_seasmk <- df.seas %>% 
   group_by(catchment, solute) %>% 
   nest() %>% 
@@ -442,7 +441,7 @@ Fig7df <- MARSSseasmkTab %>%
                                  "C32",    "C35",    "C38",
                                  # HJA
                                  "GSWS08", "GSWS09")) %>% 
-                            mutate(Sig = case_when(Sig == "Sig" ~ "Yes", Sig == "NS" ~ "No"),
+                            mutate(Sig = case_when(Sig == "Sig" ~ "S", Sig == "NS" ~ "NS"),
                                    analysis = case_when(analysis == "MARSS" ~ "MARSS",
                                    analysis == "MKandSens" ~ "Sens slope"),
                                    solute2 = fct_recode(solute, "Calcium" = "Ca", "DOC" = "DOC",
@@ -486,16 +485,47 @@ Fig7df <- MARSSseasmkTab %>%
   Fig7df2 <- Fig7df %>% 
     mutate(analysis = ifelse(analysis == "Sens slope", "SS", analysis)) %>% 
     pivot_wider(id_cols = c(solute,watershed, solute2), names_from = analysis, values_from = Bias:Sig) %>% 
-    mutate(Sig_SSMarss = paste0(Sig_SS, "_", Sig_MARSS)) %>% 
+    mutate(Sig_SSMarss = paste0("KS-",Sig_SS, " & ","MARSS-", Sig_MARSS),
+           Sig_SSMarss = as.factor(Sig_SSMarss),
+           Sig_SSMarss = fct_recode(Sig_SSMarss, "Both-NS" =  "KS-NS & MARSS-NS", "Both-S" = "KS-S & MARSS-S")) %>% 
     filter(!is.na(Sig_SS)) %>% 
-    droplevels()
+    # censure error bars b/w -15 and 10
+    mutate(Bias_L95_SS = ifelse(Bias_L95_SS < -15, -15, Bias_L95_SS),
+           Bias_L95_MARSS = ifelse(Bias_L95_MARSS < -15, -15, Bias_L95_MARSS),
+           Bias_U95_SS = ifelse(Bias_U95_SS > 10, 10, Bias_U95_SS),
+           Bias_U95_MARSS = ifelse(Bias_U95_MARSS > 10, 10, Bias_U95_MARSS)) %>% 
+    droplevels() 
+    
+  Fig7ScatterColors <- c("white","pink", "red", "blue")
   
+  png(file.path(here::here("plots"), "08_SeasKendalBiasVMarssBiasPlot.png"), 
+      units = "in", height = 10, width = 10, res = 300)
   ggplot(Fig7df2, aes(y = Bias_SS, x = Bias_MARSS, fill = Sig_SSMarss)) +
-    # geom_errorbar(data = Fig7df2, aes(y = Bias_SS, x = Bias_MARSS, ymin = Bias_L95_SS, ymax = Bias_U95_SS), color = "grey") +
-    # geom_errorbarh(data = Fig7df2, aes(y = Bias_SS, x = Bias_MARSS, xmin = Bias_L95_MARSS, xmax = Bias_U95_MARSS), color = "grey") +
+    geom_errorbar(data = Fig7df2, aes(y = Bias_SS, x = Bias_MARSS, ymin = Bias_L95_SS, ymax = Bias_U95_SS), color = "grey") +
+    geom_errorbarh(data = Fig7df2, aes(y = Bias_SS, xmin = Bias_L95_MARSS, xmax = Bias_U95_MARSS), color = "grey") +
     geom_point(shape = 21, size = 3) +
     geom_abline(intercept = 0, slope = 1) +
-    facet_wrap(~ solute2, scales = "free", nrow = 3) 
+    facet_wrap(~ solute2, nrow = 3)  + #, scales = "free"
+    xlab("MARSS bias") +
+    ylab("Kendall seasonal trend bias") +
+    xlim(-15,10) +
+    ylim(-15,10) +
+    scale_fill_manual(values = Fig7ScatterColors) +
+    theme_bw() +
+    theme(legend.position = "right",
+          legend.background = element_rect(fill = NA, color = NA),
+          legend.text = element_text(size = 18),
+          legend.title = element_text(size = 22, face = "bold"),
+          panel.grid = element_blank(),
+          panel.border = element_rect(color = "black", linewidth = 2),
+          plot.margin = unit(c(t = 0.5, r = 0.5, b = 0.5, l = 0.5), "cm"),
+          axis.text.y = element_text(size = 24),
+          axis.title.y = element_text(size = 30),
+          axis.text.x = element_text(size = 24, vjust = 0.5, hjust = 1, angle = 90),
+          axis.title.x = element_text(size = 30),
+          strip.background = element_blank(),
+          strip.text = element_text(size = 30))
+dev.off()
 
 ## export table ----
 MARSSseasmkTab_2 <- MARSSseasmkTab %>% 
@@ -505,3 +535,7 @@ MARSSseasmkTab_2 <- MARSSseasmkTab %>%
   arrange(solute, watershed)
 
 write.csv(MARSSseasmkTab_2, "Tables/08_MARSS_seasSensSlops_BiasTable.csv", row.names = FALSE)
+
+# save/load ----
+# save.image("analysis/08_MKandSensSlope_Rdat")
+# load("analysis/08_MKandSensSlope_Rdat")
