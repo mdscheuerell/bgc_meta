@@ -390,9 +390,18 @@ df_seasmk_c <- df_seasmk %>% mutate(Sig = ifelse(mk_pval < 0.05, "Sig", "NS"),
                               # this removes 28 site x solute combos
                               filter(mk_het_pval > 0.05) %>% 
                              select(solute, watershed = catchment, Bias = s_slope, Bias_L95 = s_L95, Bias_U95 = s_U95, pval = mk_pval, Sig) %>% 
-                             mutate(analysis = "MKandSens",
+                             mutate(analysis = "SeasMKandSens",
                                     solute = ifelse(solute == "NH4","NH4N",
                                     ifelse(solute == "NO3", "NO3N", solute))) 
+
+df_seasmk_c_WsigTaus <- df_seasmk %>% mutate(Sig = ifelse(mk_pval < 0.05, "Sig", "NS"),
+                                    s_slope = sen_sl*100,
+                                    s_L95 = sen_L95*100,
+                                    s_U95 = sen_U95*100) %>% 
+                              select(solute, watershed = catchment, Bias = s_slope, Bias_L95 = s_L95, Bias_U95 = s_U95, pval = mk_pval, Sig) %>% 
+                              mutate(analysis = "SeasMKandSens",
+                                     solute = ifelse(solute == "NH4","NH4N",
+                                                     ifelse(solute == "NO3", "NO3N", solute))) 
 
 tbl_fit_bias_bs_c <- tbl_fit_bias_bs %>% 
   mutate(pval = as.numeric("NA"),
@@ -402,7 +411,9 @@ tbl_fit_bias_bs_c <- tbl_fit_bias_bs %>%
 
 
 MARSSseasmkTab <- rbind(df_seasmk_c, tbl_fit_bias_bs_c)
+MARSSseasmkTab_WsigTaus <- rbind(df_seasmk_c_WsigTaus, tbl_fit_bias_bs_c)
 
+# junk plots, eventually delete
 ggplot(MARSSseasmkTab, aes(y = Bias, x = analysis, color = Sig)) +
   geom_pointrange(aes(ymin = Bias_L95, ymax = Bias_U95)) +
   facet_grid(solute ~ watershed, scales = "free_y") +
@@ -443,7 +454,7 @@ Fig7df <- MARSSseasmkTab %>%
                                  "GSWS08", "GSWS09")) %>% 
                             mutate(Sig = case_when(Sig == "Sig" ~ "S", Sig == "NS" ~ "NS"),
                                    analysis = case_when(analysis == "MARSS" ~ "MARSS",
-                                   analysis == "MKandSens" ~ "Sens slope"),
+                                   analysis == "SeasMKandSens" ~ "Sens slope"),
                                    solute2 = fct_recode(solute, "Calcium" = "Ca", "DOC" = "DOC",
                               "Ammonium" = "NH4N", "Nitrate" = "NO3N", "TDP" = "TDP",
                               "Sulfate" = "SO4")) 
@@ -528,10 +539,10 @@ Fig7df <- MARSSseasmkTab %>%
 dev.off()
 
 ## export table ----
-MARSSseasmkTab_2 <- MARSSseasmkTab %>% 
+MARSSseasmkTab_2 <- MARSSseasmkTab_WsigTaus %>% 
   pivot_wider(id_cols = c("solute", "watershed"), names_from = analysis, values_from = Bias:Sig) %>% 
   select(solute, watershed, Bias_MARSS, Bias_L95_MARSS, Bias_U95_MARSS, Sig_MARSS,
-         Bias_MKandSens, Bias_L95_MKandSens, Bias_U95_MKandSens, pval_MKandSens, Sig_MKandSens) %>% 
+         Bias_SeasMKandSens, Bias_L95_SeasMKandSens, Bias_U95_SeasMKandSens, Sig_SeasMKandSens, Taupval_MKandSens = pval_SeasMKandSens) %>% 
   arrange(solute, watershed)
 
 write.csv(MARSSseasmkTab_2, "Tables/08_MARSS_seasSensSlops_BiasTable.csv", row.names = FALSE)
