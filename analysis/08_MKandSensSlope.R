@@ -296,13 +296,18 @@ kseas <- df.seas %>% filter(catchment == "EIF" & solute == "NO3") %>%
                      kendallSeasonalTrendTest(FWMC ~ month + year, 
                                                data = .,
                                                alternative = "two.sided",
+                                               correct = TRUE, #continuity correction is on
                                                ci.slope = TRUE,
                                                conf.level = 0.95, 
+                                              # implements model for serial dependence (i.e., autocorrelation)
+                                              # For missing values, data is assigned mid-rank of non-missing values (see pg. 683)
                                                independent.obs = FALSE)
 
+kseas$p.value[1] # p-value for heterogenity of trend
 kseas$p.value[2] # p-value for trend
 kseas$parameter # df
 kseas$statistic # test statistics for heterogeneity and trend
+#CIs
 kseas$interval["limits"][[1]]
 kseas$interval$limits[[1]]
 kseas$estimate["slope"] # sen's slope
@@ -332,48 +337,56 @@ df_seasmk <- df.seas %>%
   mutate(mk_hetstat = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
                                                            data = .,
                                                            alternative = "two.sided",
+                                                           correct = TRUE, #continuity correction is on
                                                            ci.slope = TRUE,
                                                            conf.level = 0.95, 
                                                            independent.obs = FALSE)$statistic[1])) %>%
   mutate(mk_trendzstat = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
                                                            data = .,
                                                            alternative = "two.sided",
+                                                           correct = TRUE, #continuity correction is on
                                                            ci.slope = TRUE,
                                                            conf.level = 0.95, 
                                                            independent.obs = FALSE)$statistic[2])) %>%
   mutate(mk_het_pval = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
                                                               data = .,
                                                               alternative = "two.sided",
+                                                            correct = TRUE, #continuity correction is on
                                                               ci.slope = TRUE,
                                                               conf.level = 0.95, 
                                                             independent.obs = FALSE)$p.value[1])) %>%
   mutate(mk_pval = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
                                                             data = .,
                                                             alternative = "two.sided",
+                                                        correct = TRUE, #continuity correction is on
                                                             ci.slope = TRUE,
                                                             conf.level = 0.95, 
                                                         independent.obs = FALSE)$p.value[2])) %>%
   mutate(mk_df = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
                                                         data = .,
                                                         alternative = "two.sided",
+                                                      correct = TRUE, #continuity correction is on
                                                         ci.slope = TRUE,
                                                         conf.level = 0.95, 
                                                       independent.obs = FALSE)$parameter)) %>%
   mutate(sen_sl = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
                                                       data = .,
                                                       alternative = "two.sided",
+                                                      correct = TRUE, #continuity correction is on
                                                       ci.slope = TRUE,
                                                       conf.level = 0.95, 
                                                       independent.obs = FALSE)$estimate[["slope"]])) %>%
   mutate(sen_L95 = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
                                                       data = .,
                                                       alternative = "two.sided",
+                                                      correct = TRUE, #continuity correction is on
                                                       ci.slope = TRUE,
                                                       conf.level = 0.95, 
                                                       independent.obs = FALSE)$interval$limits[[1]])) %>%
   mutate(sen_U95 = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
                                                         data = .,
                                                         alternative = "two.sided",
+                                                        correct = TRUE, #continuity correction is on
                                                         ci.slope = TRUE,
                                                         conf.level = 0.95, 
                                                         independent.obs = FALSE)$interval$limits[[2]])) %>%
@@ -383,6 +396,7 @@ df_seasmk <- df.seas %>%
 
 # combine
 df_seasmk_c <- df_seasmk %>% mutate(Sig = ifelse(mk_pval < 0.05, "Sig", "NS"),
+                                    SeasDifSlopeSig = ifelse(mk_het_pval < 0.05, "Y", "N"),
                                     s_slope = sen_sl*100,
                                     s_L95 = sen_L95*100,
                                     s_U95 = sen_U95*100) %>% 
@@ -394,11 +408,13 @@ df_seasmk_c <- df_seasmk %>% mutate(Sig = ifelse(mk_pval < 0.05, "Sig", "NS"),
                                     solute = ifelse(solute == "NH4","NH4N",
                                     ifelse(solute == "NO3", "NO3N", solute))) 
 
-df_seasmk_c_WsigTaus <- df_seasmk %>% mutate(Sig = ifelse(mk_pval < 0.05, "Sig", "NS"),
+df_seasmk_c_WsigHet <- df_seasmk %>% mutate(Sig = ifelse(mk_pval < 0.05, "Sig", "NS"),
+                                             SeasDifSlopeSig = ifelse(mk_het_pval < 0.05, "Y", "N"),
                                     s_slope = sen_sl*100,
                                     s_L95 = sen_L95*100,
                                     s_U95 = sen_U95*100) %>% 
-                              select(solute, watershed = catchment, Bias = s_slope, Bias_L95 = s_L95, Bias_U95 = s_U95, pval = mk_pval, Sig) %>% 
+                              select(solute, watershed = catchment, Bias = s_slope, Bias_L95 = s_L95, Bias_U95 = s_U95, 
+                                     pval = mk_pval, Sig, mk_het_pval, SeasDifSlopeSig) %>% 
                               mutate(analysis = "SeasMKandSens",
                                      solute = ifelse(solute == "NH4","NH4N",
                                                      ifelse(solute == "NO3", "NO3N", solute))) 
@@ -411,14 +427,7 @@ tbl_fit_bias_bs_c <- tbl_fit_bias_bs %>%
 
 
 MARSSseasmkTab <- rbind(df_seasmk_c, tbl_fit_bias_bs_c)
-MARSSseasmkTab_WsigTaus <- rbind(df_seasmk_c_WsigTaus, tbl_fit_bias_bs_c)
-
-# junk plots, eventually delete
-ggplot(MARSSseasmkTab, aes(y = Bias, x = analysis, color = Sig)) +
-  geom_pointrange(aes(ymin = Bias_L95, ymax = Bias_U95)) +
-  facet_grid(solute ~ watershed, scales = "free_y") +
-  theme(axis.text.x = element_text(angle = 90))
-
+MARSSseasmkTab_WsigTaus <- rbind(df_seasmk_c_WsigHet, tbl_fit_bias_bs_c)
 
 ggplot(MARSSseasmkTab %>% 
          ungroup() %>% 
@@ -540,9 +549,11 @@ dev.off()
 
 ## export table ----
 MARSSseasmkTab_2 <- MARSSseasmkTab_WsigTaus %>% 
-  pivot_wider(id_cols = c("solute", "watershed"), names_from = analysis, values_from = Bias:Sig) %>% 
+  pivot_wider(id_cols = c("solute", "watershed"), names_from = analysis, values_from = Bias:SeasDifSlopeSig) %>% 
   select(solute, watershed, Bias_MARSS, Bias_L95_MARSS, Bias_U95_MARSS, Sig_MARSS,
-         Bias_SeasMKandSens, Bias_L95_SeasMKandSens, Bias_U95_SeasMKandSens, Sig_SeasMKandSens, Taupval_MKandSens = pval_SeasMKandSens) %>% 
+         Bias_SeasMKandSens, Bias_L95_SeasMKandSens, Bias_U95_SeasMKandSens, Sig_SeasMKandSens, 
+         Taupval_MKandSens = pval_SeasMKandSens,
+         mk_het_pval_SeasMKandSens) %>% 
   arrange(solute, watershed)
 
 write.csv(MARSSseasmkTab_2, "Tables/08_MARSS_seasSensSlops_BiasTable.csv", row.names = FALSE)
