@@ -131,7 +131,7 @@ ggplot(MARSSmkTab %>%
         # geom_pointrange(aes(ymin = Bias_L95, ymax = Bias_U95)) 
 
 ### FIG 7 ----
-MARSSmkTab %>%
+Sen_MARSS_bias.pl <- MARSSmkTab %>%
   ungroup() %>% 
   mutate(watershed = as.factor(watershed),
          watershed = fct_reorder(watershed, Bias)) %>% 
@@ -158,7 +158,7 @@ MARSSmkTab %>%
                               analysis == "MKandSens" ~ "Sens slope"),
          solute2 = fct_recode(solute, "Calcium" = "Ca", "DOC" = "DOC",
                               "Ammonium" = "NH4N", "Nitrate" = "NO3N", "TDP" = "TDP",
-                              "Sulfate" = "SO4")) %>% 
+                              "Sulfate" = "SO4")) %>%
   # fig
   ggplot() +
   geom_hline(yintercept = 0, color = "grey") +
@@ -187,8 +187,9 @@ MARSSmkTab %>%
         axis.text.x = element_text(size = 20, vjust = 0.5, hjust = 1, angle = 90),
         axis.title.x = element_blank(),
         strip.background = element_blank(),
-        strip.text = element_text(size = 34)) +
-  ggsave(path = "plots", file = "MARSS_SensSlopeComp.pdf", width = 16, height = 10, units = "in")
+        strip.text = element_text(size = 34))
+  
+ggsave(Sen_MARSS_bias.pl, path = "plots", file = "MARSS_SensSlopeComp.pdf", width = 16, height = 10, units = "in")
 
 ### export table ----
 MARSSmkTab_2 <- MARSSmkTab %>% 
@@ -269,7 +270,7 @@ biasSen.pl <- marMK %>% filter(!is.na(Sig)) %>%
                                   strip.background = element_blank(),
                                   strip.text = element_text(size = 24))
 
-ggsave(biasSen.pl, path = here("plots"), file = "Fig7_MARSS_Sen.pdf", width = 12, height = 14, units = "in")
+ggsave(biasSen.pl, path = "plots", file = "MARSS_Sen.pdf", width = 12, height = 14, units = "in")
 
 # Seasonal MK & Sen ----
 ## Import data used in MARSS models 
@@ -284,8 +285,8 @@ df.seas <- df.seas %>% mutate(date = as.Date(round_date(date_decimal(dec_water_y
                        mutate(month = as.numeric(format(date, "%m"))) %>%
                        pivot_longer(cols = Ca:TDP, names_to = "solute", values_to = "FWMC") %>% 
                        ungroup() %>%
-                       # log and center on mean...check whether MARSS demeaned by catchment or across all data
-                       group_by(solute, catchment) %>%
+                       # log and center on mean by solute
+                       group_by(solute) %>%
                        mutate(FWMC = c(scale(log(FWMC), scale = FALSE)))
                   
 ## Test ----
@@ -315,23 +316,23 @@ kseas$estimate["slope"] # sen's slope
 ## Seasonal MK all ----                                       
 
 ## Remove sites*solutes lacking data
-df.seas <- df.seas %>% filter(!(solute == "TDP" & site %in% c("BBWM", "HJA", "MEF", "SLP"))) %>%
-                       filter(!(solute == "NH4" & site %in% c("BBWM", "HJA", "MEF", "SLP"))) %>%
-                       filter(!(solute == "NO3" & site %in% c("MEF"))) %>%
-                       filter(!(solute == "NH4" & catchment %in% c("C32", "C35", "WS6"))) %>%
-                       filter(!(solute == "NO3" & catchment %in% c("WS6"))) %>%
-                       filter(!(solute == "TDP" & catchment %in% c("WS6", "WS7", "WS8", "WS9"))) %>% 
-                       # Sites/solutes lacks data (n <= 3) in dropped months
-                       filter(!(catchment == "EIF" & solute %in% c("Ca", "DOC", "NH4", "SO4", "TDP") & month %in% c(4,5))) %>% 
-                      filter(!(catchment == "EIF" & solute %in% c("NO3") & month %in% c(3,4,5))) %>% 
-                      filter(!(catchment == "NEIF" & solute %in% c("Ca", "DOC", "NH4", "NO3", "SO4", "TDP") & month %in% c(3,4,5)))  %>% 
-                      filter(!(catchment == "NWIF" & solute %in% c("Ca", "DOC", "NH4", "NO3", "SO4", "TDP") & month %in% c(3,4,5))) %>% 
-                      filter(!(catchment == "S2" & solute %in% c("Ca", "DOC", "NH4", "NO3", "SO4", "TDP") & month %in% c(4,5))) %>% 
-                      filter(!(catchment == "S5" & solute %in% c("Ca", "DOC", "NH4", "NO3", "SO4", "TDP") & month %in% c(5,6))) 
+df.seas.rm <- df.seas %>% filter(!(solute == "TDP" & site %in% c("BBWM", "HJA", "MEF", "SLP"))) %>%
+                          filter(!(solute == "NH4" & site %in% c("BBWM", "HJA", "MEF", "SLP"))) %>%
+                          filter(!(solute == "NO3" & site %in% c("MEF"))) %>%
+                          filter(!(solute == "NH4" & catchment %in% c("C32", "C35", "WS6"))) %>%
+                          filter(!(solute == "NO3" & catchment %in% c("WS6"))) %>%
+                          filter(!(solute == "TDP" & catchment %in% c("WS6", "WS7", "WS8", "WS9"))) %>% 
+                          # Sites/solutes lacks data (n <= 3) in dropped months
+                          filter(!(catchment == "EIF" & solute %in% c("Ca", "DOC", "NH4", "SO4", "TDP") & month %in% c(4,5))) %>% 
+                          filter(!(catchment == "EIF" & solute %in% c("NO3") & month %in% c(3,4,5))) %>% 
+                          filter(!(catchment == "NEIF" & solute %in% c("Ca", "DOC", "NH4", "NO3", "SO4", "TDP") & month %in% c(3,4,5)))  %>% 
+                          filter(!(catchment == "NWIF" & solute %in% c("Ca", "DOC", "NH4", "NO3", "SO4", "TDP") & month %in% c(3,4,5))) %>% 
+                          filter(!(catchment == "S2" & solute %in% c("Ca", "DOC", "NH4", "NO3", "SO4", "TDP") & month %in% c(4,5))) %>% 
+                          filter(!(catchment == "S5" & solute %in% c("Ca", "DOC", "NH4", "NO3", "SO4", "TDP") & month %in% c(5,6))) 
   
 ## Shouldn't need to rerun models for each stat. h.test object doesn't play with tidy.
 # by default this uses the continuity correction: correct = TRUE
-df_seasmk <- df.seas %>% 
+df_seasmk <- df.seas.rm %>% 
   group_by(catchment, solute) %>% 
   nest() %>% 
   mutate(mk_hetstat = map(data, ~ kendallSeasonalTrendTest(.x$FWMC ~ month + year, 
@@ -498,38 +499,37 @@ Fig7df <- MARSSseasmkTab %>%
         strip.background = element_blank(),
         strip.text = element_text(size = 30))
   
-  ggsave(path = "plots", file = "Fig7_MARSS_seasSensSlopeComp.png", width = 16, height = 18, units = "in")
+  ggsave(path = "plots", file = "Fig7OLD_MARSS_seasSensSlopeComp.png", width = 16, height = 18, units = "in")
   
   
   # Jims attempt at fig 7
   Fig7df2 <- Fig7df %>% 
     mutate(analysis = ifelse(analysis == "Sens slope", "SS", analysis)) %>% 
     pivot_wider(id_cols = c(solute,watershed, solute2), names_from = analysis, values_from = Bias:Sig) %>% 
-    mutate(Sig_SSMarss = paste0("KS-",Sig_SS, " & ","MARSS-", Sig_MARSS),
-           Sig_SSMarss = as.factor(Sig_SSMarss),
-           Sig_SSMarss = fct_recode(Sig_SSMarss, "Both-NS" =  "KS-NS & MARSS-NS", "Both-S" = "KS-S & MARSS-S")) %>% 
+    mutate(significance = ifelse(Sig_SS == "S" & Sig_MARSS == "NS", "Kendall",
+                              ifelse(Sig_SS == "NS" & Sig_MARSS == "S", "MARSS",
+                                  ifelse(Sig_SS == "S" & Sig_MARSS == "S", "both", "none")))) %>%
     filter(!is.na(Sig_SS)) %>% 
-    # censure error bars b/w -15 and 10
+    # censure error bars b/w -15 and 15
     mutate(Bias_L95_SS = ifelse(Bias_L95_SS < -15, -15, Bias_L95_SS),
            Bias_L95_MARSS = ifelse(Bias_L95_MARSS < -15, -15, Bias_L95_MARSS),
-           Bias_U95_SS = ifelse(Bias_U95_SS > 10, 10, Bias_U95_SS),
-           Bias_U95_MARSS = ifelse(Bias_U95_MARSS > 10, 10, Bias_U95_MARSS)) %>% 
+           Bias_U95_SS = ifelse(Bias_U95_SS > 15, 15, Bias_U95_SS),
+           Bias_U95_MARSS = ifelse(Bias_U95_MARSS > 15, 15, Bias_U95_MARSS)) %>% 
     droplevels() 
     
-  Fig7ScatterColors <- c("white","pink", "red", "blue")
+  Fig7ScatterColors <- c("red", "pink", "blue", "white")
   
-  png(file.path(here::here("plots"), "08_SeasKendalBiasVMarssBiasPlot.png"), 
-      units = "in", height = 10, width = 10, res = 300)
-  ggplot(Fig7df2, aes(y = Bias_SS, x = Bias_MARSS, fill = Sig_SSMarss)) +
+Fig7 <- 
+  ggplot(Fig7df2, aes(y = Bias_SS, x = Bias_MARSS, fill = significance)) +
     geom_errorbar(data = Fig7df2, aes(y = Bias_SS, x = Bias_MARSS, ymin = Bias_L95_SS, ymax = Bias_U95_SS), color = "grey") +
     geom_errorbarh(data = Fig7df2, aes(y = Bias_SS, xmin = Bias_L95_MARSS, xmax = Bias_U95_MARSS), color = "grey") +
     geom_point(shape = 21, size = 3) +
     geom_abline(intercept = 0, slope = 1) +
-    facet_wrap(~ solute2, nrow = 3)  + #, scales = "free"
-    xlab("MARSS bias") +
-    ylab("Kendall seasonal trend bias") +
-    xlim(-15,10) +
-    ylim(-15,10) +
+    facet_wrap(~ solute2, nrow = 3, scales = "free") +
+    xlab(expression(paste("MARSS bias (%"~y^{"-1"}*")"))) +
+    ylab(expression(paste("Kendal seasonal trend (%"~y^{"-1"}*")"))) +
+    #xlim(-15,10) +
+    #ylim(-15,10) +
     scale_fill_manual(values = Fig7ScatterColors) +
     theme_bw() +
     theme(legend.position = "right",
@@ -545,7 +545,8 @@ Fig7df <- MARSSseasmkTab %>%
           axis.title.x = element_text(size = 30),
           strip.background = element_blank(),
           strip.text = element_text(size = 30))
-dev.off()
+
+ggsave(Fig7, path = "plots", file = "Fig7_SeasKendalBiasVMarssBiasPlot.pdf", units = "in", height = 12, width = 10)
 
 ## export table ----
 MARSSseasmkTab_2 <- MARSSseasmkTab_WsigTaus %>% 
@@ -556,7 +557,7 @@ MARSSseasmkTab_2 <- MARSSseasmkTab_WsigTaus %>%
          mk_het_pval_SeasMKandSens) %>% 
   arrange(solute, watershed)
 
-write.csv(MARSSseasmkTab_2, "Tables/08_MARSS_seasSensSlops_BiasTable.csv", row.names = FALSE)
+write.csv(MARSSseasmkTab_2, "Tables/07_MARSS_seasSensSlops_BiasTable.csv", row.names = FALSE)
 
 # save/load ----
 # save.image("analysis/08_MKandSensSlope_Rdat")
