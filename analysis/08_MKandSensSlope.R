@@ -330,6 +330,17 @@ df.seas.rm <- df.seas %>% filter(!(solute == "TDP" & site %in% c("BBWM", "HJA", 
                           filter(!(catchment == "S2" & solute %in% c("Ca", "DOC", "NH4", "NO3", "SO4", "TDP") & month %in% c(4,5))) %>% 
                           filter(!(catchment == "S5" & solute %in% c("Ca", "DOC", "NH4", "NO3", "SO4", "TDP") & month %in% c(5,6))) 
   
+## Summarize number of time series dropped from seasonal Kenddall due to missing data
+n_ts <- df.seas %>% group_by(catchment, solute) %>%
+                    summarize(n_comb = n_distinct(unlist(across(where(is.character))))) %>%
+                    ungroup() %>%
+                    nrow()
+
+n_ts.rm <- df.seas.rm %>% group_by(catchment, solute) %>%
+                          summarize(n_comb = n_distinct(unlist(across(where(is.character))))) %>%
+                          ungroup() %>%
+                          nrow()
+
 ## Shouldn't need to rerun models for each stat. h.test object doesn't play with tidy.
 # by default this uses the continuity correction: correct = TRUE
 df_seasmk <- df.seas.rm %>% 
@@ -527,7 +538,7 @@ Fig7 <-
     geom_abline(intercept = 0, slope = 1) +
     facet_wrap(~ solute2, nrow = 3, scales = "free") +
     xlab(expression(paste("MARSS bias (%"~y^{"-1"}*")"))) +
-    ylab(expression(paste("Kendal seasonal trend (%"~y^{"-1"}*")"))) +
+    ylab(expression(paste("Kendall seasonal trend (%"~y^{"-1"}*")"))) +
     #xlim(-15,10) +
     #ylim(-15,10) +
     scale_fill_manual(values = Fig7ScatterColors) +
@@ -546,7 +557,8 @@ Fig7 <-
           strip.background = element_blank(),
           strip.text = element_text(size = 30))
 
-ggsave(Fig7, path = "plots", file = "Fig7_SeasKendalBiasVMarssBiasPlot.pdf", units = "in", height = 12, width = 10)
+ggsave(Fig7, path = "plots", file = "Fig7_SeasKendalBiasVMarssBiasPlot.pdf", units = "in", height = 13, width = 10)
+ggsave(Fig7, path = "plots", file = "Fig7_SeasKendalBiasVMarssBiasPlot.png", units = "in", height = 13, width = 10)
 
 ## export table ----
 MARSSseasmkTab_2 <- MARSSseasmkTab_WsigTaus %>% 
@@ -558,6 +570,32 @@ MARSSseasmkTab_2 <- MARSSseasmkTab_WsigTaus %>%
   arrange(solute, watershed)
 
 write.csv(MARSSseasmkTab_2, "Tables/07_MARSS_seasSensSlops_BiasTable.csv", row.names = FALSE)
+
+## Compare Kendall & MK significance tests
+# heterogeneous Kendall trends by month
+n_het <- MARSSseasmkTab_2 %>% filter(mk_het_pval_SeasMKandSens <= 0.05) %>% nrow()
+n_tot <- MARSSseasmkTab_2 %>% filter(!is.na(mk_het_pval_SeasMKandSens)) %>% nrow()
+
+tot <- MARSSseasmkTab_2 %>% #filter(mk_het_pval_SeasMKandSens > 0.05) %>%
+                            filter(Bias_MARSS != 0) %>%
+                            nrow()
+
+MARSSsig <- MARSSseasmkTab_2 %>% filter(Bias_MARSS != 0) %>%
+                                 filter(Sig_MARSS == "Sig" & Sig_SeasMKandSens == "NS") 
+#%>%
+          #                       nrow()
+
+Kensig <- MARSSseasmkTab_2 %>% filter(mk_het_pval_SeasMKandSens > 0.05) %>%
+                               filter(Bias_MARSS != 0) %>%
+                               filter(Sig_MARSS == "NS" & Sig_SeasMKandSens == "Sig") 
+#%>%
+#                               nrow()
+
+bothsig <- MARSSseasmkTab_2 %>% filter(mk_het_pval_SeasMKandSens > 0.05) %>%
+                                filter(Bias_MARSS != 0) %>%
+                                filter(Sig_MARSS == "Sig" & Sig_SeasMKandSens == "Sig") %>%
+                                mutate(slcomp = Bias_MARSS/Bias_SeasMKandSens)
+
 
 # save/load ----
 # save.image("analysis/08_MKandSensSlope_Rdat")
